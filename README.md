@@ -1,6 +1,6 @@
 # AZ-104 2026
 
-Plataforma de estudo em React, Vite e Tailwind CSS 4, preparada para o GitHub Pages em `https://nunofbcastro.github.io/az104-2026/`.
+Plataforma de estudo em React, Vite e Tailwind CSS 4, publicada em `https://nunofbcastro.github.io/plataforma-az104-2026/` através da branch `gh-pages`.
 
 ## Executar localmente
 
@@ -11,7 +11,7 @@ npm install
 npm run dev
 ```
 
-Para criar a versão de produção: `npm run build`. O workflow em `.github/workflows/deploy-pages.yml` publica automaticamente a pasta `dist` quando há uma alteração na branch principal.
+Para criar a versão de produção: `npm run build`. Para publicar a versão compilada na branch `gh-pages`: `npm run deploy` (requer acesso de escrita ao repositório GitHub).
 
 ## Perguntas
 
