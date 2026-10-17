@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { DOMAINS } from '../lib/questions';
 import { Icon } from './StudyChrome';
 import { isCommandOnly } from '../lib/technical-content';
@@ -27,6 +28,36 @@ export function RichText({ text }) {
   });
 }
 
+const IMAGE_MARKER = /\[(?:Imagem|Image)\]/;
+
+function Figure({ src, label, onZoom }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <div className="q-asset is-broken" role="img" aria-label={label}><Icon name="alert" size={16}/>Não foi possível carregar a imagem.</div>;
+  return (
+    <button type="button" className="q-asset" onClick={() => onZoom(src)} aria-label={`Ampliar ${label}`}>
+      <img src={src} alt={label} decoding="async" onError={() => setFailed(true)}/>
+      <span><Icon name="zoom" size={14}/>Toca para ampliar</span>
+    </button>
+  );
+}
+
+// Places each image where the text has an "[Imagem]" marker; images without a marker go at the end.
+function TextWithImages({ text, images, label, onZoom }) {
+  const parts = String(text || '').split(IMAGE_MARKER);
+  const figure = i => <Figure key={`img-${images[i]}`} src={images[i]} label={`${label} ${i + 1}`} onZoom={onZoom}/>;
+  return (
+    <>
+      {parts.map((part, i) => (
+        <span key={`part-${i}`}>
+          <RichText text={part.replace(/^\n+|\n+$/g, '')}/>
+          {i < parts.length - 1 && images[i] && figure(i)}
+        </span>
+      ))}
+      {images.slice(Math.max(0, parts.length - 1)).map((_, k) => figure(parts.length - 1 + k))}
+    </>
+  );
+}
+
 export function QuestionCard({
   question, index, total, lang, selected, revealed, isCorrect, locked, isMulti, isSimRunning, isSimReviewing,
   isFavorite, isFlagged, explanationOpen, onSelect, onVerify, onRetry, onToggleExplanation, onPrev, onNext,
@@ -36,6 +67,8 @@ export function QuestionCard({
   const correctCount = question.opcao_correta.length;
   const statement = lang === 'en' && question.pergunta_en ? question.pergunta_en : question.pergunta;
   const progress = total ? ((index + 1) / total) * 100 : 0;
+  const questionImages = question.assets.filter(src => !/_explicacao_/.test(src));
+  const explanationImages = question.assets.filter(src => /_explicacao_/.test(src));
 
   return (
     <article className="panel question-card" aria-labelledby="question-title">
@@ -61,18 +94,7 @@ export function QuestionCard({
 
       <div className="q-meta-line"><span>{question.origem}</span><span>#{question.id}</span></div>
 
-      <div className="q-statement"><RichText text={statement}/></div>
-
-      {question.assets.length > 0 && (
-        <div className="q-assets">
-          {question.assets.map((src, i) => (
-            <button key={src} type="button" className="q-asset" onClick={() => onZoom(src)} aria-label={`Ampliar imagem ${i + 1}`}>
-              <img src={src} alt={`Diagrama ${i + 1} da questão`} loading="lazy"/>
-              <span><Icon name="zoom" size={14}/>Toca para ampliar</span>
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="q-statement"><TextWithImages text={statement} images={questionImages} label="Imagem da questão" onZoom={onZoom}/></div>
 
       {isMulti && !revealed && <p className="q-hint"><Icon name="check" size={15}/>Seleciona {correctCount} respostas{isSimRunning ? '' : ' e carrega em “Verificar resposta”'}.</p>}
 
@@ -122,7 +144,7 @@ export function QuestionCard({
       {explanationOpen && (
         <section className="explanation" aria-label="Explicação">
           <h3><span><Icon name="bulb" size={18}/></span>Explicação</h3>
-          <div><RichText text={question.explicacao || 'Ainda não existe uma explicação para esta questão.'}/></div>
+          <div><TextWithImages text={question.explicacao || 'Ainda não existe uma explicação para esta questão.'} images={explanationImages} label="Imagem da explicação" onZoom={onZoom}/></div>
         </section>
       )}
 

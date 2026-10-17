@@ -1,0 +1,384 @@
+[
+  {
+    "id": "AUT26-CL-01",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Implantar e gerenciar recursos de computação do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Azure CLI – Redimensionar VM",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual chamada VM1 no grupo de recursos RG1, na região West Europe. VM1 está em execução com o tamanho Standard_D2s_v5.\n\nPrecisa de redimensionar VM1 para Standard_E8s_v5. Esse tamanho está disponível na região West Europe.\n\nExecuta o seguinte comando:\n\n```bash\naz vm list-vm-resize-options --resource-group RG1 --name VM1 --query \"[].name\" --output tsv\n```\n\nO resultado não inclui Standard_E8s_v5.\n\nQue comando deve executar primeiro?",
+    "pergunta_en": "Your company has an Azure subscription that contains a virtual machine named VM1 in a resource group named RG1 in the West Europe region. VM1 is running with the Standard_D2s_v5 size.\n\nYou need to resize VM1 to Standard_E8s_v5. That size is available in the West Europe region.\n\nYou run the following command:\n\n```bash\naz vm list-vm-resize-options --resource-group RG1 --name VM1 --query \"[].name\" --output tsv\n```\n\nThe output does not include Standard_E8s_v5.\n\nWhich command should you run first?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`az vm stop --resource-group RG1 --name VM1`",
+        "texto_en": "`az vm stop --resource-group RG1 --name VM1`"
+      },
+      {
+        "letra": "B",
+        "texto": "`az vm deallocate --resource-group RG1 --name VM1`",
+        "texto_en": "`az vm deallocate --resource-group RG1 --name VM1`"
+      },
+      {
+        "letra": "C",
+        "texto": "`az vm redeploy --resource-group RG1 --name VM1`",
+        "texto_en": "`az vm redeploy --resource-group RG1 --name VM1`"
+      },
+      {
+        "letra": "D",
+        "texto": "`az vm list-sizes --location westeurope`",
+        "texto_en": "`az vm list-sizes --location westeurope`"
+      }
+    ],
+    "opcao_correta": [
+      "B"
+    ],
+    "explicacao": "`az vm list-vm-resize-options` devolve apenas os tamanhos suportados pelo cluster de hardware que aloja atualmente a VM. Quando o tamanho pretendido existe na região mas não aparece nessa lista, é necessário desalocar a VM com `az vm deallocate`. Depois de desalocada, a VM pode ser redimensionada com `az vm resize --size Standard_E8s_v5` para qualquer tamanho disponível na região e voltar a ser iniciada com `az vm start`.\n\nA está errada: `az vm stop` desliga o sistema operativo, mas os recursos de computação continuam alocados (e faturados) no mesmo cluster, pelo que os tamanhos disponíveis não mudam. C está errada: `az vm redeploy` move a VM para outro nó e volta a ligá-la, mas não garante que o novo nó suporte o tamanho pretendido e não é o procedimento documentado para redimensionar. D está errada: `az vm list-sizes` (preterido em favor de `az vm list-skus`) apenas lista os tamanhos da região; não altera o estado da VM.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/resize-vm"
+  },
+  {
+    "id": "AUT26-CL-02",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Implantar e gerenciar recursos de computação do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Azure PowerShell – Update-AzVM",
+    "pergunta": "Tem uma máquina virtual chamada VM2 no grupo de recursos RG1. O tamanho Standard_D4s_v5 aparece na lista devolvida por Get-AzVMSize para VM2.\n\nPrecisa de alterar o tamanho de VM2 para Standard_D4s_v5 através do Azure PowerShell. Escreve o seguinte script:\n\n```powershell\n$vm = Get-AzVM -ResourceGroupName RG1 -Name VM2\n$vm.HardwareProfile.VmSize = \"Standard_D4s_v5\"\n<BLANK> -VM $vm -ResourceGroupName RG1\n```\n\nQue cmdlet deve colocar em <BLANK>?",
+    "pergunta_en": "You have a virtual machine named VM2 in a resource group named RG1. The Standard_D4s_v5 size appears in the list returned by Get-AzVMSize for VM2.\n\nYou need to change the size of VM2 to Standard_D4s_v5 by using Azure PowerShell. You write the following script:\n\n```powershell\n$vm = Get-AzVM -ResourceGroupName RG1 -Name VM2\n$vm.HardwareProfile.VmSize = \"Standard_D4s_v5\"\n<BLANK> -VM $vm -ResourceGroupName RG1\n```\n\nWhich cmdlet should you use for <BLANK>?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`Set-AzVM`",
+        "texto_en": "`Set-AzVM`"
+      },
+      {
+        "letra": "B",
+        "texto": "`New-AzVM`",
+        "texto_en": "`New-AzVM`"
+      },
+      {
+        "letra": "C",
+        "texto": "`Restart-AzVM`",
+        "texto_en": "`Restart-AzVM`"
+      },
+      {
+        "letra": "D",
+        "texto": "`Update-AzVM`",
+        "texto_en": "`Update-AzVM`"
+      }
+    ],
+    "opcao_correta": [
+      "D"
+    ],
+    "explicacao": "O procedimento documentado para redimensionar com PowerShell é obter o objeto da VM com Get-AzVM, alterar a propriedade HardwareProfile.VmSize e aplicar a alteração com Update-AzVM, que atualiza a VM no Azure para o estado do objeto passado em -VM. Se a VM estiver em execução, é reiniciada durante a operação.\n\nA está errada: Set-AzVM é usado para operações como -Generalized, -Redeploy, -Reapply ou -SimulateEviction e não aceita o parâmetro -VM. B está errada: New-AzVM destina-se a criar VMs novas, não a aplicar alterações a uma VM existente. C está errada: Restart-AzVM apenas reinicia a VM; a alteração feita no objeto local $vm nunca é enviada para o Azure.\n\nDocumentação: https://learn.microsoft.com/en-us/powershell/module/az.compute/update-azvm"
+  },
+  {
+    "id": "AUT26-CL-03",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Implantar e gerenciar recursos de computação do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Azure CLI – Snapshots e discos geridos",
+    "pergunta": "Tem uma máquina virtual chamada VM1 no grupo de recursos RG1. O disco do sistema operativo de VM1 é um disco gerido chamado VM1_OsDisk.\n\nExecuta o seguinte comando:\n\n```bash\naz snapshot create --resource-group RG1 --name Snap1 --source VM1_OsDisk\n```\n\nPrecisa de criar, em RG1, um novo disco gerido chamado Disk2 que contenha os dados de Snap1.\n\nQue comando deve executar?",
+    "pergunta_en": "You have a virtual machine named VM1 in a resource group named RG1. The operating system disk of VM1 is a managed disk named VM1_OsDisk.\n\nYou run the following command:\n\n```bash\naz snapshot create --resource-group RG1 --name Snap1 --source VM1_OsDisk\n```\n\nYou need to create a new managed disk named Disk2 in RG1 that contains the data from Snap1.\n\nWhich command should you run?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`az disk create --resource-group RG1 --name Disk2 --source Snap1`",
+        "texto_en": "`az disk create --resource-group RG1 --name Disk2 --source Snap1`"
+      },
+      {
+        "letra": "B",
+        "texto": "`az snapshot grant-access --resource-group RG1 --name Snap1 --duration-in-seconds 3600`",
+        "texto_en": "`az snapshot grant-access --resource-group RG1 --name Snap1 --duration-in-seconds 3600`"
+      },
+      {
+        "letra": "C",
+        "texto": "`az image create --resource-group RG1 --name Image1 --source Snap1`",
+        "texto_en": "`az image create --resource-group RG1 --name Image1 --source Snap1`"
+      },
+      {
+        "letra": "D",
+        "texto": "`az vm disk attach --resource-group RG1 --vm-name VM3 --name Disk2 --new --size-gb 128`",
+        "texto_en": "`az vm disk attach --resource-group RG1 --vm-name VM3 --name Disk2 --new --size-gb 128`"
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "`az disk create` com --source aceita um blob VHD, um disco gerido ou um snapshot (nome ou ID). Indicar --source Snap1 cria o disco gerido Disk2 com o conteúdo do snapshot, pronto a ser anexado a uma VM ou usado como disco do sistema operativo.\n\nB está errada: `az snapshot grant-access` apenas gera um URL SAS temporário para exportar/transferir o snapshot; não cria nenhum disco. C está errada: `az image create` cria uma imagem personalizada de VM a partir do snapshot, não um disco gerido. D está errada: com --new e --size-gb, `az vm disk attach` cria e anexa um disco de dados vazio, sem os dados de Snap1.\n\nDocumentação: https://learn.microsoft.com/en-us/cli/azure/disk?view=azure-cli-latest#az-disk-create"
+  },
+  {
+    "id": "AUT26-CL-04",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Implementar e gerenciar redes virtuais",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Azure CLI – Regras de NSG",
+    "pergunta": "Tem uma máquina virtual chamada VM1 com um endereço IP público, ligada a uma sub-rede chamada Subnet1. Um grupo de segurança de rede (NSG) chamado NSG1 está associado a Subnet1 e não contém regras personalizadas.\n\nExecuta o seguinte script:\n\n```bash\naz network nsg rule create --resource-group RG1 --nsg-name NSG1 --name DenyRDP --priority 200 --direction Inbound --access Deny --protocol Tcp --source-address-prefixes '*' --destination-port-ranges 3389\naz network nsg rule create --resource-group RG1 --nsg-name NSG1 --name AllowRDPAdmin --priority 300 --direction Inbound --access Allow --protocol Tcp --source-address-prefixes 203.0.113.10 --destination-port-ranges 3389\n```\n\nUm administrador tenta estabelecer uma ligação RDP ao endereço IP público de VM1 a partir do endereço 203.0.113.10.\n\nQual é o resultado?",
+    "pergunta_en": "You have a virtual machine named VM1 that has a public IP address and is connected to a subnet named Subnet1. A network security group (NSG) named NSG1 is associated with Subnet1 and contains no custom rules.\n\nYou run the following script:\n\n```bash\naz network nsg rule create --resource-group RG1 --nsg-name NSG1 --name DenyRDP --priority 200 --direction Inbound --access Deny --protocol Tcp --source-address-prefixes '*' --destination-port-ranges 3389\naz network nsg rule create --resource-group RG1 --nsg-name NSG1 --name AllowRDPAdmin --priority 300 --direction Inbound --access Allow --protocol Tcp --source-address-prefixes 203.0.113.10 --destination-port-ranges 3389\n```\n\nAn administrator attempts to establish an RDP connection to the public IP address of VM1 from the address 203.0.113.10.\n\nWhat is the result?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "A ligação é permitida, porque a regra AllowRDPAdmin é mais específica do que a regra DenyRDP.",
+        "texto_en": "The connection is allowed because the AllowRDPAdmin rule is more specific than the DenyRDP rule."
+      },
+      {
+        "letra": "B",
+        "texto": "A ligação é permitida, porque as regras com a ação Allow têm sempre precedência sobre as regras com a ação Deny.",
+        "texto_en": "The connection is allowed because rules with the Allow action always take precedence over rules with the Deny action."
+      },
+      {
+        "letra": "C",
+        "texto": "A ligação é negada, porque DenyRDP tem a prioridade 200 e é avaliada antes de AllowRDPAdmin.",
+        "texto_en": "The connection is denied because DenyRDP has priority 200 and is evaluated before AllowRDPAdmin."
+      },
+      {
+        "letra": "D",
+        "texto": "O segundo comando falha, porque o NSG já contém uma regra de entrada para a porta 3389.",
+        "texto_en": "The second command fails because the NSG already contains an inbound rule for port 3389."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "As regras de um NSG são processadas por ordem de prioridade: números mais baixos são avaliados primeiro e, assim que o tráfego corresponde a uma regra, o processamento termina. O tráfego RDP vindo de 203.0.113.10 corresponde primeiro a DenyRDP (prioridade 200, origem '*', porta 3389), pelo que é negado e AllowRDPAdmin (prioridade 300) nunca chega a ser avaliada. Para permitir o administrador, AllowRDPAdmin teria de ter um número de prioridade inferior a 200.\n\nA está errada: o NSG não escolhe a regra mais específica; decide apenas pela prioridade. B está errada: não existe precedência de Allow sobre Deny; vale a primeira regra correspondente por prioridade. D está errada: podem existir várias regras para a mesma porta e direção, desde que cada uma tenha um nome e uma prioridade únicos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-network/network-security-groups-overview"
+  },
+  {
+    "id": "AUT26-CL-05",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Implementar e gerenciar redes virtuais",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "Azure CLI – Emparelhamento e trânsito de gateway",
+    "pergunta": "Tem duas redes virtuais no grupo de recursos RG1: VNetHub e VNetSpoke. VNetHub contém um gateway de VPN chamado VPNGW1 com uma ligação site a site para a rede no local. VNetSpoke não contém nenhum gateway.\n\nPrecisa de garantir que as máquinas virtuais em VNetSpoke conseguem comunicar com a rede no local através de VPNGW1. Prepara o seguinte script:\n\n```bash\naz network vnet peering create --resource-group RG1 --name Hub-to-Spoke --vnet-name VNetHub --remote-vnet VNetSpoke --allow-vnet-access <BLANK1>\naz network vnet peering create --resource-group RG1 --name Spoke-to-Hub --vnet-name VNetSpoke --remote-vnet VNetHub --allow-vnet-access <BLANK2>\n```\n\nQue dois valores deve utilizar para completar o script? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "You have two virtual networks in a resource group named RG1: VNetHub and VNetSpoke. VNetHub contains a VPN gateway named VPNGW1 that has a site-to-site connection to the on-premises network. VNetSpoke does not contain a gateway.\n\nYou need to ensure that the virtual machines in VNetSpoke can communicate with the on-premises network through VPNGW1. You prepare the following script:\n\n```bash\naz network vnet peering create --resource-group RG1 --name Hub-to-Spoke --vnet-name VNetHub --remote-vnet VNetSpoke --allow-vnet-access <BLANK1>\naz network vnet peering create --resource-group RG1 --name Spoke-to-Hub --vnet-name VNetSpoke --remote-vnet VNetHub --allow-vnet-access <BLANK2>\n```\n\nWhich two values should you use to complete the script? Each correct answer presents part of the solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Em <BLANK1>: `--allow-gateway-transit`",
+        "texto_en": "In <BLANK1>: `--allow-gateway-transit`"
+      },
+      {
+        "letra": "B",
+        "texto": "Em <BLANK1>: `--use-remote-gateways`",
+        "texto_en": "In <BLANK1>: `--use-remote-gateways`"
+      },
+      {
+        "letra": "C",
+        "texto": "Em <BLANK2>: `--allow-forwarded-traffic`",
+        "texto_en": "In <BLANK2>: `--allow-forwarded-traffic`"
+      },
+      {
+        "letra": "D",
+        "texto": "Em <BLANK2>: `--use-remote-gateways`",
+        "texto_en": "In <BLANK2>: `--use-remote-gateways`"
+      },
+      {
+        "letra": "E",
+        "texto": "Em <BLANK2>: `--allow-gateway-transit`",
+        "texto_en": "In <BLANK2>: `--allow-gateway-transit`"
+      }
+    ],
+    "opcao_correta": [
+      "A",
+      "D"
+    ],
+    "explicacao": "O trânsito de gateway é configurado nos dois lados do emparelhamento. No emparelhamento da rede que tem o gateway (Hub-to-Spoke, em VNetHub) usa-se --allow-gateway-transit, que permite que a rede remota use o gateway local. No emparelhamento da rede sem gateway (Spoke-to-Hub, em VNetSpoke) usa-se --use-remote-gateways, que faz VNetSpoke usar VPNGW1. A ordem do script também importa: --use-remote-gateways exige que o emparelhamento remoto já tenha --allow-gateway-transit ativo.\n\nB está errada: --use-remote-gateways não pode ser definido numa rede que já tem o seu próprio gateway, como VNetHub. C está errada: --allow-forwarded-traffic controla o tráfego reencaminhado (por exemplo, por uma NVA); não dá acesso ao gateway remoto. E está errada: definir --allow-gateway-transit em VNetSpoke ofereceria um gateway que não existe e não faria VNetSpoke usar VPNGW1.\n\nDocumentação: https://learn.microsoft.com/en-us/cli/azure/network/vnet/peering?view=azure-cli-latest#az-network-vnet-peering-create"
+  },
+  {
+    "id": "AUT26-CL-06",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Azure CLI – Firewall da conta de armazenamento",
+    "pergunta": "Tem uma conta de armazenamento chamada stcontoso01 e uma máquina virtual chamada VM1 ligada à sub-rede Subnet1 da rede virtual VNet1. Todos os recursos estão no grupo de recursos RG1.\n\nPara bloquear o acesso a partir da Internet, executa o seguinte script:\n\n```bash\naz network vnet subnet update --resource-group RG1 --vnet-name VNet1 --name Subnet1 --service-endpoints Microsoft.Storage\naz storage account update --resource-group RG1 --name stcontoso01 --default-action Deny\n```\n\nDepois de executar o script, as aplicações em VM1 recebem erros 403 ao aceder a blobs em stcontoso01.\n\nPrecisa de permitir o acesso a partir de Subnet1, mantendo bloqueado o acesso a partir da Internet.\n\nQue comando deve executar?",
+    "pergunta_en": "You have a storage account named stcontoso01 and a virtual machine named VM1 that is connected to a subnet named Subnet1 in a virtual network named VNet1. All the resources are in a resource group named RG1.\n\nTo block access from the internet, you run the following script:\n\n```bash\naz network vnet subnet update --resource-group RG1 --vnet-name VNet1 --name Subnet1 --service-endpoints Microsoft.Storage\naz storage account update --resource-group RG1 --name stcontoso01 --default-action Deny\n```\n\nAfter you run the script, the applications on VM1 receive 403 errors when they access blobs in stcontoso01.\n\nYou need to allow access from Subnet1 while keeping access from the internet blocked.\n\nWhich command should you run?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`az storage account network-rule add --resource-group RG1 --account-name stcontoso01 --vnet-name VNet1 --subnet Subnet1`",
+        "texto_en": "`az storage account network-rule add --resource-group RG1 --account-name stcontoso01 --vnet-name VNet1 --subnet Subnet1`"
+      },
+      {
+        "letra": "B",
+        "texto": "`az storage account update --resource-group RG1 --name stcontoso01 --bypass AzureServices`",
+        "texto_en": "`az storage account update --resource-group RG1 --name stcontoso01 --bypass AzureServices`"
+      },
+      {
+        "letra": "C",
+        "texto": "`az storage account update --resource-group RG1 --name stcontoso01 --default-action Allow`",
+        "texto_en": "`az storage account update --resource-group RG1 --name stcontoso01 --default-action Allow`"
+      },
+      {
+        "letra": "D",
+        "texto": "`az network nsg rule create --resource-group RG1 --nsg-name NSG1 --name AllowStorage --priority 100 --direction Outbound --access Allow --protocol Tcp --destination-address-prefixes Storage --destination-port-ranges 443`",
+        "texto_en": "`az network nsg rule create --resource-group RG1 --nsg-name NSG1 --name AllowStorage --priority 100 --direction Outbound --access Allow --protocol Tcp --destination-address-prefixes Storage --destination-port-ranges 443`"
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "O ponto final de serviço Microsoft.Storage em Subnet1 é apenas metade da configuração: com --default-action Deny, a firewall da conta rejeita todos os pedidos que não correspondam a uma regra. É necessário adicionar uma regra de rede virtual com `az storage account network-rule add` indicando --vnet-name VNet1 e --subnet Subnet1, para que o tráfego de Subnet1 seja permitido e o resto da Internet continue bloqueado.\n\nB está errada: --bypass AzureServices só abre exceções para serviços fidedignos do Azure, não para VMs numa sub-rede. C está errada: --default-action Allow desativa a restrição e volta a permitir o acesso a partir da Internet. D está errada: as regras de saída por defeito do NSG já permitem este tráfego; o bloqueio está na firewall da conta de armazenamento, não no NSG.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security"
+  },
+  {
+    "id": "AUT26-CL-07",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "AzCopy – sync vs copy",
+    "pergunta": "Tem um servidor de ficheiros no local com a pasta D:\\Reports, que contém vários subdiretórios. Tem também uma conta de armazenamento chamada stcontoso01 com um contentor de blobs chamado reports. O AzCopy v10 já está autenticado com azcopy login e a identidade tem a função Storage Blob Data Contributor no contentor.\n\nPrecisa de configurar uma tarefa agendada que cumpra os seguintes requisitos:\n\n- O contentor reports deve refletir o conteúdo de D:\\Reports, incluindo os subdiretórios.\n- Os blobs cujos ficheiros de origem foram eliminados devem ser removidos do contentor.\n- A tarefa não pode pedir confirmação ao utilizador.\n\nQue comando deve executar na tarefa?",
+    "pergunta_en": "You have an on-premises file server that has a folder named D:\\Reports, which contains several subdirectories. You also have a storage account named stcontoso01 that has a blob container named reports. AzCopy v10 is already authenticated by using azcopy login, and the identity has the Storage Blob Data Contributor role on the container.\n\nYou need to configure a scheduled task that meets the following requirements:\n\n- The reports container must mirror the contents of D:\\Reports, including the subdirectories.\n- Blobs whose source files were deleted must be removed from the container.\n- The task must not prompt the user for confirmation.\n\nWhich command should the task run?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`azcopy copy \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --recursive`",
+        "texto_en": "`azcopy copy \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --recursive`"
+      },
+      {
+        "letra": "B",
+        "texto": "`azcopy sync \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --delete-destination=true`",
+        "texto_en": "`azcopy sync \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --delete-destination=true`"
+      },
+      {
+        "letra": "C",
+        "texto": "`azcopy sync \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --recursive`",
+        "texto_en": "`azcopy sync \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --recursive`"
+      },
+      {
+        "letra": "D",
+        "texto": "`azcopy sync \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --delete-destination=prompt`",
+        "texto_en": "`azcopy sync \"D:\\Reports\" \"https://stcontoso01.blob.core.windows.net/reports\" --delete-destination=prompt`"
+      }
+    ],
+    "opcao_correta": [
+      "B"
+    ],
+    "explicacao": "`azcopy sync` compara nomes e datas de modificação e transfere apenas o que mudou; no sync, --recursive já é true por predefinição, pelo que os subdiretórios são incluídos. Para remover do destino os blobs que já não existem na origem, é preciso --delete-destination=true, que elimina sem pedir confirmação.\n\nA está errada: `azcopy copy` com --recursive envia os ficheiros, mas nunca elimina blobs no destino (e, ao copiar a pasta, cria-a como diretório virtual dentro do contentor). C está errada: --delete-destination é false por predefinição, pelo que os blobs órfãos ficam no contentor. D está errada: --delete-destination=prompt pede confirmação antes de eliminar, o que viola o requisito de execução sem interação.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/storage/common/storage-use-azcopy-blobs-synchronize"
+  },
+  {
+    "id": "AUT26-CL-08",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Médio",
+    "tema": "Azure CLI e PowerShell – Atribuição de funções RBAC",
+    "pergunta": "A sua empresa tem uma subscrição do Azure com o ID 00000000-0000-0000-0000-000000000000. A subscrição contém um grupo de recursos chamado RG1 e um utilizador chamado user1@contoso.com.\n\nPrecisa de permitir que user1@contoso.com faça a gestão das máquinas virtuais em RG1. A solução deve respeitar o princípio do menor privilégio e não pode conceder permissões fora de RG1.\n\nQue dois comandos pode executar? Cada resposta correta apresenta uma solução completa.",
+    "pergunta_en": "Your company has an Azure subscription that has the ID 00000000-0000-0000-0000-000000000000. The subscription contains a resource group named RG1 and a user named user1@contoso.com.\n\nYou need to allow user1@contoso.com to manage the virtual machines in RG1. The solution must follow the principle of least privilege and must not grant permissions outside RG1.\n\nWhich two commands can you run? Each correct answer presents a complete solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`az role assignment create --assignee user1@contoso.com --role \"Virtual Machine Contributor\" --scope /subscriptions/00000000-0000-0000-0000-000000000000`",
+        "texto_en": "`az role assignment create --assignee user1@contoso.com --role \"Virtual Machine Contributor\" --scope /subscriptions/00000000-0000-0000-0000-000000000000`"
+      },
+      {
+        "letra": "B",
+        "texto": "`az role assignment create --assignee user1@contoso.com --role \"Virtual Machine Contributor\" --scope /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1`",
+        "texto_en": "`az role assignment create --assignee user1@contoso.com --role \"Virtual Machine Contributor\" --scope /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1`"
+      },
+      {
+        "letra": "C",
+        "texto": "`New-AzRoleAssignment -SignInName user1@contoso.com -RoleDefinitionName \"Virtual Machine Contributor\" -Scope /subscriptions/00000000-0000-0000-0000-000000000000`",
+        "texto_en": "`New-AzRoleAssignment -SignInName user1@contoso.com -RoleDefinitionName \"Virtual Machine Contributor\" -Scope /subscriptions/00000000-0000-0000-0000-000000000000`"
+      },
+      {
+        "letra": "D",
+        "texto": "`az role assignment create --assignee user1@contoso.com --role \"Owner\" --scope /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1`",
+        "texto_en": "`az role assignment create --assignee user1@contoso.com --role \"Owner\" --scope /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1`"
+      },
+      {
+        "letra": "E",
+        "texto": "`New-AzRoleAssignment -SignInName user1@contoso.com -RoleDefinitionName \"Virtual Machine Contributor\" -ResourceGroupName RG1`",
+        "texto_en": "`New-AzRoleAssignment -SignInName user1@contoso.com -RoleDefinitionName \"Virtual Machine Contributor\" -ResourceGroupName RG1`"
+      }
+    ],
+    "opcao_correta": [
+      "B",
+      "E"
+    ],
+    "explicacao": "A função integrada Virtual Machine Contributor permite gerir máquinas virtuais sem conceder acesso para gerir permissões. O âmbito tem de ser o grupo de recursos RG1. Na CLI, `az role assignment create` exige --scope, que neste caso é /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1. No PowerShell, New-AzRoleAssignment aceita -SignInName com -ResourceGroupName RG1, o que produz exatamente a mesma atribuição.\n\nA e C estão erradas: o âmbito é a subscrição inteira, o que concede permissões fora de RG1. D está errada: Owner em RG1 permite gerir as VMs, mas também todos os outros recursos e as próprias atribuições de funções, o que viola o princípio do menor privilégio.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/role-assignments-cli"
+  },
+  {
+    "id": "AUT26-CL-09",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Azure PowerShell – Bloqueios de recursos",
+    "pergunta": "Tem um grupo de recursos chamado RG1 que contém uma máquina virtual chamada VM1. O tamanho Standard_D4s_v5 está disponível para VM1. Um utilizador chamado User1 tem a função Owner na subscrição.\n\nExecuta o seguinte comando:\n\n```powershell\nNew-AzResourceLock -LockName LockRG1 -LockLevel CanNotDelete -ResourceGroupName RG1 -Force\n```\n\nEm seguida, User1 executa os seguintes comandos:\n\n```bash\naz vm resize --resource-group RG1 --name VM1 --size Standard_D4s_v5\naz vm delete --resource-group RG1 --name VM1 --yes\n```\n\nQual é o resultado?",
+    "pergunta_en": "You have a resource group named RG1 that contains a virtual machine named VM1. The Standard_D4s_v5 size is available for VM1. A user named User1 has the Owner role on the subscription.\n\nYou run the following command:\n\n```powershell\nNew-AzResourceLock -LockName LockRG1 -LockLevel CanNotDelete -ResourceGroupName RG1 -Force\n```\n\nUser1 then runs the following commands:\n\n```bash\naz vm resize --resource-group RG1 --name VM1 --size Standard_D4s_v5\naz vm delete --resource-group RG1 --name VM1 --yes\n```\n\nWhat is the result?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Ambos os comandos são concluídos com êxito, porque User1 tem a função Owner.",
+        "texto_en": "Both commands complete successfully because User1 has the Owner role."
+      },
+      {
+        "letra": "B",
+        "texto": "Ambos os comandos falham, porque o bloqueio impede qualquer alteração aos recursos de RG1.",
+        "texto_en": "Both commands fail because the lock prevents any change to the resources in RG1."
+      },
+      {
+        "letra": "C",
+        "texto": "O redimensionamento é concluído com êxito e a eliminação de VM1 falha.",
+        "texto_en": "The resize completes successfully, and the deletion of VM1 fails."
+      },
+      {
+        "letra": "D",
+        "texto": "O redimensionamento falha e a eliminação de VM1 é concluída com êxito.",
+        "texto_en": "The resize fails, and the deletion of VM1 completes successfully."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "Um bloqueio CanNotDelete (Eliminação, no portal) aplicado a RG1 é herdado por todos os recursos do grupo. Os utilizadores autorizados continuam a poder ler e modificar os recursos, por isso `az vm resize` é concluído, mas não os podem eliminar, por isso `az vm delete` falha.\n\nA está errada: os bloqueios aplicam-se a todos os utilizadores, incluindo Owner; um Owner teria primeiro de remover o bloqueio. B está errada: impedir também as alterações é o comportamento do bloqueio ReadOnly, não de CanNotDelete. D está errada: inverte o efeito do bloqueio.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources"
+  },
+  {
+    "id": "AUT26-CL-10",
+    "origem": "Questões autorais 2026",
+    "assets": [],
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Azure CLI – Azure Backup para VMs",
+    "pergunta": "Tem uma máquina virtual chamada VM1 na região West Europe e um cofre dos Serviços de Recuperação chamado Vault1 na região North Europe. Ambos os recursos estão no grupo de recursos RG1.\n\nExecuta o seguinte comando:\n\n```bash\naz backup protection enable-for-vm --resource-group RG1 --vault-name Vault1 --vm VM1 --policy-name DefaultPolicy\n```\n\nO comando falha.\n\nPrecisa de proteger VM1 com o Azure Backup.\n\nQue comando deve executar primeiro?",
+    "pergunta_en": "You have a virtual machine named VM1 in the West Europe region and a Recovery Services vault named Vault1 in the North Europe region. Both resources are in a resource group named RG1.\n\nYou run the following command:\n\n```bash\naz backup protection enable-for-vm --resource-group RG1 --vault-name Vault1 --vm VM1 --policy-name DefaultPolicy\n```\n\nThe command fails.\n\nYou need to protect VM1 by using Azure Backup.\n\nWhich command should you run first?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`az backup vault backup-properties set --resource-group RG1 --name Vault1 --cross-region-restore-flag True`",
+        "texto_en": "`az backup vault backup-properties set --resource-group RG1 --name Vault1 --cross-region-restore-flag True`"
+      },
+      {
+        "letra": "B",
+        "texto": "`az backup vault backup-properties set --resource-group RG1 --name Vault1 --backup-storage-redundancy GeoRedundant`",
+        "texto_en": "`az backup vault backup-properties set --resource-group RG1 --name Vault1 --backup-storage-redundancy GeoRedundant`"
+      },
+      {
+        "letra": "C",
+        "texto": "`az resource move --destination-group RG2 --ids <Vault1-resource-id>`",
+        "texto_en": "`az resource move --destination-group RG2 --ids <Vault1-resource-id>`"
+      },
+      {
+        "letra": "D",
+        "texto": "`az backup vault create --resource-group RG1 --name Vault2 --location westeurope`",
+        "texto_en": "`az backup vault create --resource-group RG1 --name Vault2 --location westeurope`"
+      }
+    ],
+    "opcao_correta": [
+      "D"
+    ],
+    "explicacao": "O Azure Backup não suporta fazer cópia de segurança de uma VM para um cofre noutra região: a VM e o cofre dos Serviços de Recuperação têm de estar na mesma região. É preciso criar primeiro um cofre em West Europe com `az backup vault create --location westeurope` e depois executar `az backup protection enable-for-vm` com --vault-name Vault2.\n\nA está errada: --cross-region-restore-flag ativa o restauro na região emparelhada a partir de cópias já existentes; não permite proteger uma VM de outra região. B está errada: a redundância do armazenamento do cofre (GeoRedundant) não altera a região do cofre. C está errada: `az resource move` muda o recurso de grupo de recursos (ou de subscrição), mas o cofre continua em North Europe.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/backup/backup-support-matrix-iaas"
+  }
+]

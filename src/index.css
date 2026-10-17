@@ -277,10 +277,11 @@ kbd { font-family: inherit; font-size: 10px; padding: 1px 5px; border: 1px solid
 .nav-toggle { display: none; }
 .q-meta-line { display: flex; gap: 14px; flex-wrap: wrap; margin: 12px 0 0; font-size: 11.5px; color: var(--muted); }
 .q-statement { margin: 18px 0 22px; font-size: 16.5px; line-height: 1.75; color: var(--text); overflow-wrap: anywhere; }
-.q-assets { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
-.q-asset { display: block; width: 100%; padding: 10px; border-radius: var(--radius-sm); background: #fff; border: 1px solid var(--border); cursor: zoom-in; text-align: center; }
+.q-asset { display: block; width: 100%; margin: 14px 0; padding: 10px; border-radius: var(--radius-sm); background: #fff; border: 1px solid var(--border); cursor: zoom-in; text-align: center; }
 .q-asset img { max-width: 100%; max-height: 460px; margin: 0 auto; display: block; border-radius: 6px; }
 .q-asset span { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 11.5px; color: #4b6584; }
+.q-asset.is-broken { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 64px; cursor: default; background: var(--danger-soft); color: var(--danger); border-color: color-mix(in srgb, var(--danger) 35%, transparent); font-size: 13px; }
+.explanation .q-asset img { max-height: 380px; }
 .q-hint { display: flex; align-items: center; gap: 8px; margin: -6px 0 12px; font-size: 13px; color: var(--violet); }
 
 .options { display: flex; flex-direction: column; gap: 11px; }

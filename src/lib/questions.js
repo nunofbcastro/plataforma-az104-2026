@@ -23,6 +23,7 @@ function normalize(question) {
     tipo: multi ? 'Seleção Múltipla' : 'Múltipla Escolha',
     assets: question.assets || [],
     domainIndex: domainIndexOf(question),
+    hasCode: /```/.test(question.pergunta || '') || (question.opcoes || []).some(o => /^`[^`]+`$/.test(String(o.texto || '').trim())),
   };
 }
 

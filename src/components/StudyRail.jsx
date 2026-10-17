@@ -85,6 +85,7 @@ export function FiltersPanel({ filters, setFilter, clearFilters, sourceCounts, t
             <option value="all">Todos os tipos</option>
             <option value="single">Escolha única</option>
             <option value="multi">Seleção múltipla</option>
+            <option value="code">Com código / comandos</option>
           </Select>
           <Select label="Fonte" value={filters.source} onChange={v => setFilter('source', v)}>
             <option value="all">Todas as fontes ({total.toLocaleString('pt-PT')})</option>

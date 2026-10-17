@@ -11888,8 +11888,7 @@
     ],
     "explicacao": "Falso é a resposta correta. Os três grupos foram criados com a opção \"As funções do Microsoft Entra podem ser atribuídas ao grupo\" = Sim (isAssignableToRole = true). Grupos atribuíveis a funções não suportam aninhamento: um grupo não pode ser adicionado como membro de um grupo atribuível a funções. Como o Group1 é atribuível a funções, não é possível adicionar o Group2 como membro do Group1 e, por isso, o User2 não pode obter a função Owner no RG1 dessa forma. Para conceder o acesso, atribua a função Owner diretamente ao User2 ou ao Group2 no escopo do RG1.\n\nReferência(s):\n\n- https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/groups-concept#how-are-role-assignable-groups-protected",
     "assets": [
-      "assets/form_2/q87_pergunta_1.png",
-      "assets/form_2/q87_explicacao_1.png"
+      "assets/form_2/q87_pergunta_1.png"
     ],
     "numero": 304
   },

@@ -1,0 +1,384 @@
+[
+  {
+    "id": "AUT26-KS-01",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "KQL – Heartbeat",
+    "pergunta": "A sua empresa tem uma subscrição do Azure com 40 máquinas virtuais que enviam dados para uma área de trabalho do Log Analytics chamada LAW1 através do Azure Monitor Agent. O intervalo de tempo da consulta está definido para as últimas 24 horas.\n\nPrecisa de identificar as máquinas virtuais que enviaram pelo menos um heartbeat nas últimas 24 horas, mas que não enviaram nenhum heartbeat nos últimos 15 minutos.\n\nQue consulta deve executar?",
+    "pergunta_en": "Your company has an Azure subscription with 40 virtual machines that send data to a Log Analytics workspace named LAW1 by using Azure Monitor Agent. The query time range is set to the last 24 hours.\n\nYou need to identify the virtual machines that sent at least one heartbeat in the last 24 hours, but have not sent any heartbeat in the last 15 minutes.\n\nWhich query should you run?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`Heartbeat | where TimeGenerated < ago(15m) | distinct Computer`",
+        "texto_en": "`Heartbeat | where TimeGenerated < ago(15m) | distinct Computer`"
+      },
+      {
+        "letra": "B",
+        "texto": "`Heartbeat | summarize LastHeartbeat = max(TimeGenerated) by Computer | where LastHeartbeat < ago(15m)`",
+        "texto_en": "`Heartbeat | summarize LastHeartbeat = max(TimeGenerated) by Computer | where LastHeartbeat < ago(15m)`"
+      },
+      {
+        "letra": "C",
+        "texto": "`Heartbeat | where TimeGenerated > ago(15m) | summarize count() by Computer`",
+        "texto_en": "`Heartbeat | where TimeGenerated > ago(15m) | summarize count() by Computer`"
+      },
+      {
+        "letra": "D",
+        "texto": "`Heartbeat | summarize LastHeartbeat = min(TimeGenerated) by Computer | where LastHeartbeat < ago(15m)`",
+        "texto_en": "`Heartbeat | summarize LastHeartbeat = min(TimeGenerated) by Computer | where LastHeartbeat < ago(15m)`"
+      }
+    ],
+    "opcao_correta": [
+      "B"
+    ],
+    "explicacao": "A consulta B agrupa os registos por Computer e calcula, com max(TimeGenerated), o heartbeat mais recente de cada máquina. Depois mantém apenas as máquinas cujo último heartbeat é anterior a ago(15m), ou seja, as que deixaram de comunicar há mais de 15 minutos. O agente envia um heartbeat por minuto, pelo que uma máquina saudável tem sempre um valor recente.\n\nA: devolve todas as máquinas que têm algum heartbeat com mais de 15 minutos. Isso inclui praticamente todas as máquinas saudáveis, porque todas têm heartbeats antigos dentro das 24 horas.\nC: devolve as máquinas que enviaram heartbeats nos últimos 15 minutos, isto é, exatamente o conjunto oposto ao pretendido.\nD: min(TimeGenerated) devolve o primeiro heartbeat do intervalo, que é quase sempre antigo. A consulta devolveria quase todas as máquinas.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/heartbeat",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-02",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "KQL – summarize e bin()",
+    "pergunta": "Tem uma área de trabalho do Log Analytics chamada LAW1 que recolhe contadores de desempenho de várias máquinas virtuais Windows.\n\nExecuta a seguinte consulta:\n\n```kusto\nPerf\n| where TimeGenerated > ago(1h)\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\" and InstanceName == \"_Total\"\n| summarize AvgCPU = avg(CounterValue) by Computer, bin(TimeGenerated, 5m)\n| where AvgCPU > 80\n```\n\nO que devolve a consulta?",
+    "pergunta_en": "You have a Log Analytics workspace named LAW1 that collects performance counters from several Windows virtual machines.\n\nYou run the following query:\n\n```kusto\nPerf\n| where TimeGenerated > ago(1h)\n| where ObjectName == \"Processor\" and CounterName == \"% Processor Time\" and InstanceName == \"_Total\"\n| summarize AvgCPU = avg(CounterValue) by Computer, bin(TimeGenerated, 5m)\n| where AvgCPU > 80\n```\n\nWhat does the query return?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Uma linha por computador com a média de CPU de toda a última hora, apenas para os computadores cuja média horária é superior a 80.",
+        "texto_en": "One row per computer with the average CPU for the entire last hour, only for computers whose hourly average is greater than 80."
+      },
+      {
+        "letra": "B",
+        "texto": "Exatamente 12 linhas por computador, uma por cada intervalo de 5 minutos, incluindo intervalos sem dados.",
+        "texto_en": "Exactly 12 rows per computer, one for each 5-minute interval, including intervals with no data."
+      },
+      {
+        "letra": "C",
+        "texto": "Uma linha por cada combinação de computador e intervalo de 5 minutos da última hora em que a média do contador % Processor Time (_Total) foi superior a 80.",
+        "texto_en": "One row for each combination of computer and 5-minute interval in the last hour in which the average of the % Processor Time (_Total) counter was greater than 80."
+      },
+      {
+        "letra": "D",
+        "texto": "Todas as amostras individuais do contador % Processor Time (_Total) da última hora com um valor superior a 80.",
+        "texto_en": "Every individual sample of the % Processor Time (_Total) counter from the last hour with a value greater than 80."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "O summarize ... by Computer, bin(TimeGenerated, 5m) cria um grupo para cada combinação distinta de computador e intervalo de 5 minutos e calcula avg(CounterValue) em cada grupo. O where final, aplicado depois da agregação, mantém apenas os grupos cuja média (AvgCPU) é superior a 80.\n\nA: a média seria por hora apenas se o agrupamento fosse só por Computer. Aqui existe também o bin de 5 minutos.\nB: o summarize só produz linhas para grupos que existem nos dados. Intervalos sem amostras não geram linhas e, além disso, o where final remove os intervalos com média igual ou inferior a 80.\nD: as amostras individuais deixam de existir depois do summarize. O resultado contém médias por intervalo, não registos de Perf.\n\nDocumentação: https://learn.microsoft.com/en-us/kusto/query/summarize-operator?view=azure-monitor",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-03",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "KQL – AzureActivity",
+    "pergunta": "O registo de atividades da sua subscrição do Azure é enviado para uma área de trabalho do Log Analytics. Escreveu a seguinte consulta:\n\n```kusto\nAzureActivity\n| where TimeGenerated > ago(7d)\n| where OperationNameValue =~ \"Microsoft.Compute/virtualMachines/delete\"\n```\n\nPrecisa de acrescentar uma linha no fim da consulta para obter, para cada valor de Caller, o número de máquinas virtuais distintas que foram alvo de operações de eliminação nos últimos 7 dias.\n\nQue linha deve acrescentar?",
+    "pergunta_en": "The activity log of your Azure subscription is sent to a Log Analytics workspace. You wrote the following query:\n\n```kusto\nAzureActivity\n| where TimeGenerated > ago(7d)\n| where OperationNameValue =~ \"Microsoft.Compute/virtualMachines/delete\"\n```\n\nYou need to add a line at the end of the query to return, for each Caller value, the number of distinct virtual machines that were targeted by delete operations in the last 7 days.\n\nWhich line should you add?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`| summarize DeletedVMs = dcount(_ResourceId) by Caller`",
+        "texto_en": "`| summarize DeletedVMs = dcount(_ResourceId) by Caller`"
+      },
+      {
+        "letra": "B",
+        "texto": "`| summarize DeletedVMs = count() by _ResourceId`",
+        "texto_en": "`| summarize DeletedVMs = count() by _ResourceId`"
+      },
+      {
+        "letra": "C",
+        "texto": "`| project Caller, DeletedVMs = dcount(_ResourceId)`",
+        "texto_en": "`| project Caller, DeletedVMs = dcount(_ResourceId)`"
+      },
+      {
+        "letra": "D",
+        "texto": "`| top 10 by Caller`",
+        "texto_en": "`| top 10 by Caller`"
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "O summarize com dcount(_ResourceId) by Caller devolve uma linha por Caller com o número de recursos (máquinas virtuais) distintos. Usar dcount em vez de count() é importante porque a mesma operação de eliminação pode gerar vários registos no AzureActivity (por exemplo, com os estados Started e Succeeded, partilhando o mesmo CorrelationId), o que inflacionaria uma contagem simples. O operador =~ faz uma comparação de cadeias sem distinção de maiúsculas e minúsculas, útil porque OperationNameValue pode aparecer em maiúsculas.\n\nB: agrupa por máquina virtual e não por Caller, e conta registos em vez de máquinas distintas.\nC: o project não aceita funções de agregação como dcount(). As agregações só podem ser usadas no summarize, pelo que a consulta falha.\nD: o top ordena por Caller e devolve 10 registos individuais. Não faz qualquer contagem.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-monitor/reference/tables/azureactivity",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-04",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "Alertas de pesquisa de registos",
+    "pergunta": "Cria uma regra de alerta de pesquisa de registos no âmbito de uma área de trabalho do Log Analytics chamada LAW1. A regra usa a seguinte consulta:\n\n```kusto\nEvent\n| where EventLog == \"System\" and EventLevelName == \"Error\"\n| summarize ErrorCount = count() by Computer, bin(TimeGenerated, 15m)\n```\n\nA regra está configurada da seguinte forma:\n- Measure: ErrorCount\n- Aggregation type: Total\n- Aggregation granularity: 15 minutos\n- Split by dimensions: Computer (incluir todos os valores futuros)\n- Operator: Greater than\n- Threshold value: 10\n- Frequency of evaluation: 15 minutos\n- Number of violations: 1 em 1 período de avaliação\n\nQuais são as duas afirmações verdadeiras? Cada resposta correta apresenta uma solução completa.",
+    "pergunta_en": "You create a log search alert rule scoped to a Log Analytics workspace named LAW1. The rule uses the following query:\n\n```kusto\nEvent\n| where EventLog == \"System\" and EventLevelName == \"Error\"\n| summarize ErrorCount = count() by Computer, bin(TimeGenerated, 15m)\n```\n\nThe rule is configured as follows:\n- Measure: ErrorCount\n- Aggregation type: Total\n- Aggregation granularity: 15 minutes\n- Split by dimensions: Computer (include all future values)\n- Operator: Greater than\n- Threshold value: 10\n- Frequency of evaluation: 15 minutes\n- Number of violations: 1 out of 1 evaluation period\n\nWhich two statements are true? Each correct answer presents a complete solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Se, no mesmo intervalo de 15 minutos, VM1 registar 6 erros e VM2 registar 7 erros no registo System, é disparado um alerta.",
+        "texto_en": "If, in the same 15-minute window, VM1 logs 6 errors and VM2 logs 7 errors in the System log, an alert fires."
+      },
+      {
+        "letra": "B",
+        "texto": "Se, no mesmo intervalo de 15 minutos, VM1 registar 11 erros e VM2 registar 12 erros no registo System, são gerados dois alertas, um para cada valor de Computer.",
+        "texto_en": "If, in the same 15-minute window, VM1 logs 11 errors and VM2 logs 12 errors in the System log, two alerts are generated, one for each Computer value."
+      },
+      {
+        "letra": "C",
+        "texto": "É disparado um alerta quando VM3 registar exatamente 10 erros no registo System num intervalo de 15 minutos.",
+        "texto_en": "An alert fires when VM3 logs exactly 10 errors in the System log in a 15-minute window."
+      },
+      {
+        "letra": "D",
+        "texto": "Não é necessário acrescentar `| where ErrorCount > 10` à consulta, porque o limiar é avaliado pela lógica da regra de alerta.",
+        "texto_en": "You do not need to add `| where ErrorCount > 10` to the query, because the threshold is evaluated by the alert rule logic."
+      },
+      {
+        "letra": "E",
+        "texto": "Os erros do registo Application de VM1 também contam para ErrorCount.",
+        "texto_en": "Errors from the Application log of VM1 also count toward ErrorCount."
+      }
+    ],
+    "opcao_correta": [
+      "B",
+      "D"
+    ],
+    "explicacao": "B: com Split by dimensions em Computer, a regra avalia cada computador como uma série separada e dispara um alerta para cada combinação que cumpre a condição. VM1 (11) e VM2 (12) excedem o limiar de 10, logo são gerados dois alertas.\nD: a comparação com o limiar (Greater than 10) é feita pela secção Alert logic da regra, sobre o valor medido em ErrorCount. A consulta só precisa de devolver os valores. Filtrar na consulta não é necessário.\n\nA: como os resultados são divididos por Computer, os valores não são somados entre máquinas. VM1 (6) e VM2 (7) ficam ambos abaixo do limiar.\nC: o operador é Greater than, pelo que 10 não é superior a 10 e não dispara alerta.\nE: a consulta filtra EventLog == \"System\", portanto os eventos do registo Application são excluídos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-create-log-alert-rule",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-05",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "KQL – join",
+    "pergunta": "Configurou uma regra de recolha de dados (DCR) para enviar contadores de desempenho de várias máquinas virtuais para uma área de trabalho do Log Analytics. Suspeita que algumas máquinas não estão associadas à DCR.\n\nExecuta a seguinte consulta:\n\n```kusto\nlet perfComputers = Perf\n    | where TimeGenerated > ago(1h)\n    | distinct Computer;\nHeartbeat\n| where TimeGenerated > ago(1h)\n| distinct Computer\n| join kind=leftanti (perfComputers) on Computer\n```\n\nO que devolve a consulta?",
+    "pergunta_en": "You configured a data collection rule (DCR) to send performance counters from several virtual machines to a Log Analytics workspace. You suspect that some machines are not associated with the DCR.\n\nYou run the following query:\n\n```kusto\nlet perfComputers = Perf\n    | where TimeGenerated > ago(1h)\n    | distinct Computer;\nHeartbeat\n| where TimeGenerated > ago(1h)\n| distinct Computer\n| join kind=leftanti (perfComputers) on Computer\n```\n\nWhat does the query return?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Os computadores que enviaram heartbeats e dados de desempenho na última hora.",
+        "texto_en": "The computers that sent both heartbeats and performance data in the last hour."
+      },
+      {
+        "letra": "B",
+        "texto": "Os computadores que enviaram dados de desempenho na última hora, mas nenhum heartbeat.",
+        "texto_en": "The computers that sent performance data in the last hour, but no heartbeat."
+      },
+      {
+        "letra": "C",
+        "texto": "Todos os computadores que enviaram heartbeats na última hora, com as colunas de Perf vazias quando não existem dados de desempenho.",
+        "texto_en": "All the computers that sent heartbeats in the last hour, with the Perf columns empty when there is no performance data."
+      },
+      {
+        "letra": "D",
+        "texto": "Os computadores que enviaram heartbeats na última hora, mas nenhum registo de Perf no mesmo período.",
+        "texto_en": "The computers that sent heartbeats in the last hour, but no Perf records in the same period."
+      }
+    ],
+    "opcao_correta": [
+      "D"
+    ],
+    "explicacao": "O join kind=leftanti devolve apenas as linhas da tabela da esquerda (os computadores com heartbeat na última hora) que não têm correspondência na tabela da direita (perfComputers). O resultado são as máquinas que estão ativas, mas não estão a enviar contadores de desempenho, o que confirma a suspeita sobre a DCR.\n\nA: seria o resultado de um join inner ou innerunique (o tipo predefinido), que devolve apenas as linhas com correspondência nos dois lados.\nB: seria o resultado de kind=rightanti, que devolve as linhas da direita sem correspondência na esquerda.\nC: seria o resultado de kind=leftouter, que mantém todas as linhas da esquerda e preenche com valores nulos as colunas da direita quando não há correspondência.\n\nDocumentação: https://learn.microsoft.com/en-us/kusto/query/join-operator?view=azure-monitor",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-06",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "SAS – parâmetros do token",
+    "pergunta": "Um utilizador externo recebe o seguinte URL de assinatura de acesso partilhado (SAS) para uma conta de armazenamento chamada stcontosodata:\n\n```text\nhttps://stcontosodata.blob.core.windows.net/reports/2026/q3-summary.pdf?sv=2024-11-04&sr=b&sp=r&st=2026-10-01T08:00:00Z&se=2026-10-08T08:00:00Z&spr=https&sig=Xk2q7ZbN1vYc8f%2BmR4tLw0sPpE9uHjA6dQe5nKz3%3D\n```\n\nO que pode o utilizador fazer com este URL?",
+    "pergunta_en": "An external user receives the following shared access signature (SAS) URL for a storage account named stcontosodata:\n\n```text\nhttps://stcontosodata.blob.core.windows.net/reports/2026/q3-summary.pdf?sv=2024-11-04&sr=b&sp=r&st=2026-10-01T08:00:00Z&se=2026-10-08T08:00:00Z&spr=https&sig=Xk2q7ZbN1vYc8f%2BmR4tLw0sPpE9uHjA6dQe5nKz3%3D\n```\n\nWhat can the user do with this URL?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Ler o conteúdo e as propriedades do blob q3-summary.pdf, apenas através de HTTPS, entre 1 de outubro de 2026 às 08:00 UTC e 8 de outubro de 2026 às 08:00 UTC.",
+        "texto_en": "Read the content and properties of the q3-summary.pdf blob, over HTTPS only, between October 1, 2026 at 08:00 UTC and October 8, 2026 at 08:00 UTC."
+      },
+      {
+        "letra": "B",
+        "texto": "Listar e ler todos os blobs do contentor reports até 8 de outubro de 2026.",
+        "texto_en": "List and read all the blobs in the reports container until October 8, 2026."
+      },
+      {
+        "letra": "C",
+        "texto": "Ler e substituir o blob q3-summary.pdf até 8 de outubro de 2026.",
+        "texto_en": "Read and overwrite the q3-summary.pdf blob until October 8, 2026."
+      },
+      {
+        "letra": "D",
+        "texto": "Ler o blob q3-summary.pdf através de HTTP ou HTTPS até 8 de outubro de 2026.",
+        "texto_en": "Read the q3-summary.pdf blob over HTTP or HTTPS until October 8, 2026."
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "sr=b indica que o recurso assinado é um único blob (q3-summary.pdf). sp=r concede apenas a permissão Read, que permite ler o conteúdo, as propriedades e os metadados do blob. st e se definem o início e a expiração da validade em UTC, e spr=https limita os pedidos a HTTPS. sig é a assinatura HMAC-SHA256 que autoriza o pedido.\n\nB: listar blobs exige a permissão l e um recurso ao nível do contentor (sr=c). Com sr=b, o acesso está limitado a este blob.\nC: substituir o blob exige a permissão w (Write), que não está presente em sp.\nD: para permitir HTTP, spr teria de ser https,http. HTTP isolado nunca é um valor permitido.\n\nDocumentação: https://learn.microsoft.com/en-us/rest/api/storageservices/create-service-sas",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-07",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Ciclo de vida de blobs",
+    "pergunta": "Tem uma conta de armazenamento de uso geral v2 chamada stapp01 com armazenamento localmente redundante (LRS). Configura a seguinte política de gestão do ciclo de vida:\n\n```json\n{\n  \"rules\": [\n    {\n      \"enabled\": true,\n      \"name\": \"app1-logs\",\n      \"type\": \"Lifecycle\",\n      \"definition\": {\n        \"filters\": {\n          \"blobTypes\": [ \"blockBlob\" ],\n          \"prefixMatch\": [ \"logs/app1\" ]\n        },\n        \"actions\": {\n          \"baseBlob\": {\n            \"tierToCool\": { \"daysAfterModificationGreaterThan\": 30 },\n            \"tierToArchive\": { \"daysAfterModificationGreaterThan\": 90 },\n            \"delete\": { \"daysAfterModificationGreaterThan\": 365 }\n          }\n        }\n      }\n    }\n  ]\n}\n```\n\nA conta contém os blobs seguintes. Nenhum foi modificado nos últimos 120 dias e todos estão no escalão Hot.\n\nQue blob é movido para o escalão Archive na próxima execução da política?",
+    "pergunta_en": "You have a general-purpose v2 storage account named stapp01 that uses locally redundant storage (LRS). You configure the following lifecycle management policy:\n\n```json\n{\n  \"rules\": [\n    {\n      \"enabled\": true,\n      \"name\": \"app1-logs\",\n      \"type\": \"Lifecycle\",\n      \"definition\": {\n        \"filters\": {\n          \"blobTypes\": [ \"blockBlob\" ],\n          \"prefixMatch\": [ \"logs/app1\" ]\n        },\n        \"actions\": {\n          \"baseBlob\": {\n            \"tierToCool\": { \"daysAfterModificationGreaterThan\": 30 },\n            \"tierToArchive\": { \"daysAfterModificationGreaterThan\": 90 },\n            \"delete\": { \"daysAfterModificationGreaterThan\": 365 }\n          }\n        }\n      }\n    }\n  ]\n}\n```\n\nThe account contains the following blobs. None of them was modified in the last 120 days and all of them are in the Hot tier.\n\nWhich blob is moved to the Archive tier during the next policy run?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Blob de blocos app2/2026/05.log no contentor logs.",
+        "texto_en": "Block blob app2/2026/05.log in the logs container."
+      },
+      {
+        "letra": "B",
+        "texto": "Blob de blocos logs/app1/2026/05.log no contentor archive.",
+        "texto_en": "Block blob logs/app1/2026/05.log in the archive container."
+      },
+      {
+        "letra": "C",
+        "texto": "Blob de blocos app1/2026/05.log no contentor logs.",
+        "texto_en": "Block blob app1/2026/05.log in the logs container."
+      },
+      {
+        "letra": "D",
+        "texto": "Blob de acréscimo (append blob) app1/audit.log no contentor logs.",
+        "texto_en": "Append blob app1/audit.log in the logs container."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "O valor de prefixMatch começa sempre pelo nome do contentor. \"logs/app1\" corresponde aos blobs do contentor logs cujo nome começa por app1, e blobTypes limita a regra a blobs de blocos. O blob app1/2026/05.log cumpre os dois filtros e, com 120 dias sem modificação, satisfaz as condições de tierToCool (30) e de tierToArchive (90). Quando várias ações se aplicam ao mesmo blob, a gestão do ciclo de vida aplica a menos dispendiosa, que neste caso é tierToArchive. A ação delete (365 dias) ainda não se aplica.\n\nA: está no contentor logs, mas o nome começa por app2, por isso não corresponde ao prefixo.\nB: o prefixo é avaliado como contentor/nome. Este blob está no contentor archive, pelo que o caminho é archive/logs/app1/... e não corresponde a \"logs/app1\".\nD: blobTypes inclui apenas blockBlob. Além disso, as ações de mudança de escalão não são suportadas em blobs de acréscimo.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-policy-structure",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-08",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "Ciclo de vida – último acesso e snapshots",
+    "pergunta": "Tem uma conta de armazenamento de uso geral v2 chamada stmedia01. O controlo da hora do último acesso foi ativado há 200 dias. Há 150 dias, adicionou a seguinte regra à política de gestão do ciclo de vida:\n\n```json\n{\n  \"rules\": [\n    {\n      \"enabled\": true,\n      \"name\": \"media-by-access\",\n      \"type\": \"Lifecycle\",\n      \"definition\": {\n        \"filters\": {\n          \"blobTypes\": [ \"blockBlob\" ],\n          \"prefixMatch\": [ \"media/\" ]\n        },\n        \"actions\": {\n          \"baseBlob\": {\n            \"enableAutoTierToHotFromCool\": true,\n            \"tierToCool\": { \"daysAfterLastAccessTimeGreaterThan\": 45 }\n          },\n          \"snapshot\": {\n            \"delete\": { \"daysAfterCreationGreaterThan\": 90 }\n          }\n        }\n      }\n    }\n  ]\n}\n```\n\nQuais são as duas ações que a política executa? Cada resposta correta apresenta uma solução completa.",
+    "pergunta_en": "You have a general-purpose v2 storage account named stmedia01. Last access time tracking was enabled 200 days ago. 150 days ago, you added the following rule to the lifecycle management policy:\n\n```json\n{\n  \"rules\": [\n    {\n      \"enabled\": true,\n      \"name\": \"media-by-access\",\n      \"type\": \"Lifecycle\",\n      \"definition\": {\n        \"filters\": {\n          \"blobTypes\": [ \"blockBlob\" ],\n          \"prefixMatch\": [ \"media/\" ]\n        },\n        \"actions\": {\n          \"baseBlob\": {\n            \"enableAutoTierToHotFromCool\": true,\n            \"tierToCool\": { \"daysAfterLastAccessTimeGreaterThan\": 45 }\n          },\n          \"snapshot\": {\n            \"delete\": { \"daysAfterCreationGreaterThan\": 90 }\n          }\n        }\n      }\n    }\n  ]\n}\n```\n\nWhich two actions does the policy perform? Each correct answer presents a complete solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Move para o escalão Cool o blob de blocos Blob1 do contentor media, que está no escalão Hot e foi lido pela última vez há 60 dias.",
+        "texto_en": "It moves to the Cool tier the block blob Blob1 in the media container, which is in the Hot tier and was last read 60 days ago."
+      },
+      {
+        "letra": "B",
+        "texto": "Move para o escalão Hot o blob de blocos Blob2 do contentor media quando este é lido hoje. Blob2 foi colocado manualmente no escalão Cool antes de a regra ser criada.",
+        "texto_en": "It moves to the Hot tier the block blob Blob2 in the media container when it is read today. Blob2 was manually set to the Cool tier before the rule was created."
+      },
+      {
+        "letra": "C",
+        "texto": "Elimina um snapshot do blob Blob3 do contentor media que foi criado há 100 dias.",
+        "texto_en": "It deletes a snapshot of the Blob3 blob in the media container that was created 100 days ago."
+      },
+      {
+        "letra": "D",
+        "texto": "Move para o escalão Cool o blob de blocos Blob4 do contentor media-archive, que está no escalão Hot e foi lido pela última vez há 60 dias.",
+        "texto_en": "It moves to the Cool tier the block blob Blob4 in the media-archive container, which is in the Hot tier and was last read 60 days ago."
+      },
+      {
+        "letra": "E",
+        "texto": "Move para o escalão Cool o blob de blocos Blob5 do contentor media, que foi modificado há 300 dias e lido pela última vez há 10 dias.",
+        "texto_en": "It moves to the Cool tier the block blob Blob5 in the media container, which was modified 300 days ago and last read 10 days ago."
+      }
+    ],
+    "opcao_correta": [
+      "A",
+      "C"
+    ],
+    "explicacao": "A: Blob1 cumpre o filtro (contentor media, blob de blocos) e a condição daysAfterLastAccessTimeGreaterThan de 45 dias, porque foi lido pela última vez há 60 dias e o controlo do último acesso está ativo.\nC: a ação snapshot.delete usa daysAfterCreationGreaterThan, que nos snapshots se baseia na hora de criação do snapshot. 100 dias é superior a 90.\n\nB: enableAutoTierToHotFromCool só funciona com daysAfterLastAccessTimeGreaterThan e não tem efeito em blobs que já estavam no escalão Cool antes de a ação ser ativada na regra.\nD: o prefixo \"media/\" corresponde apenas ao contentor media. O contentor media-archive não começa por \"media/\".\nE: a condição usa a hora do último acesso, não a da última modificação. Blob5 foi lido há 10 dias, menos do que os 45 dias exigidos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/storage/blobs/lifecycle-management-policy-structure",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-09",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Firewall da conta de armazenamento",
+    "pergunta": "Tem uma conta de armazenamento chamada stweu01 na região West Europe. A propriedade networkAcls da conta está configurada da seguinte forma:\n\n```json\n{\n  \"networkAcls\": {\n    \"defaultAction\": \"Deny\",\n    \"bypass\": \"AzureServices\",\n    \"ipRules\": [\n      { \"value\": \"203.0.113.0/24\", \"action\": \"Allow\" }\n    ],\n    \"virtualNetworkRules\": [\n      {\n        \"id\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1/providers/Microsoft.Network/virtualNetworks/VNet1/subnets/Apps\",\n        \"action\": \"Allow\"\n      }\n    ]\n  }\n}\n```\n\nO ponto final de serviço Microsoft.Storage está ativado na sub-rede Apps. Todos os clientes usam credenciais válidas e acedem ao ponto final público da conta.\n\nQue cliente consegue aceder aos dados de blob de stweu01?",
+    "pergunta_en": "You have a storage account named stweu01 in the West Europe region. The networkAcls property of the account is configured as follows:\n\n```json\n{\n  \"networkAcls\": {\n    \"defaultAction\": \"Deny\",\n    \"bypass\": \"AzureServices\",\n    \"ipRules\": [\n      { \"value\": \"203.0.113.0/24\", \"action\": \"Allow\" }\n    ],\n    \"virtualNetworkRules\": [\n      {\n        \"id\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1/providers/Microsoft.Network/virtualNetworks/VNet1/subnets/Apps\",\n        \"action\": \"Allow\"\n      }\n    ]\n  }\n}\n```\n\nThe Microsoft.Storage service endpoint is enabled on the Apps subnet. All the clients use valid credentials and access the public endpoint of the account.\n\nWhich client can access the blob data in stweu01?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "VM2, na sub-rede Data de VNet1 (West Europe), sem ponto final de serviço, com o endereço IP público 203.0.113.10.",
+        "texto_en": "VM2, in the Data subnet of VNet1 (West Europe), without a service endpoint, with the public IP address 203.0.113.10."
+      },
+      {
+        "letra": "B",
+        "texto": "Um computador no local com o endereço IP público 198.51.100.25.",
+        "texto_en": "An on-premises computer with the public IP address 198.51.100.25."
+      },
+      {
+        "letra": "C",
+        "texto": "VM3, na sub-rede Data de VNet1, depois de ativar o ponto final de serviço Microsoft.Storage na sub-rede Data.",
+        "texto_en": "VM3, in the Data subnet of VNet1, after enabling the Microsoft.Storage service endpoint on the Data subnet."
+      },
+      {
+        "letra": "D",
+        "texto": "VM4, numa rede virtual na região East US sem pontos finais de serviço, que sai para a Internet com o endereço IP público 203.0.113.80.",
+        "texto_en": "VM4, in a virtual network in the East US region without service endpoints, that egresses to the internet with the public IP address 203.0.113.80."
+      }
+    ],
+    "opcao_correta": [
+      "D"
+    ],
+    "explicacao": "Com defaultAction definido como Deny, só é permitido o tráfego que corresponde a uma regra. VM4 está noutra região e não usa pontos finais de serviço, por isso chega à conta com o endereço público 203.0.113.80, que pertence ao intervalo 203.0.113.0/24 da regra ipRules.\n\nA: as regras de IP não têm efeito em pedidos com origem na mesma região do Azure que a conta de armazenamento. Para clientes na mesma região, é necessário usar regras de rede virtual.\nB: 198.51.100.25 não está em nenhuma regra de IP.\nC: ativar o ponto final de serviço não basta. A sub-rede Data também tem de ser adicionada a virtualNetworkRules, e só a sub-rede Apps está autorizada. O bypass AzureServices aplica-se apenas aos serviços fidedignos do Azure, não a máquinas virtuais.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/storage/common/storage-network-security-limitations",
+    "assets": []
+  },
+  {
+    "id": "AUT26-KS-10",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Replicação de objetos",
+    "pergunta": "Tem duas contas de armazenamento de uso geral v2: stsrcweu (origem) e stdstneu (destino). O controlo de versões de blobs está ativado em ambas as contas e o feed de alterações está ativado em stsrcweu. Aplicou a seguinte política de replicação de objetos:\n\n```json\n{\n  \"properties\": {\n    \"policyId\": \"default\",\n    \"sourceAccount\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1/providers/Microsoft.Storage/storageAccounts/stsrcweu\",\n    \"destinationAccount\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG2/providers/Microsoft.Storage/storageAccounts/stdstneu\",\n    \"rules\": [\n      {\n        \"ruleId\": \"\",\n        \"sourceContainer\": \"invoices\",\n        \"destinationContainer\": \"invoices-copy\",\n        \"filters\": {\n          \"prefixMatch\": [ \"2026/\" ],\n          \"minCreationTime\": \"2026-06-01T00:00:00Z\"\n        }\n      }\n    ]\n  }\n}\n```\n\nForam carregados os seguintes blobs no contentor invoices de stsrcweu, todos no escalão Hot.\n\nQue blob é replicado para stdstneu?",
+    "pergunta_en": "You have two general-purpose v2 storage accounts: stsrcweu (source) and stdstneu (destination). Blob versioning is enabled on both accounts and change feed is enabled on stsrcweu. You applied the following object replication policy:\n\n```json\n{\n  \"properties\": {\n    \"policyId\": \"default\",\n    \"sourceAccount\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1/providers/Microsoft.Storage/storageAccounts/stsrcweu\",\n    \"destinationAccount\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG2/providers/Microsoft.Storage/storageAccounts/stdstneu\",\n    \"rules\": [\n      {\n        \"ruleId\": \"\",\n        \"sourceContainer\": \"invoices\",\n        \"destinationContainer\": \"invoices-copy\",\n        \"filters\": {\n          \"prefixMatch\": [ \"2026/\" ],\n          \"minCreationTime\": \"2026-06-01T00:00:00Z\"\n        }\n      }\n    ]\n  }\n}\n```\n\nThe following blobs were uploaded to the invoices container in stsrcweu, all of them in the Hot tier.\n\nWhich blob is replicated to stdstneu?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Blob de blocos 2025/12/inv-0912.pdf, carregado em 15 de julho de 2026.",
+        "texto_en": "Block blob 2025/12/inv-0912.pdf, uploaded on July 15, 2026."
+      },
+      {
+        "letra": "B",
+        "texto": "Blob de blocos 2026/07/inv-1044.pdf, carregado em 15 de julho de 2026.",
+        "texto_en": "Block blob 2026/07/inv-1044.pdf, uploaded on July 15, 2026."
+      },
+      {
+        "letra": "C",
+        "texto": "Blob de blocos 2026/05/inv-0871.pdf, carregado em 20 de maio de 2026.",
+        "texto_en": "Block blob 2026/05/inv-0871.pdf, uploaded on May 20, 2026."
+      },
+      {
+        "letra": "D",
+        "texto": "Blob de acréscimo (append blob) 2026/08/upload.log, carregado em 3 de agosto de 2026.",
+        "texto_en": "Append blob 2026/08/upload.log, uploaded on August 3, 2026."
+      }
+    ],
+    "opcao_correta": [
+      "B"
+    ],
+    "explicacao": "Na replicação de objetos, o prefixMatch é avaliado sobre o nome do blob dentro do contentor de origem (sourceContainer), e minCreationTime replica apenas os blobs criados nessa data ou depois. 2026/07/inv-1044.pdf é um blob de blocos, começa por \"2026/\" e foi criado depois de 1 de junho de 2026, por isso é replicado para o contentor invoices-copy.\n\nA: foi criado depois de minCreationTime, mas o nome começa por \"2025/\" e não corresponde ao prefixo.\nC: corresponde ao prefixo, mas foi criado antes de 2026-06-01T00:00:00Z.\nD: a replicação de objetos suporta apenas blobs de blocos. Os blobs de acréscimo e os blobs de páginas não são replicados.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/storage/blobs/object-replication-overview",
+    "assets": []
+  }
+]

@@ -99,7 +99,8 @@ function App() {
     if (mode === 'favoritas') list = list.filter(q => stickyIds.has(q.id) || favorites.has(q.id));
     if (filters.domain !== 'all') list = list.filter(q => q.domainIndex === Number(filters.domain));
     if (filters.source !== 'all') list = list.filter(q => q.origem === filters.source);
-    if (filters.type !== 'all') list = list.filter(q => (q.opcao_correta.length > 1) === (filters.type === 'multi'));
+    if (filters.type === 'code') list = list.filter(q => q.hasCode);
+    else if (filters.type !== 'all') list = list.filter(q => (q.opcao_correta.length > 1) === (filters.type === 'multi'));
     if (filters.status !== 'all') {
       list = list.filter(q => {
         if (stickyIds.has(q.id)) return true;
