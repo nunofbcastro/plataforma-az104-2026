@@ -771,9 +771,30 @@ function App() {
                   })}
                 </div>
               </div>
+            {/* Progresso por domínio — calculado a partir de respostas reais */}
+            <div className="domain-progress-panel">
+              <div className="domain-progress-heading"><span>▥</span> Progresso por tema</div>
+              {domainOptions.map(([domain, label], domainIndex) => {
+                const aliases = domainAliases[domainIndex] || [];
+                const questions = allQuestions.filter(q => aliases.some(alias => (q.dominio || '').toLowerCase().includes(alias)));
+                const completed = questions.filter(q => userAnswers[q.id]).length;
+                const percentage = questions.length ? Math.round(completed / questions.length * 100) : 0;
+                return (
+                  <div className="domain-progress-item" key={domain}>
+                    <div><span>{label.split(' · ')[0]}</span><strong>{percentage}%</strong></div>
+                    <div className="domain-progress-track"><div style={{ width: `${percentage}%` }} /></div>
+                  </div>
+                );
+              })}
             </div>
+          </div>
 
-            {/* RIGHT COLUMN: SIMULADO LOBBY OR QUESTION CARD */}
+          <div className="study-quick-actions">
+            <button onClick={() => requestModeSwitch('treino')} className="quick-primary">▶ <span>Continuar treino</span></button>
+            <button onClick={() => requestModeSwitch('simulado')} className="quick-secondary">▤ <span>Iniciar simulado</span></button>
+          </div>
+
+          {/* RIGHT COLUMN: SIMULADO LOBBY OR QUESTION CARD */}
             <div className="flex flex-col">
               {/* 1. SIMULADO LOBBY (when simState === 'idle') */}
               {mode === 'simulado' && simState === 'idle' && (
@@ -990,13 +1011,13 @@ function App() {
                       </div>
 
                       {/* Question Statement */}
-                      <div className="text-[14.5px] leading-relaxed text-slate-200 mb-6">
+                      <div className="question-statement text-[14.5px] leading-relaxed text-slate-200 mb-6">
                         {renderFormattedText(lang === 'en' && currentQ.pergunta_en ? currentQ.pergunta_en : currentQ.pergunta)}
                       </div>
 
                       {/* Architecture Diagrams Box */}
                       {currentQ.assets && currentQ.assets.length > 0 && (
-                        <div className="flex flex-col gap-3 mb-6">
+                        <div className="answer-options flex flex-col gap-3 mb-6">
                           {currentQ.assets.map((assetPath, aIdx) => (
                             <div
                               key={aIdx}
