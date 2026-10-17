@@ -74,20 +74,20 @@ export function Sidebar({ mode, requestModeSwitch, openStats, openSettings, stat
           </button>
         ))}
         <button className="side-link" onClick={openStats} title="Estatísticas"><Icon name="chart"/><span>Estatísticas</span></button>
-        <button className="side-link" onClick={openSettings} title="Definições"><Icon name="settings"/><span>Definições</span></button>
+        <button className="side-link" onClick={openSettings} title="Configurações"><Icon name="settings"/><span>Configurações</span></button>
       </nav>
       <div className="side-promo">
         <div className="side-promo-art" aria-hidden="true"><span className="cloud c1"/><span className="cloud c2"/><span className="cloud c3"/><AzureMark className="side-promo-mark"/></div>
-        <h2>O teu sucesso<br/>começa aqui</h2>
-        <p>Pratica todos os dias e acompanha a evolução em cada domínio do exame.</p>
+        <h2>Seu sucesso<br/>começa aqui</h2>
+        <p>Pratique todos os dias e acompanhe sua evolução em cada domínio do exame.</p>
         <div className="side-progress">
-          <div><span>O teu percurso</span><strong>{progress}%</strong></div>
+          <div><span>Seu progresso</span><strong>{progress}%</strong></div>
           <div className="bar"><span style={{ width: `${progress}%` }}/></div>
-          <small>{stats.answered.toLocaleString('pt-PT')} de {stats.total.toLocaleString('pt-PT')} questões</small>
+          <small>{stats.answered.toLocaleString('pt-BR')} de {stats.total.toLocaleString('pt-BR')} questões</small>
         </div>
-        <button className="btn btn-primary btn-block" onClick={() => requestModeSwitch('treino')}>Continuar a evoluir <Icon name="arrowRight" size={16}/></button>
+        <button className="btn btn-primary btn-block" onClick={() => requestModeSwitch('treino')}>Continuar evoluindo <Icon name="arrowRight" size={16}/></button>
       </div>
-      <p className="side-foot"><i/>Progresso guardado neste dispositivo</p>
+      <p className="side-foot"><i/>Progresso salvo neste dispositivo</p>
     </aside>
   );
 }
@@ -124,7 +124,7 @@ export function Topbar({ theme, setTheme, lang, setLang, searchTerm, setSearchTe
         <button className="icon-btn search-toggle" onClick={() => { setSearchOpen(true); requestAnimationFrame(() => inputRef.current?.focus()); }} aria-label="Pesquisar"><Icon name="search"/></button>
         <button className="icon-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label={theme === 'dark' ? 'Ativar tema claro' : 'Ativar tema escuro'} title="Alternar tema"><Icon name={theme === 'dark' ? 'sun' : 'moon'}/></button>
         <button className="lang-btn" onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')} aria-label={`Idioma das questões: ${lang === 'pt' ? 'Português' : 'Inglês'}`} title="Idioma das questões"><Icon name="globe" size={16}/>{lang === 'pt' ? 'PT' : 'EN'}</button>
-        <button className="icon-btn settings-toggle" onClick={openSettings} aria-label="Definições"><Icon name="settings"/></button>
+        <button className="icon-btn settings-toggle" onClick={openSettings} aria-label="Configurações"><Icon name="settings"/></button>
       </div>
     </header>
   );
@@ -148,10 +148,10 @@ export function StatsRow({ stats }) {
   const progress = stats.total ? Math.round(stats.answered / stats.total * 100) : 0;
   const errorRate = stats.answered ? 100 - stats.percent : 0;
   const entries = [
-    { icon: 'file', tone: 'blue', value: stats.total.toLocaleString('pt-PT'), label: 'Questões', detail: 'no total' },
-    { icon: 'check', tone: 'green', value: stats.answered.toLocaleString('pt-PT'), label: 'Respondidas', detail: `${progress}% do total` },
-    { icon: 'chart', tone: 'sky', value: stats.correct.toLocaleString('pt-PT'), label: 'Acertos', detail: `${stats.percent}% de sucesso` },
-    { icon: 'cross', tone: 'red', value: stats.incorrect.toLocaleString('pt-PT'), label: 'Erros', detail: `${errorRate}% de erro` },
+    { icon: 'file', tone: 'blue', value: stats.total.toLocaleString('pt-BR'), label: 'Questões', detail: 'no total' },
+    { icon: 'check', tone: 'green', value: stats.answered.toLocaleString('pt-BR'), label: 'Respondidas', detail: `${progress}% do total` },
+    { icon: 'chart', tone: 'sky', value: stats.correct.toLocaleString('pt-BR'), label: 'Acertos', detail: `${stats.percent}% de sucesso` },
+    { icon: 'cross', tone: 'red', value: stats.incorrect.toLocaleString('pt-BR'), label: 'Erros', detail: `${errorRate}% de erro` },
   ];
   return (
     <section className="stats" aria-label="Resumo do estudo">
@@ -163,7 +163,7 @@ export function StatsRow({ stats }) {
       ))}
       <div className="stat tone-violet">
         <span className="stat-ring" style={{ '--p': progress }}><Icon name="target" size={20}/></span>
-        <div><strong>{progress}%</strong><span>Progresso</span><small>{stats.answered} de {stats.total.toLocaleString('pt-PT')}</small></div>
+        <div><strong>{progress}%</strong><span>Progresso</span><small>{stats.answered} de {stats.total.toLocaleString('pt-BR')}</small></div>
       </div>
     </section>
   );

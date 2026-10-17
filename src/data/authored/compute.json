@@ -6,7 +6,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
     "tema": "Bicep",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um grupo de recursos chamado RG1 na região West Europe.\n\nTem um ficheiro Bicep chamado main.bicep que implementa uma máquina virtual. O ficheiro não define a propriedade targetScope e contém a seguinte declaração: `param vmSize string`\n\nPrecisa de implementar o ficheiro em RG1 e definir o valor de vmSize como Standard_D2s_v5.\n\nQue comando deve executar?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém um grupo de recursos chamado RG1 na região West Europe.\n\nVocê tem um arquivo Bicep chamado main.bicep que implanta uma máquina virtual. O arquivo não define a propriedade targetScope e contém a seguinte declaração: `param vmSize string`\n\nVocê precisa implantar o arquivo em RG1 e definir o valor de vmSize como Standard_D2s_v5.\n\nQual comando você deve executar?",
     "pergunta_en": "Your company has an Azure subscription that contains a resource group named RG1 in the West Europe region.\n\nYou have a Bicep file named main.bicep that deploys a virtual machine. The file does not set the targetScope property and contains the following declaration: `param vmSize string`\n\nYou need to deploy the file to RG1 and set the value of vmSize to Standard_D2s_v5.\n\nWhich command should you run?",
     "opcoes": [
       { "letra": "A", "texto": "`az deployment sub create --location westeurope --template-file main.bicep --parameters vmSize=Standard_D2s_v5`", "texto_en": "`az deployment sub create --location westeurope --template-file main.bicep --parameters vmSize=Standard_D2s_v5`" },
@@ -15,7 +15,7 @@
       { "letra": "D", "texto": "`az group create --name RG1 --location westeurope`", "texto_en": "`az group create --name RG1 --location westeurope`" }
     ],
     "opcao_correta": ["C"],
-    "explicacao": "Quando um ficheiro Bicep não define targetScope, o âmbito predefinido é resourceGroup, pelo que a implementação deve ser feita ao nível do grupo de recursos com `az deployment group create` (equivalente em PowerShell: New-AzResourceGroupDeployment). O parâmetro sem valor predefinido é fornecido com --parameters vmSize=Standard_D2s_v5.\n\nA está errada: `az deployment sub create` implementa no âmbito da subscrição, o que não corresponde ao âmbito do ficheiro. B apenas compila o Bicep para um template ARM JSON; não implementa nada. D cria (ou atualiza) o grupo de recursos, mas não implementa o ficheiro Bicep.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli"
+    "explicacao": "Quando um arquivo Bicep não define targetScope, o escopo padrão é resourceGroup, portanto a implantação deve ser feita no nível do grupo de recursos com `az deployment group create` (equivalente no PowerShell: New-AzResourceGroupDeployment). O parâmetro sem valor padrão é fornecido com --parameters vmSize=Standard_D2s_v5.\n\nA está errada: `az deployment sub create` implanta no escopo da assinatura, o que não corresponde ao escopo do arquivo. B apenas compila o Bicep para um modelo do ARM em JSON; não implanta nada. D cria (ou atualiza) o grupo de recursos, mas não implanta o arquivo Bicep.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-cli"
   },
   {
     "id": "AUT26-CP-02",
@@ -23,17 +23,17 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
-    "tema": "Templates ARM – modos de implementação",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um grupo de recursos chamado RG1. RG1 contém os seguintes recursos: uma conta de armazenamento chamada storage1, uma conta de armazenamento chamada storage2 e uma rede virtual chamada VNet1. Nenhum dos recursos tem bloqueios.\n\nTem um template ARM que define apenas storage1 e uma nova conta de armazenamento chamada storage3.\n\nImplementa o template em RG1 com o modo de implementação Complete.\n\nQual é o resultado da implementação?",
+    "tema": "Modelos do ARM – modos de implantação",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém um grupo de recursos chamado RG1. RG1 contém os seguintes recursos: uma conta de armazenamento chamada storage1, uma conta de armazenamento chamada storage2 e uma rede virtual chamada VNet1. Nenhum dos recursos tem bloqueios.\n\nVocê tem um modelo do ARM que define apenas storage1 e uma nova conta de armazenamento chamada storage3.\n\nVocê implanta o modelo em RG1 com o modo de implantação Complete.\n\nQual é o resultado da implantação?",
     "pergunta_en": "Your company has an Azure subscription that contains a resource group named RG1. RG1 contains the following resources: a storage account named storage1, a storage account named storage2, and a virtual network named VNet1. None of the resources have locks.\n\nYou have an ARM template that defines only storage1 and a new storage account named storage3.\n\nYou deploy the template to RG1 by using the Complete deployment mode.\n\nWhat is the result of the deployment?",
     "opcoes": [
-      { "letra": "A", "texto": "storage3 é criada e todos os restantes recursos de RG1 permanecem inalterados.", "texto_en": "storage3 is created and all other resources in RG1 remain unchanged." },
-      { "letra": "B", "texto": "storage3 é criada, storage1 é atualizada conforme o template, e storage2 e VNet1 são eliminadas.", "texto_en": "storage3 is created, storage1 is updated to match the template, and storage2 and VNet1 are deleted." },
-      { "letra": "C", "texto": "A implementação falha porque VNet1 e storage2 não estão definidas no template.", "texto_en": "The deployment fails because VNet1 and storage2 are not defined in the template." },
-      { "letra": "D", "texto": "Todos os recursos de RG1 são eliminados e depois storage1 e storage3 são recriadas.", "texto_en": "All resources in RG1 are deleted and then storage1 and storage3 are re-created." }
+      { "letra": "A", "texto": "storage3 é criada e todos os demais recursos de RG1 permanecem inalterados.", "texto_en": "storage3 is created and all other resources in RG1 remain unchanged." },
+      { "letra": "B", "texto": "storage3 é criada, storage1 é atualizada conforme o modelo, e storage2 e VNet1 são excluídas.", "texto_en": "storage3 is created, storage1 is updated to match the template, and storage2 and VNet1 are deleted." },
+      { "letra": "C", "texto": "A implantação falha porque VNet1 e storage2 não estão definidas no modelo.", "texto_en": "The deployment fails because VNet1 and storage2 are not defined in the template." },
+      { "letra": "D", "texto": "Todos os recursos de RG1 são excluídos e depois storage1 e storage3 são recriadas.", "texto_en": "All resources in RG1 are deleted and then storage1 and storage3 are re-created." }
     ],
     "opcao_correta": ["B"],
-    "explicacao": "No modo Complete, o Resource Manager elimina os recursos que existem no grupo de recursos mas não estão especificados no template. Os recursos definidos no template são criados (storage3) ou atualizados (storage1). Como storage2 e VNet1 não estão no template e não têm bloqueios, são eliminados.\n\nA descreve o comportamento do modo Incremental (o predefinido). C está errada: a ausência de recursos no template não provoca falha; no modo Complete provoca a eliminação. D está errada: os recursos existentes definidos no template não são eliminados e recriados, são atualizados no local.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-modes"
+    "explicacao": "No modo Complete, o Resource Manager exclui os recursos que existem no grupo de recursos mas não estão especificados no modelo. Os recursos definidos no modelo são criados (storage3) ou atualizados (storage1). Como storage2 e VNet1 não estão no modelo e não têm bloqueios, eles são excluídos.\n\nA descreve o comportamento do modo Incremental (o padrão). C está errada: a ausência de recursos no modelo não causa falha; no modo Complete, causa a exclusão. D está errada: os recursos existentes definidos no modelo não são excluídos e recriados, eles são atualizados no local.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-modes"
   },
   {
     "id": "AUT26-CP-03",
@@ -42,7 +42,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
     "tema": "Bicep – what-if",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um grupo de recursos chamado RG1. Os recursos de RG1 foram implementados a partir de um ficheiro Bicep chamado main.bicep.\n\nUm colega alterou main.bicep. Antes de implementar a nova versão, precisa de ver quais os recursos de RG1 que seriam criados, modificados ou eliminados, sem aplicar quaisquer alterações.\n\nQue comando deve executar?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém um grupo de recursos chamado RG1. Os recursos de RG1 foram implantados a partir de um arquivo Bicep chamado main.bicep.\n\nUm colega alterou main.bicep. Antes de implantar a nova versão, você precisa ver quais recursos de RG1 seriam criados, modificados ou excluídos, sem aplicar nenhuma alteração.\n\nQual comando você deve executar?",
     "pergunta_en": "Your company has an Azure subscription that contains a resource group named RG1. The resources in RG1 were deployed from a Bicep file named main.bicep.\n\nA colleague modified main.bicep. Before you deploy the new version, you need to see which resources in RG1 would be created, modified, or deleted, without applying any changes.\n\nWhich command should you run?",
     "opcoes": [
       { "letra": "A", "texto": "`az deployment group validate --resource-group RG1 --template-file main.bicep`", "texto_en": "`az deployment group validate --resource-group RG1 --template-file main.bicep`" },
@@ -51,7 +51,7 @@
       { "letra": "D", "texto": "`az deployment group what-if --resource-group RG1 --template-file main.bicep`", "texto_en": "`az deployment group what-if --resource-group RG1 --template-file main.bicep`" }
     ],
     "opcao_correta": ["D"],
-    "explicacao": "A operação what-if compara o template com o estado atual dos recursos e mostra as alterações previstas (Create, Modify, Delete, NoChange, etc.) sem as aplicar. Em PowerShell, o equivalente é New-AzResourceGroupDeployment com -WhatIf ou Get-AzResourceGroupDeploymentWhatIfResult.\n\nA apenas valida a sintaxe e a aceitação do template pelo Resource Manager; não lista as alterações aos recursos. B executa efetivamente a implementação. C analisa o código Bicep segundo regras de boas práticas, sem comparar com os recursos implementados.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-what-if"
+    "explicacao": "A operação what-if compara o modelo com o estado atual dos recursos e mostra as alterações previstas (Create, Modify, Delete, NoChange, etc.) sem aplicá-las. No PowerShell, o equivalente é New-AzResourceGroupDeployment com -WhatIf ou Get-AzResourceGroupDeploymentWhatIfResult.\n\nA apenas valida a sintaxe e a aceitação do modelo pelo Resource Manager; não lista as alterações nos recursos. B executa efetivamente a implantação. C analisa o código Bicep segundo regras de boas práticas, sem comparar com os recursos implantados.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-what-if"
   },
   {
     "id": "AUT26-CP-04",
@@ -59,18 +59,18 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Seleção Múltipla",
     "dificuldade": "Médio",
-    "tema": "Templates ARM – exportar",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um grupo de recursos chamado RG1. Os recursos de RG1 foram criados manualmente no portal do Azure.\n\nPrecisa de obter um template ARM que represente os recursos atualmente existentes em RG1, para o reutilizar noutros ambientes.\n\nQuais são as DUAS ações que permitem cumprir este requisito? Cada resposta correta apresenta uma solução completa.",
+    "tema": "Modelos do ARM – exportar",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém um grupo de recursos chamado RG1. Os recursos de RG1 foram criados manualmente no portal do Azure.\n\nVocê precisa obter um modelo do ARM que represente os recursos existentes atualmente em RG1, para reutilizá-lo em outros ambientes.\n\nQuais são as DUAS ações que permitem atender a esse requisito? Cada resposta correta apresenta uma solução completa.",
     "pergunta_en": "Your company has an Azure subscription that contains a resource group named RG1. The resources in RG1 were created manually in the Azure portal.\n\nYou need to obtain an ARM template that represents the resources that currently exist in RG1 so that you can reuse it in other environments.\n\nWhich TWO actions meet this requirement? Each correct answer presents a complete solution.",
     "opcoes": [
-      { "letra": "A", "texto": "No portal do Azure, abrir RG1 e, em Automatização, selecionar Exportar modelo.", "texto_en": "In the Azure portal, open RG1 and, under Automation, select Export template." },
+      { "letra": "A", "texto": "No portal do Azure, abrir RG1 e, em Automação, selecionar Exportar modelo.", "texto_en": "In the Azure portal, open RG1 and, under Automation, select Export template." },
       { "letra": "B", "texto": "Executar `az deployment group what-if --resource-group RG1`.", "texto_en": "Run `az deployment group what-if --resource-group RG1`." },
       { "letra": "C", "texto": "Executar `az group export --name RG1`.", "texto_en": "Run `az group export --name RG1`." },
-      { "letra": "D", "texto": "Transferir o registo de atividades de RG1 em formato CSV.", "texto_en": "Download the activity log of RG1 in CSV format." },
+      { "letra": "D", "texto": "Baixar o log de atividades de RG1 em formato CSV.", "texto_en": "Download the activity log of RG1 in CSV format." },
       { "letra": "E", "texto": "Executar `az bicep decompile` no grupo de recursos RG1.", "texto_en": "Run `az bicep decompile` against the RG1 resource group." }
     ],
     "opcao_correta": ["A", "C"],
-    "explicacao": "A funcionalidade Exportar modelo do portal (A) e o comando `az group export` (C, ou Export-AzResourceGroup em PowerShell) geram um template ARM JSON a partir do estado atual dos recursos do grupo de recursos. O template exportado pode depois ser parametrizado e reutilizado.\n\nB requer um template como entrada e apenas pré-visualiza alterações. D devolve eventos de operações, não um template implementável. E converte um ficheiro de template ARM JSON já existente em Bicep; não exporta recursos de um grupo de recursos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/export-template-portal"
+    "explicacao": "O recurso Exportar modelo do portal (A) e o comando `az group export` (C, ou Export-AzResourceGroup no PowerShell) geram um modelo do ARM em JSON a partir do estado atual dos recursos do grupo de recursos. O modelo exportado pode depois ser parametrizado e reutilizado.\n\nB requer um modelo como entrada e apenas visualiza as alterações. D retorna eventos de operações, não um modelo implantável. E converte um arquivo de modelo do ARM em JSON já existente em Bicep; não exporta recursos de um grupo de recursos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/export-template-portal"
   },
   {
     "id": "AUT26-CP-05",
@@ -78,17 +78,17 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
-    "tema": "Encriptação de VMs",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual Windows chamada VM1 com o tamanho Standard_D4s_v5. VM1 utiliza discos geridos Premium SSD e nunca teve o Azure Disk Encryption ativado.\n\nPrecisa de garantir que o disco temporário e as caches dos discos do sistema operativo e de dados de VM1 são encriptados em repouso. A solução não pode instalar extensões nem consumir CPU do sistema operativo convidado para efetuar a encriptação.\n\nO que deve fazer?",
+    "tema": "Criptografia de VMs",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém uma máquina virtual Windows chamada VM1 com o tamanho Standard_D4s_v5. VM1 usa discos gerenciados Premium SSD e nunca teve o Azure Disk Encryption habilitado.\n\nVocê precisa garantir que o disco temporário e os caches dos discos do sistema operacional e de dados de VM1 sejam criptografados em repouso. A solução não pode instalar extensões nem consumir CPU do sistema operacional convidado para realizar a criptografia.\n\nO que você deve fazer?",
     "pergunta_en": "Your company has an Azure subscription that contains a Windows virtual machine named VM1 that uses the Standard_D4s_v5 size. VM1 uses Premium SSD managed disks and has never had Azure Disk Encryption enabled.\n\nYou need to ensure that the temporary disk and the caches of the OS and data disks of VM1 are encrypted at rest. The solution must not install extensions or consume guest operating system CPU to perform the encryption.\n\nWhat should you do?",
     "opcoes": [
-      { "letra": "A", "texto": "Ativar o Azure Disk Encryption (ADE) em VM1 com uma chave armazenada no Azure Key Vault.", "texto_en": "Enable Azure Disk Encryption (ADE) on VM1 by using a key stored in Azure Key Vault." },
-      { "letra": "B", "texto": "Registar a funcionalidade EncryptionAtHost na subscrição, desalocar VM1 e ativar a encriptação no anfitrião (encryption at host).", "texto_en": "Register the EncryptionAtHost feature in the subscription, deallocate VM1, and enable encryption at host." },
-      { "letra": "C", "texto": "Criar um conjunto de encriptação de disco (disk encryption set) e configurar a encriptação do lado do servidor com chaves geridas pelo cliente nos discos de VM1.", "texto_en": "Create a disk encryption set and configure server-side encryption with customer-managed keys on the disks of VM1." },
-      { "letra": "D", "texto": "Ativar a encriptação confidencial de disco (confidential disk encryption) no disco do SO de VM1.", "texto_en": "Enable confidential disk encryption on the OS disk of VM1." }
+      { "letra": "A", "texto": "Habilitar o Azure Disk Encryption (ADE) em VM1 com uma chave armazenada no Azure Key Vault.", "texto_en": "Enable Azure Disk Encryption (ADE) on VM1 by using a key stored in Azure Key Vault." },
+      { "letra": "B", "texto": "Registrar o recurso EncryptionAtHost na assinatura, desalocar VM1 e habilitar a criptografia no host (encryption at host).", "texto_en": "Register the EncryptionAtHost feature in the subscription, deallocate VM1, and enable encryption at host." },
+      { "letra": "C", "texto": "Criar um conjunto de criptografia de disco (disk encryption set) e configurar a criptografia do lado do servidor com chaves gerenciadas pelo cliente nos discos de VM1.", "texto_en": "Create a disk encryption set and configure server-side encryption with customer-managed keys on the disks of VM1." },
+      { "letra": "D", "texto": "Habilitar a criptografia confidencial de disco (confidential disk encryption) no disco do SO de VM1.", "texto_en": "Enable confidential disk encryption on the OS disk of VM1." }
     ],
     "opcao_correta": ["B"],
-    "explicacao": "A encriptação no anfitrião encripta os dados no servidor anfitrião do Azure: os discos temporários são encriptados em repouso com chaves geridas pela plataforma e as caches dos discos do SO e de dados são encriptadas com a mesma chave dos respetivos discos. Não usa extensões nem CPU da VM. É necessário registar a funcionalidade EncryptionAtHost (Microsoft.Compute) na subscrição e, numa VM existente, desalocá-la para aplicar a encriptação.\n\nA está errada: o ADE usa BitLocker/DM-Crypt dentro do SO convidado através de uma extensão e consome recursos da VM (além disso, uma VM que tenha tido ADE deixa de poder usar encriptação no anfitrião). C protege os dados dos discos no armazenamento, mas não encripta o disco temporário nem as caches no anfitrião. D só está disponível em tamanhos de VM confidenciais, o que não é o caso de Standard_D4s_v5.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/disks-enable-host-based-encryption-portal"
+    "explicacao": "A criptografia no host criptografa os dados no servidor host do Azure: os discos temporários são criptografados em repouso com chaves gerenciadas pela plataforma e os caches dos discos do SO e de dados são criptografados com a mesma chave dos respectivos discos. Não usa extensões nem CPU da VM. É necessário registrar o recurso EncryptionAtHost (Microsoft.Compute) na assinatura e, em uma VM existente, desalocá-la para aplicar a criptografia.\n\nA está errada: o ADE usa BitLocker/DM-Crypt dentro do SO convidado por meio de uma extensão e consome recursos da VM (além disso, uma VM que tenha tido ADE não pode mais usar a criptografia no host). C protege os dados dos discos no armazenamento, mas não criptografa o disco temporário nem os caches no host. D só está disponível em tamanhos de VM confidenciais, o que não é o caso de Standard_D4s_v5.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/disks-enable-host-based-encryption-portal"
   },
   {
     "id": "AUT26-CP-06",
@@ -97,16 +97,16 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Mover VMs entre regiões",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual chamada VM1 na região West Europe. VM1 está ligada a uma rede virtual, a um grupo de segurança de rede e a um endereço IP público.\n\nPrecisa de mover VM1 e os recursos dependentes para a região Sweden Central. A solução deve identificar automaticamente as dependências e permitir preparar, iniciar e confirmar (commit) a movimentação a partir de uma única experiência de gestão.\n\nO que deve utilizar?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém uma máquina virtual chamada VM1 na região West Europe. VM1 está conectada a uma rede virtual, a um grupo de segurança de rede e a um endereço IP público.\n\nVocê precisa mover VM1 e os recursos dependentes para a região Sweden Central. A solução deve identificar automaticamente as dependências e permitir preparar, iniciar e confirmar (commit) a movimentação a partir de uma única experiência de gerenciamento.\n\nO que você deve usar?",
     "pergunta_en": "Your company has an Azure subscription that contains a virtual machine named VM1 in the West Europe region. VM1 is connected to a virtual network, a network security group, and a public IP address.\n\nYou need to move VM1 and its dependent resources to the Sweden Central region. The solution must automatically identify dependencies and allow you to prepare, initiate, and commit the move from a single management experience.\n\nWhat should you use?",
     "opcoes": [
       { "letra": "A", "texto": "O cmdlet `Move-AzResource` para mover VM1 para um grupo de recursos criado em Sweden Central.", "texto_en": "The `Move-AzResource` cmdlet to move VM1 to a resource group created in Sweden Central." },
       { "letra": "B", "texto": "Azure Migrate: Server Migration.", "texto_en": "Azure Migrate: Server Migration." },
-      { "letra": "C", "texto": "Alterar a propriedade Localização de VM1 no painel Propriedades do portal do Azure.", "texto_en": "Change the Location property of VM1 in the Properties pane of the Azure portal." },
+      { "letra": "C", "texto": "Alterar a propriedade Local de VM1 no painel Propriedades do portal do Azure.", "texto_en": "Change the Location property of VM1 in the Properties pane of the Azure portal." },
       { "letra": "D", "texto": "Azure Resource Mover.", "texto_en": "Azure Resource Mover." }
     ],
     "opcao_correta": ["D"],
-    "explicacao": "O Azure Resource Mover move recursos do Azure entre regiões: analisa e adiciona as dependências (rede virtual, NSG, IP público, etc.) e conduz o processo em fases — preparar, iniciar a movimentação e confirmar (commit) ou descartar — a partir de um único hub.\n\nA está errada: mover um recurso para outro grupo de recursos (ou subscrição) não altera a sua região, mesmo que o grupo de recursos de destino esteja noutra região. B destina-se a migrar servidores de ambientes locais ou de outras clouds para o Azure. C não é possível: a localização de uma VM não é uma propriedade editável.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/resource-mover/tutorial-move-region-virtual-machines"
+    "explicacao": "O Azure Resource Mover move recursos do Azure entre regiões: analisa e adiciona as dependências (rede virtual, NSG, IP público, etc.) e conduz o processo em fases — preparar, iniciar a movimentação e confirmar (commit) ou descartar — a partir de um único hub.\n\nA está errada: mover um recurso para outro grupo de recursos (ou assinatura) não altera sua região, mesmo que o grupo de recursos de destino esteja em outra região. B destina-se a migrar servidores de ambientes locais ou de outras nuvens para o Azure. C não é possível: o local de uma VM não é uma propriedade editável.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/resource-mover/tutorial-move-region-virtual-machines"
   },
   {
     "id": "AUT26-CP-07",
@@ -115,7 +115,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Redimensionar VMs",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual autónoma chamada VM1. VM1 está em execução e não pertence a nenhum conjunto de disponibilidade nem conjunto de dimensionamento.\n\nPrecisa de alterar VM1 para um tamanho maior. O tamanho pretendido está disponível na região, mas não aparece na lista de tamanhos disponíveis no painel Tamanho de VM1.\n\nO que deve fazer primeiro?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém uma máquina virtual autônoma chamada VM1. VM1 está em execução e não pertence a nenhum conjunto de disponibilidade nem conjunto de dimensionamento.\n\nVocê precisa alterar VM1 para um tamanho maior. O tamanho desejado está disponível na região, mas não aparece na lista de tamanhos disponíveis no painel Tamanho de VM1.\n\nO que você deve fazer primeiro?",
     "pergunta_en": "Your company has an Azure subscription that contains a standalone virtual machine named VM1. VM1 is running and does not belong to any availability set or scale set.\n\nYou need to change VM1 to a larger size. The required size is available in the region, but it does not appear in the list of available sizes on the Size pane of VM1.\n\nWhat should you do first?",
     "opcoes": [
       { "letra": "A", "texto": "Parar (desalocar) VM1.", "texto_en": "Stop (deallocate) VM1." },
@@ -124,7 +124,7 @@
       { "letra": "D", "texto": "Criar um conjunto de disponibilidade e adicionar VM1 a esse conjunto.", "texto_en": "Create an availability set and add VM1 to it." }
     ],
     "opcao_correta": ["A"],
-    "explicacao": "A lista de tamanhos de uma VM em execução mostra apenas os tamanhos suportados pelo cluster de hardware que a aloja. Se o tamanho pretendido não estiver disponível nesse cluster, é necessário desalocar a VM; depois de desalocada, são apresentados os tamanhos disponíveis na região e a VM pode ser realocada noutro cluster com o novo tamanho.\n\nB apenas volta a aplicar o estado/configuração da VM no anfitrião atual. C altera o desempenho dos discos e não influencia os tamanhos de VM disponíveis. D não é possível: uma VM existente não pode ser adicionada a um conjunto de disponibilidade.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/resize-vm"
+    "explicacao": "A lista de tamanhos de uma VM em execução mostra apenas os tamanhos suportados pelo cluster de hardware que a hospeda. Se o tamanho desejado não estiver disponível nesse cluster, é necessário desalocar a VM; depois de desalocada, são exibidos os tamanhos disponíveis na região e a VM pode ser realocada em outro cluster com o novo tamanho.\n\nB apenas reaplica o estado/configuração da VM no host atual. C altera o desempenho dos discos e não influencia os tamanhos de VM disponíveis. D não é possível: uma VM existente não pode ser adicionada a um conjunto de disponibilidade.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/sizes/resize-vm"
   },
   {
     "id": "AUT26-CP-08",
@@ -132,8 +132,8 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Seleção Múltipla",
     "dificuldade": "Médio",
-    "tema": "Discos geridos",
-    "pergunta": "A sua empresa planeia implementar várias máquinas virtuais do Azure com discos geridos.\n\nPrecisa de identificar quais os tipos de disco gerido que NÃO podem ser utilizados como disco do sistema operativo.\n\nQuais são os DOIS tipos de disco que deve identificar? Cada resposta correta apresenta parte da solução.",
+    "tema": "Discos gerenciados",
+    "pergunta": "Sua empresa planeja implantar várias máquinas virtuais do Azure com discos gerenciados.\n\nVocê precisa identificar quais tipos de disco gerenciado NÃO podem ser usados como disco do sistema operacional.\n\nQuais são os DOIS tipos de disco que você deve identificar? Cada resposta correta apresenta parte da solução.",
     "pergunta_en": "Your company plans to deploy several Azure virtual machines that use managed disks.\n\nYou need to identify which managed disk types CANNOT be used as an operating system disk.\n\nWhich TWO disk types should you identify? Each correct answer presents part of the solution.",
     "opcoes": [
       { "letra": "A", "texto": "Standard HDD", "texto_en": "Standard HDD" },
@@ -143,7 +143,7 @@
       { "letra": "E", "texto": "Premium SSD v2", "texto_en": "Premium SSD v2" }
     ],
     "opcao_correta": ["B", "E"],
-    "explicacao": "Os discos Ultra Disk e Premium SSD v2 só podem ser utilizados como discos de dados; não podem ser discos do SO. São indicados para cargas de trabalho intensivas em E/S (por exemplo, bases de dados) e permitem ajustar o desempenho de forma flexível.\n\nStandard HDD, Standard SSD e Premium SSD podem ser usados tanto como disco do SO como disco de dados (Premium SSD é a opção habitual para discos do SO de produção).\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types"
+    "explicacao": "Os discos Ultra Disk e Premium SSD v2 só podem ser usados como discos de dados; não podem ser discos do SO. São indicados para cargas de trabalho com uso intensivo de E/S (por exemplo, bancos de dados) e permitem ajustar o desempenho de forma flexível.\n\nStandard HDD, Standard SSD e Premium SSD podem ser usados tanto como disco do SO quanto como disco de dados (Premium SSD é a opção usual para discos do SO de produção).\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/disks-types"
   },
   {
     "id": "AUT26-CP-09",
@@ -152,7 +152,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
     "tema": "Conjuntos de disponibilidade",
-    "pergunta": "A sua empresa tem uma subscrição do Azure. Cria um conjunto de disponibilidade chamado AS1 com 2 domínios de falha e 5 domínios de atualização.\n\nImplementa 12 máquinas virtuais em AS1.\n\nDurante um evento de manutenção planeada da plataforma que exige o reinício dos anfitriões, qual é o número máximo de máquinas virtuais de AS1 que podem ficar indisponíveis em simultâneo?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure. Você cria um conjunto de disponibilidade chamado AS1 com 2 domínios de falha e 5 domínios de atualização.\n\nVocê implanta 12 máquinas virtuais em AS1.\n\nDurante um evento de manutenção planejada da plataforma que exige a reinicialização dos hosts, qual é o número máximo de máquinas virtuais de AS1 que podem ficar indisponíveis simultaneamente?",
     "pergunta_en": "Your company has an Azure subscription. You create an availability set named AS1 that has 2 fault domains and 5 update domains.\n\nYou deploy 12 virtual machines to AS1.\n\nDuring a planned platform maintenance event that requires host reboots, what is the maximum number of virtual machines in AS1 that can be unavailable at the same time?",
     "opcoes": [
       { "letra": "A", "texto": "2", "texto_en": "2" },
@@ -161,7 +161,7 @@
       { "letra": "D", "texto": "6", "texto_en": "6" }
     ],
     "opcao_correta": ["C"],
-    "explicacao": "Durante a manutenção planeada, apenas um domínio de atualização é reiniciado de cada vez. As VMs são distribuídas sequencialmente pelos 5 domínios de atualização (a sexta VM volta ao primeiro domínio, e assim sucessivamente), pelo que 12 VMs ficam distribuídas como 3, 3, 2, 2 e 2. O máximo indisponível em simultâneo é, portanto, 3.\n\nA (2) corresponde aos domínios com menos VMs, não ao máximo. B (4) não resulta da distribuição. D (6) seria o impacto de uma falha não planeada de um domínio de falha (12 VMs / 2 domínios de falha), não de manutenção planeada.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview"
+    "explicacao": "Durante a manutenção planejada, apenas um domínio de atualização é reinicializado por vez. As VMs são distribuídas sequencialmente pelos 5 domínios de atualização (a sexta VM volta ao primeiro domínio, e assim por diante), de modo que 12 VMs ficam distribuídas como 3, 3, 2, 2 e 2. O máximo indisponível simultaneamente é, portanto, 3.\n\nA (2) corresponde aos domínios com menos VMs, não ao máximo. B (4) não resulta da distribuição. D (6) seria o impacto de uma falha não planejada de um domínio de falha (12 VMs / 2 domínios de falha), não de manutenção planejada.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/virtual-machines/availability-set-overview"
   },
   {
     "id": "AUT26-CP-10",
@@ -170,16 +170,16 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Conjuntos de dimensionamento – dimensionamento automático",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um conjunto de dimensionamento de máquinas virtuais chamado VMSS1.\n\nVMSS1 tem uma definição de dimensionamento automático com um mínimo de 2 instâncias e um máximo de 10 instâncias, e uma única regra: aumentar o número de instâncias em 2 quando a percentagem média de CPU for superior a 70% durante 10 minutos.\n\nApós um pico de carga, VMSS1 atingiu 10 instâncias. Várias horas depois, a utilização média de CPU é de 10%, mas VMSS1 continua com 10 instâncias.\n\nPrecisa de garantir que VMSS1 reduz automaticamente o número de instâncias quando a carga diminui.\n\nO que deve fazer?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém um conjunto de dimensionamento de máquinas virtuais chamado VMSS1.\n\nVMSS1 tem uma configuração de dimensionamento automático com um mínimo de 2 instâncias e um máximo de 10 instâncias, e uma única regra: aumentar o número de instâncias em 2 quando a porcentagem média de CPU for superior a 70% durante 10 minutos.\n\nApós um pico de carga, VMSS1 atingiu 10 instâncias. Várias horas depois, a utilização média de CPU é de 10%, mas VMSS1 continua com 10 instâncias.\n\nVocê precisa garantir que VMSS1 reduza automaticamente o número de instâncias quando a carga diminuir.\n\nO que você deve fazer?",
     "pergunta_en": "Your company has an Azure subscription that contains a virtual machine scale set named VMSS1.\n\nVMSS1 has an autoscale setting with a minimum of 2 instances, a maximum of 10 instances, and a single rule: increase the instance count by 2 when average CPU percentage is greater than 70% for 10 minutes.\n\nAfter a load peak, VMSS1 reached 10 instances. Several hours later, average CPU usage is 10%, but VMSS1 still has 10 instances.\n\nYou need to ensure that VMSS1 automatically reduces the number of instances when the load decreases.\n\nWhat should you do?",
     "opcoes": [
       { "letra": "A", "texto": "Adicionar uma regra de redução horizontal (scale-in), por exemplo, diminuir o número de instâncias em 1 quando a CPU média for inferior a 30%.", "texto_en": "Add a scale-in rule, for example, decrease the instance count by 1 when average CPU is less than 30%." },
       { "letra": "B", "texto": "Configurar a política de redução (scale-in policy) de VMSS1 como NewestVM.", "texto_en": "Set the scale-in policy of VMSS1 to NewestVM." },
       { "letra": "C", "texto": "Alterar o número máximo de instâncias para 2.", "texto_en": "Change the maximum instance count to 2." },
-      { "letra": "D", "texto": "Ativar o sobreaprovisionamento (overprovisioning) em VMSS1.", "texto_en": "Enable overprovisioning on VMSS1." }
+      { "letra": "D", "texto": "Habilitar o superprovisionamento (overprovisioning) em VMSS1.", "texto_en": "Enable overprovisioning on VMSS1." }
     ],
     "opcao_correta": ["A"],
-    "explicacao": "O dimensionamento automático só reduz instâncias se existir uma regra de scale-in. A boa prática é definir sempre pares de regras de aumento e redução, com limiares suficientemente afastados (por exemplo, >70% para aumentar e <30% para reduzir) para evitar oscilações (flapping).\n\nB define QUAIS as VMs removidas quando ocorre uma redução, mas não desencadeia a redução. C impediria o aumento horizontal durante picos de carga. D cria temporariamente VMs adicionais durante o aprovisionamento para acelerar implementações; não reduz instâncias.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-best-practices"
+    "explicacao": "O dimensionamento automático só reduz instâncias se existir uma regra de scale-in. A prática recomendada é sempre definir pares de regras de aumento e redução, com limites suficientemente afastados (por exemplo, >70% para aumentar e <30% para reduzir) para evitar oscilações (flapping).\n\nB define QUAIS VMs são removidas quando ocorre uma redução, mas não dispara a redução. C impediria o aumento horizontal durante picos de carga. D cria temporariamente VMs adicionais durante o provisionamento para acelerar implantações; não reduz instâncias.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-monitor/autoscale/autoscale-best-practices"
   },
   {
     "id": "AUT26-CP-11",
@@ -188,16 +188,16 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
     "tema": "Azure Container Registry",
-    "pergunta": "A sua empresa planeia criar um Azure Container Registry chamado acr1.\n\nPrecisa de garantir que acr1 suporta georreplicação para duas regiões e acesso através de pontos finais privados (Azure Private Link). A solução deve minimizar os custos.\n\nQue SKU deve utilizar?",
+    "pergunta": "Sua empresa planeja criar um Azure Container Registry chamado acr1.\n\nVocê precisa garantir que acr1 dê suporte à replicação geográfica para duas regiões e ao acesso por meio de pontos de extremidade privados (Azure Private Link). A solução deve minimizar os custos.\n\nQual SKU você deve usar?",
     "pergunta_en": "Your company plans to create an Azure Container Registry named acr1.\n\nYou need to ensure that acr1 supports geo-replication to two regions and access through private endpoints (Azure Private Link). The solution must minimize costs.\n\nWhich SKU should you use?",
     "opcoes": [
       { "letra": "A", "texto": "Basic", "texto_en": "Basic" },
       { "letra": "B", "texto": "Standard", "texto_en": "Standard" },
       { "letra": "C", "texto": "Premium", "texto_en": "Premium" },
-      { "letra": "D", "texto": "Qualquer SKU, desde que o utilizador administrador esteja ativado.", "texto_en": "Any SKU, as long as the admin user is enabled." }
+      { "letra": "D", "texto": "Qualquer SKU, desde que o usuário administrador esteja habilitado.", "texto_en": "Any SKU, as long as the admin user is enabled." }
     ],
     "opcao_correta": ["C"],
-    "explicacao": "A georreplicação e os pontos finais privados (Private Link) são funcionalidades exclusivas do SKU Premium do Azure Container Registry, pelo que Premium é o SKU de menor custo que cumpre ambos os requisitos.\n\nBasic e Standard não suportam georreplicação nem Private Link. D está errada: o utilizador administrador é apenas uma conta de autenticação (desativada por predefinição e não recomendada para produção) e não desbloqueia funcionalidades do SKU.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/container-registry/container-registry-skus"
+    "explicacao": "A replicação geográfica e os pontos de extremidade privados (Private Link) são recursos exclusivos do SKU Premium do Azure Container Registry, portanto Premium é o SKU de menor custo que atende a ambos os requisitos.\n\nBasic e Standard não dão suporte à replicação geográfica nem ao Private Link. D está errada: o usuário administrador é apenas uma conta de autenticação (desabilitada por padrão e não recomendada para produção) e não desbloqueia recursos do SKU.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/container-registry/container-registry-skus"
   },
   {
     "id": "AUT26-CP-12",
@@ -206,16 +206,16 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Azure Container Instances",
-    "pergunta": "A sua empresa planeia utilizar o Azure Container Instances para executar uma tarefa de processamento em lote noturna num grupo de contentores chamado CG1.\n\nO contentor deve ser executado até concluir a tarefa. Se o processo terminar com sucesso, o contentor não deve ser reiniciado. Se o processo terminar com erro, o contentor deve ser reiniciado automaticamente.\n\nQue política de reinício deve configurar para CG1?",
+    "pergunta": "Sua empresa planeja usar o Azure Container Instances para executar uma tarefa noturna de processamento em lote em um grupo de contêineres chamado CG1.\n\nO contêiner deve ser executado até concluir a tarefa. Se o processo terminar com sucesso, o contêiner não deve ser reiniciado. Se o processo terminar com erro, o contêiner deve ser reiniciado automaticamente.\n\nQual política de reinicialização você deve configurar para CG1?",
     "pergunta_en": "Your company plans to use Azure Container Instances to run a nightly batch processing task in a container group named CG1.\n\nThe container must run until the task completes. If the process exits successfully, the container must not be restarted. If the process exits with an error, the container must be restarted automatically.\n\nWhich restart policy should you configure for CG1?",
     "opcoes": [
       { "letra": "A", "texto": "Always", "texto_en": "Always" },
       { "letra": "B", "texto": "OnFailure", "texto_en": "OnFailure" },
       { "letra": "C", "texto": "Never", "texto_en": "Never" },
-      { "letra": "D", "texto": "Configurar uma sonda de atividade (liveness probe) e manter a política predefinida.", "texto_en": "Configure a liveness probe and keep the default policy." }
+      { "letra": "D", "texto": "Configurar uma investigação de atividade (liveness probe) e manter a política padrão.", "texto_en": "Configure a liveness probe and keep the default policy." }
     ],
     "opcao_correta": ["B"],
-    "explicacao": "Com a política OnFailure, os contentores do grupo só são reiniciados quando o processo termina com falha (código de saída diferente de zero); quando terminam com sucesso, permanecem parados. Define-se, por exemplo, com `az container create ... --restart-policy OnFailure`.\n\nA (Always) é a predefinição e reinicia sempre o contentor, mesmo após sucesso, o que não é adequado a tarefas que devem terminar. C (Never) apenas garante que o contentor não é reiniciado quando termina com sucesso; não configura o reinício em caso de erro (a plataforma pode ou não reiniciar um contentor que termina com código diferente de zero), pelo que não cumpre o requisito de reinício automático após falha. D mantém a política Always; a sonda de atividade deteta contentores não saudáveis, mas não altera o comportamento após a conclusão.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/container-instances/container-instances-restart-policy"
+    "explicacao": "Com a política OnFailure, os contêineres do grupo só são reiniciados quando o processo termina com falha (código de saída diferente de zero); quando terminam com sucesso, permanecem parados. Ela é definida, por exemplo, com `az container create ... --restart-policy OnFailure`.\n\nA (Always) é o padrão e sempre reinicia o contêiner, mesmo após sucesso, o que não é adequado para tarefas que devem terminar. C (Never) apenas garante que o contêiner não seja reiniciado quando termina com sucesso; não configura a reinicialização em caso de erro (a plataforma pode ou não reiniciar um contêiner que termina com código diferente de zero), portanto não atende ao requisito de reinicialização automática após falha. D mantém a política Always; a investigação de atividade detecta contêineres não íntegros, mas não altera o comportamento após a conclusão.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/container-instances/container-instances-restart-policy"
   },
   {
     "id": "AUT26-CP-13",
@@ -224,16 +224,16 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
     "tema": "Azure Container Apps",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma aplicação do Azure Container Apps chamada app1. app1 tem a entrada (ingress) HTTP externa ativada e utiliza o modo de revisão predefinido.\n\nPrecisa de implementar uma nova versão da imagem de app1 e enviar 20% do tráfego para a nova revisão e 80% para a revisão atual. A solução deve minimizar o esforço administrativo e manter ambas as versões dentro de app1.\n\nO que deve fazer?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém um aplicativo do Azure Container Apps chamado app1. app1 tem a entrada (ingress) HTTP externa habilitada e usa o modo de revisão padrão.\n\nVocê precisa implantar uma nova versão da imagem de app1 e enviar 20% do tráfego para a nova revisão e 80% para a revisão atual. A solução deve minimizar o esforço administrativo e manter ambas as versões dentro de app1.\n\nO que você deve fazer?",
     "pergunta_en": "Your company has an Azure subscription that contains an Azure Container Apps app named app1. app1 has external HTTP ingress enabled and uses the default revision mode.\n\nYou need to deploy a new version of the app1 image and send 20% of the traffic to the new revision and 80% to the current revision. The solution must minimize administrative effort and keep both versions within app1.\n\nWhat should you do?",
     "opcoes": [
-      { "letra": "A", "texto": "Criar um bloco de implementação (deployment slot) chamado staging em app1 e configurar o encaminhamento de 20% do tráfego.", "texto_en": "Create a deployment slot named staging in app1 and configure 20% traffic routing." },
-      { "letra": "B", "texto": "Adicionar uma regra de dimensionamento HTTP com 20 pedidos simultâneos por réplica.", "texto_en": "Add an HTTP scale rule with 20 concurrent requests per replica." },
-      { "letra": "C", "texto": "Criar um novo ambiente do Container Apps e implementar nele a nova versão.", "texto_en": "Create a new Container Apps environment and deploy the new version to it." },
+      { "letra": "A", "texto": "Criar um slot de implantação (deployment slot) chamado staging em app1 e configurar o roteamento de 20% do tráfego.", "texto_en": "Create a deployment slot named staging in app1 and configure 20% traffic routing." },
+      { "letra": "B", "texto": "Adicionar uma regra de dimensionamento HTTP com 20 solicitações simultâneas por réplica.", "texto_en": "Add an HTTP scale rule with 20 concurrent requests per replica." },
+      { "letra": "C", "texto": "Criar um novo ambiente do Container Apps e implantar nele a nova versão.", "texto_en": "Create a new Container Apps environment and deploy the new version to it." },
       { "letra": "D", "texto": "Alterar o modo de revisão de app1 para Multiple e atribuir pesos de tráfego de 80 e 20 às revisões.", "texto_en": "Change the revision mode of app1 to Multiple and assign traffic weights of 80 and 20 to the revisions." }
     ],
     "opcao_correta": ["D"],
-    "explicacao": "No modo de revisão Single (predefinido), apenas uma revisão está ativa e recebe 100% do tráfego. Para dividir o tráfego entre revisões (por exemplo, implementações canário ou blue-green), é necessário mudar para o modo Multiple e definir pesos de tráfego por revisão (por exemplo, com `az containerapp ingress traffic set --revision-weight`).\n\nA está errada: os blocos de implementação são uma funcionalidade do Azure App Service, não do Container Apps. B controla o número de réplicas, não a distribuição de tráfego entre versões. C separa as versões em aplicações distintas, aumentando o esforço e violando o requisito.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/container-apps/traffic-splitting"
+    "explicacao": "No modo de revisão Single (padrão), apenas uma revisão está ativa e recebe 100% do tráfego. Para dividir o tráfego entre revisões (por exemplo, implantações canário ou blue-green), é necessário mudar para o modo Multiple e definir pesos de tráfego por revisão (por exemplo, com `az containerapp ingress traffic set --revision-weight`).\n\nA está errada: os slots de implantação são um recurso do Azure App Service, não do Container Apps. B controla o número de réplicas, não a distribuição de tráfego entre versões. C separa as versões em aplicativos distintos, aumentando o esforço e violando o requisito.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/container-apps/traffic-splitting"
   },
   {
     "id": "AUT26-CP-14",
@@ -242,7 +242,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
     "tema": "Planos do App Service",
-    "pergunta": "A sua empresa planeia implementar uma aplicação web no Azure App Service.\n\nA aplicação deve suportar blocos de implementação (deployment slots) e dimensionamento automático baseado em regras. A solução deve minimizar os custos.\n\nQue escalão do plano do App Service deve utilizar?",
+    "pergunta": "Sua empresa planeja implantar um aplicativo web no Azure App Service.\n\nO aplicativo deve dar suporte a slots de implantação (deployment slots) e ao dimensionamento automático baseado em regras. A solução deve minimizar os custos.\n\nQual camada do plano do App Service você deve usar?",
     "pergunta_en": "Your company plans to deploy a web app to Azure App Service.\n\nThe app must support deployment slots and rule-based autoscale. The solution must minimize costs.\n\nWhich App Service plan tier should you use?",
     "opcoes": [
       { "letra": "A", "texto": "Free (F1)", "texto_en": "Free (F1)" },
@@ -251,7 +251,7 @@
       { "letra": "D", "texto": "Premium v3 (P1v3)", "texto_en": "Premium v3 (P1v3)" }
     ],
     "opcao_correta": ["C"],
-    "explicacao": "O escalão Standard é o escalão de menor custo que suporta blocos de implementação e dimensionamento automático. Os escalões Premium (v3/v4) e Isolated também os suportam, mas com custo superior.\n\nFree não suporta blocos de implementação nem aumento horizontal. Basic suporta domínios personalizados, ligações TLS e aumento horizontal manual, mas não suporta blocos de implementação nem dimensionamento automático. Premium v3 cumpre os requisitos, mas não minimiza os custos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots"
+    "explicacao": "A camada Standard é a camada de menor custo que dá suporte a slots de implantação e ao dimensionamento automático. As camadas Premium (v3/v4) e Isolated também dão suporte a eles, mas com custo maior.\n\nFree não dá suporte a slots de implantação nem ao aumento horizontal. Basic dá suporte a domínios personalizados, associações TLS e aumento horizontal manual, mas não dá suporte a slots de implantação nem ao dimensionamento automático. Premium v3 atende aos requisitos, mas não minimiza os custos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots"
   },
   {
     "id": "AUT26-CP-15",
@@ -260,17 +260,17 @@
     "tipo": "Seleção Múltipla",
     "dificuldade": "Médio",
     "tema": "App Service – domínios personalizados",
-    "pergunta": "A sua empresa tem uma aplicação do Azure App Service chamada app1, acessível em app1.azurewebsites.net. O plano do App Service utiliza o escalão Standard.\n\nO domínio contoso.com está alojado num fornecedor de DNS externo. Precisa de mapear www.contoso.com para app1. O mapeamento deve continuar a funcionar se o endereço IP de entrada de app1 mudar.\n\nQuais são os DOIS registos DNS que deve criar? Cada resposta correta apresenta parte da solução.",
+    "pergunta": "Sua empresa tem um aplicativo do Azure App Service chamado app1, acessível em app1.azurewebsites.net. O plano do App Service usa a camada Standard.\n\nO domínio contoso.com está hospedado em um provedor de DNS externo. Você precisa mapear www.contoso.com para app1. O mapeamento deve continuar funcionando se o endereço IP de entrada de app1 mudar.\n\nQuais são os DOIS registros DNS que você deve criar? Cada resposta correta apresenta parte da solução.",
     "pergunta_en": "Your company has an Azure App Service app named app1 that is accessible at app1.azurewebsites.net. The App Service plan uses the Standard tier.\n\nThe contoso.com domain is hosted by an external DNS provider. You need to map www.contoso.com to app1. The mapping must keep working if the inbound IP address of app1 changes.\n\nWhich TWO DNS records should you create? Each correct answer presents part of the solution.",
     "opcoes": [
-      { "letra": "A", "texto": "Um registo CNAME com o nome www que aponta para app1.azurewebsites.net.", "texto_en": "A CNAME record named www that points to app1.azurewebsites.net." },
-      { "letra": "B", "texto": "Um registo A com o nome www que aponta para o endereço IP de entrada de app1.", "texto_en": "An A record named www that points to the inbound IP address of app1." },
-      { "letra": "C", "texto": "Um registo TXT com o nome @ que contém o ID de verificação do domínio personalizado.", "texto_en": "A TXT record named @ that contains the custom domain verification ID." },
-      { "letra": "D", "texto": "Um registo TXT com o nome asuid.www que contém o ID de verificação do domínio personalizado.", "texto_en": "A TXT record named asuid.www that contains the custom domain verification ID." },
-      { "letra": "E", "texto": "Um registo MX com o nome www que aponta para app1.azurewebsites.net.", "texto_en": "An MX record named www that points to app1.azurewebsites.net." }
+      { "letra": "A", "texto": "Um registro CNAME com o nome www que aponta para app1.azurewebsites.net.", "texto_en": "A CNAME record named www that points to app1.azurewebsites.net." },
+      { "letra": "B", "texto": "Um registro A com o nome www que aponta para o endereço IP de entrada de app1.", "texto_en": "An A record named www that points to the inbound IP address of app1." },
+      { "letra": "C", "texto": "Um registro TXT com o nome @ que contém o ID de verificação do domínio personalizado.", "texto_en": "A TXT record named @ that contains the custom domain verification ID." },
+      { "letra": "D", "texto": "Um registro TXT com o nome asuid.www que contém o ID de verificação do domínio personalizado.", "texto_en": "A TXT record named asuid.www that contains the custom domain verification ID." },
+      { "letra": "E", "texto": "Um registro MX com o nome www que aponta para app1.azurewebsites.net.", "texto_en": "An MX record named www that points to app1.azurewebsites.net." }
     ],
     "opcao_correta": ["A", "D"],
-    "explicacao": "Para um subdomínio como www, o App Service recomenda um registo CNAME que aponte para <nome-da-app>.azurewebsites.net, o que mantém o mapeamento válido mesmo que o IP de entrada mude. Para provar a propriedade do domínio, cria-se um registo TXT asuid.<subdomínio> (aqui asuid.www) com o ID de verificação do domínio personalizado da app.\n\nB depende do IP de entrada, que pode mudar (por exemplo, ao eliminar e recriar a app ou mudar de unidade de implementação). C usa o nome errado: o TXT de verificação para www tem de ser asuid.www (asuid sem prefixo aplica-se ao domínio raiz). E é um registo de correio eletrónico e não serve para mapear domínios web.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain"
+    "explicacao": "Para um subdomínio como www, o App Service recomenda um registro CNAME que aponte para <nome-do-app>.azurewebsites.net, o que mantém o mapeamento válido mesmo que o IP de entrada mude. Para comprovar a propriedade do domínio, você cria um registro TXT asuid.<subdomínio> (aqui, asuid.www) com o ID de verificação do domínio personalizado do aplicativo.\n\nB depende do IP de entrada, que pode mudar (por exemplo, ao excluir e recriar o aplicativo ou mudar de unidade de implantação). C usa o nome errado: o TXT de verificação para www precisa ser asuid.www (asuid sem prefixo se aplica ao domínio raiz). E é um registro de email e não serve para mapear domínios web.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/app-service-web-tutorial-custom-domain"
   },
   {
     "id": "AUT26-CP-16",
@@ -279,16 +279,16 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
     "tema": "App Service – certificados TLS",
-    "pergunta": "A sua empresa tem três aplicações do Azure App Service chamadas app1, app2 e app3, num plano do App Service do escalão Standard. As aplicações usam os domínios personalizados app1.contoso.com, app2.contoso.com e app3.contoso.com.\n\nPrecisa de proteger os três domínios com HTTPS utilizando um único certificado wildcard emitido para *.contoso.com. A renovação do certificado deve ser gerida pelo Azure.\n\nO que deve fazer?",
+    "pergunta": "Sua empresa tem três aplicativos do Azure App Service chamados app1, app2 e app3, em um plano do App Service da camada Standard. Os aplicativos usam os domínios personalizados app1.contoso.com, app2.contoso.com e app3.contoso.com.\n\nVocê precisa proteger os três domínios com HTTPS usando um único certificado curinga emitido para *.contoso.com. A renovação do certificado deve ser gerenciada pelo Azure.\n\nO que você deve fazer?",
     "pergunta_en": "Your company has three Azure App Service apps named app1, app2, and app3 in a Standard tier App Service plan. The apps use the custom domains app1.contoso.com, app2.contoso.com, and app3.contoso.com.\n\nYou need to secure the three domains with HTTPS by using a single wildcard certificate issued for *.contoso.com. Certificate renewal must be managed by Azure.\n\nWhat should you do?",
     "opcoes": [
-      { "letra": "A", "texto": "Criar um certificado gerido do App Service gratuito para *.contoso.com e associá-lo às três aplicações.", "texto_en": "Create a free App Service managed certificate for *.contoso.com and bind it to the three apps." },
-      { "letra": "B", "texto": "Carregar um ficheiro de certificado público .cer para *.contoso.com em cada aplicação.", "texto_en": "Upload a public .cer certificate file for *.contoso.com to each app." },
-      { "letra": "C", "texto": "Ativar a definição Apenas HTTPS (HTTPS Only) nas três aplicações.", "texto_en": "Enable the HTTPS Only setting on the three apps." },
-      { "letra": "D", "texto": "Comprar um certificado do App Service com o SKU Wildcard, importá-lo para as aplicações e criar as ligações TLS.", "texto_en": "Purchase an App Service certificate with the Wildcard SKU, import it into the apps, and create the TLS bindings." }
+      { "letra": "A", "texto": "Criar um certificado gerenciado do App Service gratuito para *.contoso.com e associá-lo aos três aplicativos.", "texto_en": "Create a free App Service managed certificate for *.contoso.com and bind it to the three apps." },
+      { "letra": "B", "texto": "Carregar um arquivo de certificado público .cer para *.contoso.com em cada aplicativo.", "texto_en": "Upload a public .cer certificate file for *.contoso.com to each app." },
+      { "letra": "C", "texto": "Habilitar a configuração Somente HTTPS (HTTPS Only) nos três aplicativos.", "texto_en": "Enable the HTTPS Only setting on the three apps." },
+      { "letra": "D", "texto": "Comprar um certificado do App Service com o SKU Wildcard, importá-lo para os aplicativos e criar as associações TLS.", "texto_en": "Purchase an App Service certificate with the Wildcard SKU, import it into the apps, and create the TLS bindings." }
     ],
     "opcao_correta": ["D"],
-    "explicacao": "Um certificado do App Service (App Service Certificate) pode ser adquirido com o SKU Wildcard, é armazenado no Azure Key Vault, pode ser renovado automaticamente pelo Azure e importado para as aplicações, onde se criam as ligações TLS para cada domínio personalizado.\n\nA está errada: o certificado gerido gratuito do App Service não suporta certificados wildcard (nem é exportável). B está errada: os certificados públicos .cer não contêm a chave privada e não servem para proteger domínios personalizados em ligações TLS; seria necessário um PFX privado. C apenas redireciona HTTP para HTTPS; não fornece nenhum certificado para os domínios personalizados.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-certificate"
+    "explicacao": "Um certificado do App Service (App Service Certificate) pode ser adquirido com o SKU Wildcard, é armazenado no Azure Key Vault, pode ser renovado automaticamente pelo Azure e importado para os aplicativos, onde são criadas as associações TLS para cada domínio personalizado.\n\nA está errada: o certificado gerenciado gratuito do App Service não dá suporte a certificados curinga (nem é exportável). B está errada: os certificados públicos .cer não contêm a chave privada e não servem para proteger domínios personalizados em associações TLS; seria necessário um PFX privado. C apenas redireciona HTTP para HTTPS; não fornece nenhum certificado para os domínios personalizados.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/configure-ssl-certificate"
   },
   {
     "id": "AUT26-CP-17",
@@ -297,17 +297,17 @@
     "tipo": "Seleção Múltipla",
     "dificuldade": "Difícil",
     "tema": "App Service – rede",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma rede virtual chamada VNet1 e uma aplicação do Azure App Service chamada app1 num plano Premium v3. VNet1 contém uma máquina virtual chamada VM1 que executa SQL Server e só tem um endereço IP privado.\n\nPrecisa de cumprir os seguintes requisitos:\n\n- app1 deve ligar-se ao SQL Server em VM1 através do endereço IP privado de VM1.\n- Os clientes ligados a VNet1 devem aceder a app1 através de um endereço IP privado de VNet1, e o acesso público a app1 deve ser desativado.\n\nQuais são as DUAS ações que deve realizar? Cada resposta correta apresenta parte da solução.",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém uma rede virtual chamada VNet1 e um aplicativo do Azure App Service chamado app1 em um plano Premium v3. VNet1 contém uma máquina virtual chamada VM1 que executa SQL Server e tem apenas um endereço IP privado.\n\nVocê precisa atender aos seguintes requisitos:\n\n- app1 deve se conectar ao SQL Server em VM1 por meio do endereço IP privado de VM1.\n- Os clientes conectados a VNet1 devem acessar app1 por meio de um endereço IP privado de VNet1, e o acesso público a app1 deve ser desabilitado.\n\nQuais são as DUAS ações que você deve realizar? Cada resposta correta apresenta parte da solução.",
     "pergunta_en": "Your company has an Azure subscription that contains a virtual network named VNet1 and an Azure App Service app named app1 in a Premium v3 plan. VNet1 contains a virtual machine named VM1 that runs SQL Server and has only a private IP address.\n\nYou need to meet the following requirements:\n\n- app1 must connect to SQL Server on VM1 by using the private IP address of VM1.\n- Clients connected to VNet1 must access app1 by using a private IP address from VNet1, and public access to app1 must be disabled.\n\nWhich TWO actions should you perform? Each correct answer presents part of the solution.",
     "opcoes": [
       { "letra": "A", "texto": "Associar um gateway NAT a uma sub-rede de VNet1.", "texto_en": "Associate a NAT gateway with a subnet of VNet1." },
       { "letra": "B", "texto": "Configurar a integração de rede virtual (VNet integration) de app1 com uma sub-rede delegada de VNet1.", "texto_en": "Configure virtual network integration for app1 with a delegated subnet of VNet1." },
-      { "letra": "C", "texto": "Configurar restrições de acesso em app1 com pontos finais de serviço Microsoft.Web na sub-rede dos clientes.", "texto_en": "Configure access restrictions on app1 with Microsoft.Web service endpoints on the client subnet." },
-      { "letra": "D", "texto": "Criar um ponto final privado (private endpoint) para app1 em VNet1 e desativar o acesso de rede público.", "texto_en": "Create a private endpoint for app1 in VNet1 and disable public network access." },
-      { "letra": "E", "texto": "Implementar um Azure Application Gateway com um IP público à frente de app1.", "texto_en": "Deploy an Azure Application Gateway with a public IP in front of app1." }
+      { "letra": "C", "texto": "Configurar restrições de acesso em app1 com pontos de extremidade de serviço Microsoft.Web na sub-rede dos clientes.", "texto_en": "Configure access restrictions on app1 with Microsoft.Web service endpoints on the client subnet." },
+      { "letra": "D", "texto": "Criar um ponto de extremidade privado (private endpoint) para app1 em VNet1 e desabilitar o acesso à rede pública.", "texto_en": "Create a private endpoint for app1 in VNet1 and disable public network access." },
+      { "letra": "E", "texto": "Implantar um Azure Application Gateway com um IP público na frente de app1.", "texto_en": "Deploy an Azure Application Gateway with a public IP in front of app1." }
     ],
     "opcao_correta": ["B", "D"],
-    "explicacao": "A integração de rede virtual trata do tráfego de SAÍDA: permite que app1 aceda a recursos em VNet1 (como VM1) através de endereços privados. O ponto final privado trata do tráfego de ENTRADA: atribui a app1 um IP privado de VNet1 e, com o acesso público desativado, a app só é acessível de forma privada.\n\nA fornece um IP público de saída estático para a sub-rede; não resolve o acesso privado de entrada. C limita o acesso de entrada a uma sub-rede, mas o tráfego continua a usar o ponto final público da app, sem IP privado. E expõe a app publicamente, contrariando o requisito.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/networking-features"
+    "explicacao": "A integração de rede virtual trata do tráfego de SAÍDA: permite que app1 acesse recursos em VNet1 (como VM1) por meio de endereços privados. O ponto de extremidade privado trata do tráfego de ENTRADA: atribui a app1 um IP privado de VNet1 e, com o acesso público desabilitado, o aplicativo só fica acessível de forma privada.\n\nA fornece um IP público de saída estático para a sub-rede; não resolve o acesso privado de entrada. C limita o acesso de entrada a uma sub-rede, mas o tráfego continua usando o ponto de extremidade público do aplicativo, sem IP privado. E expõe o aplicativo publicamente, contrariando o requisito.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/networking-features"
   },
   {
     "id": "AUT26-CP-18",
@@ -315,16 +315,16 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
-    "tema": "App Service – blocos de implementação",
-    "pergunta": "A sua empresa tem uma aplicação do Azure App Service chamada app1 com um bloco de implementação chamado staging.\n\nO bloco de produção tem uma cadeia de ligação chamada DbConn que aponta para a base de dados de produção. O bloco staging tem uma cadeia de ligação DbConn que aponta para uma base de dados de testes.\n\nPrecisa de garantir que, após uma troca (swap) entre staging e produção, cada bloco mantém a sua própria cadeia de ligação DbConn.\n\nO que deve fazer?",
+    "tema": "App Service – slots de implantação",
+    "pergunta": "Sua empresa tem um aplicativo do Azure App Service chamado app1 com um slot de implantação chamado staging.\n\nO slot de produção tem uma cadeia de conexão chamada DbConn que aponta para o banco de dados de produção. O slot staging tem uma cadeia de conexão DbConn que aponta para um banco de dados de teste.\n\nVocê precisa garantir que, após uma troca (swap) entre staging e produção, cada slot mantenha sua própria cadeia de conexão DbConn.\n\nO que você deve fazer?",
     "pergunta_en": "Your company has an Azure App Service app named app1 that has a deployment slot named staging.\n\nThe production slot has a connection string named DbConn that points to the production database. The staging slot has a DbConn connection string that points to a test database.\n\nYou need to ensure that after a swap between staging and production, each slot keeps its own DbConn connection string.\n\nWhat should you do?",
     "opcoes": [
-      { "letra": "A", "texto": "Marcar a cadeia de ligação DbConn como Definição do bloco de implementação (deployment slot setting) em ambos os blocos.", "texto_en": "Mark the DbConn connection string as a deployment slot setting in both slots." },
-      { "letra": "B", "texto": "Ativar a troca automática (auto swap) no bloco staging.", "texto_en": "Enable auto swap on the staging slot." },
-      { "letra": "C", "texto": "Executar a troca com pré-visualização (swap with preview).", "texto_en": "Perform a swap with preview." },
-      { "letra": "D", "texto": "Recriar o bloco staging clonando a configuração do bloco de produção.", "texto_en": "Re-create the staging slot by cloning the configuration from the production slot." }
+      { "letra": "A", "texto": "Marcar a cadeia de conexão DbConn como Configuração de slot de implantação (deployment slot setting) em ambos os slots.", "texto_en": "Mark the DbConn connection string as a deployment slot setting in both slots." },
+      { "letra": "B", "texto": "Habilitar a troca automática (auto swap) no slot staging.", "texto_en": "Enable auto swap on the staging slot." },
+      { "letra": "C", "texto": "Executar a troca com visualização (swap with preview).", "texto_en": "Perform a swap with preview." },
+      { "letra": "D", "texto": "Recriar o slot staging clonando a configuração do slot de produção.", "texto_en": "Re-create the staging slot by cloning the configuration from the production slot." }
     ],
     "opcao_correta": ["A"],
-    "explicacao": "Por predefinição, as definições de aplicação e as cadeias de ligação são trocadas juntamente com o conteúdo do bloco. Ao marcá-las como definição do bloco de implementação (sticky), ficam associadas ao bloco e não acompanham a troca.\n\nB troca automaticamente o bloco com a produção após cada implementação, mas as cadeias de ligação continuariam a ser trocadas. C aplica primeiro as definições do destino ao bloco de origem para validação, mas não torna as definições fixas. D apenas copia a configuração da produção para staging no momento da criação; não altera o comportamento durante a troca.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots"
+    "explicacao": "Por padrão, as configurações de aplicativo e as cadeias de conexão são trocadas junto com o conteúdo do slot. Ao marcá-las como configuração de slot de implantação (sticky), elas ficam associadas ao slot e não acompanham a troca.\n\nB troca automaticamente o slot com a produção após cada implantação, mas as cadeias de conexão continuariam sendo trocadas. C aplica primeiro as configurações do destino ao slot de origem para validação, mas não torna as configurações fixas. D apenas copia a configuração da produção para staging no momento da criação; não altera o comportamento durante a troca.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/app-service/deploy-staging-slots"
   }
 ]

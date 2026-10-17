@@ -30,11 +30,11 @@ export function QuestionNavigator({ questions, currentIndex, onJump, userAnswers
     <section className="panel navigator">
       <div className="panel-head">
         <h3><Icon name="star" size={18}/>Navegação de questões</h3>
-        <span className="muted-sm">{questions.length.toLocaleString('pt-PT')}</span>
+        <span className="muted-sm">{questions.length.toLocaleString('pt-BR')}</span>
       </div>
       <div className="legend">
         <span><i className="dot-current"/>Atual</span>
-        {isSimRunning ? <><span><i className="dot-answered"/>Respondida</span><span><i className="dot-flag"/>Para rever</span></> : <><span><i className="dot-correct"/>Correta</span><span><i className="dot-wrong"/>Incorreta</span></>}
+        {isSimRunning ? <><span><i className="dot-answered"/>Respondida</span><span><i className="dot-flag"/>Para revisar</span></> : <><span><i className="dot-correct"/>Correta</span><span><i className="dot-wrong"/>Incorreta</span></>}
         <span><i/>Não respondida</span>
       </div>
       {questions.length === 0 ? <p className="muted-sm empty-nav">Sem questões para mostrar.</p> : (
@@ -75,7 +75,7 @@ export function FiltersPanel({ filters, setFilter, clearFilters, sourceCounts, t
             <option value="all">Todos os domínios</option>
             {DOMAINS.map((d, i) => <option key={d.key} value={String(i)}>{i + 1}. {d.short} · {d.weight}</option>)}
           </Select>
-          <Select label="Estado" value={filters.status} onChange={v => setFilter('status', v)}>
+          <Select label="Status" value={filters.status} onChange={v => setFilter('status', v)}>
             <option value="all">Todas</option>
             <option value="new">Não respondidas</option>
             <option value="correct">Corretas</option>
@@ -88,7 +88,7 @@ export function FiltersPanel({ filters, setFilter, clearFilters, sourceCounts, t
             <option value="code">Com código / comandos</option>
           </Select>
           <Select label="Fonte" value={filters.source} onChange={v => setFilter('source', v)}>
-            <option value="all">Todas as fontes ({total.toLocaleString('pt-PT')})</option>
+            <option value="all">Todas as fontes ({total.toLocaleString('pt-BR')})</option>
             {Object.entries(sourceCounts).sort(([a], [b]) => a.localeCompare(b)).map(([source, count]) => <option key={source} value={source}>{source} ({count})</option>)}
           </Select>
         </div>

@@ -229,7 +229,7 @@ function App() {
   useEffect(() => {
     if (isSimRunning && simSecondsLeft === 0) {
       finishSimulado();
-      showToast('O tempo terminou. O simulado foi submetido.');
+      showToast('O tempo acabou. O simulado foi enviado.');
     }
   }, [isSimRunning, simSecondsLeft]);
 
@@ -322,22 +322,22 @@ function App() {
   };
 
   if (dataState === 'loading') {
-    return <div className="boot"><span className="spinner"/>A carregar o banco de questões…</div>;
+    return <div className="boot"><span className="spinner"/>Carregando o banco de questões…</div>;
   }
   if (dataState === 'error') {
     return (
       <div className="boot">
         <strong>Não foi possível carregar as questões.</strong>
-        <span>Verifica a ligação à Internet e tenta novamente.</span>
-        <button className="btn btn-primary" onClick={() => window.location.reload()}>Tentar de novo</button>
+        <span>Verifique sua conexão com a Internet e tente novamente.</span>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>Tentar novamente</button>
       </div>
     );
   }
 
   const modeTitle = {
-    treino: `Modo treino · ${filteredQuestions.length.toLocaleString('pt-PT')} questões`,
-    simulado: isSimRunning ? `Simulado em curso · ${Object.keys(simAnswers).filter(k => simAnswers[k].length).length}/${simQuestions.length} respondidas` : 'Modo simulado',
-    erros: `Caderno de erros · ${filteredQuestions.length} para rever`,
+    treino: `Modo treino · ${filteredQuestions.length.toLocaleString('pt-BR')} questões`,
+    simulado: isSimRunning ? `Simulado em andamento · ${Object.keys(simAnswers).filter(k => simAnswers[k].length).length}/${simQuestions.length} respondidas` : 'Modo simulado',
+    erros: `Caderno de erros · ${filteredQuestions.length} para revisar`,
     favoritas: `Favoritas · ${filteredQuestions.length} questões`,
   }[mode];
 
@@ -365,7 +365,7 @@ function App() {
               )}
               {isSimReviewing && (
                 <div className="review-bar">
-                  <span><Icon name="search" size={16}/>A rever o simulado · {simResult?.score ?? 0}/1000</span>
+                  <span><Icon name="search" size={16}/>Revisando o simulado · {simResult?.score ?? 0}/1000</span>
                   <button className="link-btn" onClick={() => setSimState('finished')}>Voltar ao resultado</button>
                 </div>
               )}
@@ -438,13 +438,13 @@ function App() {
           onResetAnswers={() => { setUserAnswers({}); setDrafts({}); setModal(null); showToast('Histórico de respostas apagado.'); }}/>
       )}
       {modal === 'exit' && (
-        <ConfirmModal title="Sair do simulado?" message="O simulado ainda está a decorrer. Se saíres agora, as respostas deste simulado são descartadas."
+        <ConfirmModal title="Sair do simulado?" message="O simulado ainda está em andamento. Se você sair agora, as respostas deste simulado serão descartadas."
           cancelLabel="Continuar simulado" confirmLabel="Sair e descartar" onConfirm={confirmExitSimulado} onClose={() => { setModal(null); setPendingMode(null); }}/>
       )}
       {modal === 'finish' && (
-        <ConfirmModal title="Terminar o simulado?" tone={unanswered ? 'danger' : 'primary'}
-          message={unanswered ? `Ainda tens ${unanswered} ${unanswered === 1 ? 'questão' : 'questões'} sem resposta. Questões sem resposta contam como erradas.` : 'Respondeste a todas as questões. Queres submeter e ver o resultado?'}
-          cancelLabel="Voltar" confirmLabel="Terminar e ver resultado" onConfirm={finishSimulado} onClose={() => setModal(null)}/>
+        <ConfirmModal title="Finalizar o simulado?" tone={unanswered ? 'danger' : 'primary'}
+          message={unanswered ? `Você ainda tem ${unanswered} ${unanswered === 1 ? 'questão' : 'questões'} sem resposta. Questões sem resposta contam como erradas.` : 'Você respondeu a todas as questões. Deseja enviar e ver o resultado?'}
+          cancelLabel="Voltar" confirmLabel="Finalizar e ver resultado" onConfirm={finishSimulado} onClose={() => setModal(null)}/>
       )}
       {zoomedImage && <ImageModal src={zoomedImage} onClose={() => setZoomedImage(null)}/>}
       {toast && <div className="toast" role="status"><Icon name="check" size={16}/>{toast}</div>}

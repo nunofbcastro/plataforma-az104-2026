@@ -3,11 +3,11 @@ import legacyAuthored from '../data/authored-questions.json';
 const authoredModules = import.meta.glob('../data/authored/*.json', { eager: true, import: 'default' });
 
 export const DOMAINS = [
-  { key: 'identity', short: 'Identidades e governação', label: 'Gerir identidades e governação', weight: '20–25%', color: '#3b9bff', aliases: ['manage azure identities', 'gerenciar identidades', 'identidades e governança'] },
-  { key: 'storage', short: 'Armazenamento', label: 'Implementar e gerir armazenamento', weight: '15–20%', color: '#a78bfa', aliases: ['implement and manage storage', 'implementar e gerenciar armazenamento'] },
-  { key: 'compute', short: 'Computação', label: 'Implementar e gerir computação', weight: '20–25%', color: '#2dd4bf', aliases: ['deploy and manage azure compute', 'implantar e gerenciar recursos de computação'] },
-  { key: 'network', short: 'Redes virtuais', label: 'Configurar redes virtuais', weight: '15–20%', color: '#fbbf24', aliases: ['implement and manage virtual networking', 'implementar e gerenciar redes virtuais'] },
-  { key: 'monitor', short: 'Monitorização e cópias', label: 'Monitorizar e manter recursos', weight: '10–15%', color: '#fb7185', aliases: ['monitor and maintain azure resources', 'monitorar e manter recursos do azure'] },
+  { key: 'identity', short: 'Identidades e governança', label: 'Gerenciar identidades e governança', weight: '20–25%', color: '#3b9bff', aliases: ['manage azure identities', 'gerenciar identidades', 'identidades e governança'] },
+  { key: 'storage', short: 'Armazenamento', label: 'Implementar e gerenciar armazenamento', weight: '15–20%', color: '#a78bfa', aliases: ['implement and manage storage', 'implementar e gerenciar armazenamento'] },
+  { key: 'compute', short: 'Computação', label: 'Implantar e gerenciar computação', weight: '20–25%', color: '#2dd4bf', aliases: ['deploy and manage azure compute', 'implantar e gerenciar recursos de computação'] },
+  { key: 'network', short: 'Redes virtuais', label: 'Implementar e gerenciar redes virtuais', weight: '15–20%', color: '#fbbf24', aliases: ['implement and manage virtual networking', 'implementar e gerenciar redes virtuais'] },
+  { key: 'monitor', short: 'Monitoramento e backup', label: 'Monitorar e manter recursos', weight: '10–15%', color: '#fb7185', aliases: ['monitor and maintain azure resources', 'monitorar e manter recursos do azure'] },
 ];
 
 export function domainIndexOf(question) {
@@ -29,7 +29,8 @@ function normalize(question) {
 
 export function buildQuestionBank(imported) {
   const authored = Object.keys(authoredModules).sort().flatMap(key => authoredModules[key]);
-  return [...imported, ...legacyAuthored, ...authored].map(normalize);
+  // Questions whose answer depends on a retired Azure feature stay in the data for reference but are not shown.
+  return [...imported, ...legacyAuthored, ...authored].filter(question => !question.obsoleta).map(normalize);
 }
 
 export function isAnswerCorrect(selected, correct) {

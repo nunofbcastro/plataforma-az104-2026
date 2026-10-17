@@ -36,7 +36,7 @@ function Figure({ src, label, onZoom }) {
   return (
     <button type="button" className="q-asset" onClick={() => onZoom(src)} aria-label={`Ampliar ${label}`}>
       <img src={src} alt={label} decoding="async" onError={() => setFailed(true)}/>
-      <span><Icon name="zoom" size={14}/>Toca para ampliar</span>
+      <span><Icon name="zoom" size={14}/>Clique para ampliar</span>
     </button>
   );
 }
@@ -76,19 +76,19 @@ export function QuestionCard({
       <header className="q-head">
         <div className="q-title">
           <span className="q-icon"><Icon name="file" size={18}/></span>
-          <h2 id="question-title">Pergunta <strong>{index + 1}</strong> <span>de {total.toLocaleString('pt-PT')}</span></h2>
+          <h2 id="question-title">Pergunta <strong>{index + 1}</strong> <span>de {total.toLocaleString('pt-BR')}</span></h2>
         </div>
         <div className="q-tags">
           {domain && <span className="tag tag-domain" style={{ '--c': domain.color }}>Domínio {question.domainIndex + 1}<em>{domain.short}</em></span>}
           {question.tema && <span className="tag">{question.tema}</span>}
           {question.dificuldade && <span className={`tag tag-level level-${question.dificuldade.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()}`}><i/><i/><i/>{question.dificuldade}</span>}
-          {isMulti && <span className="tag tag-multi">Escolhe {correctCount}</span>}
+          {isMulti && <span className="tag tag-multi">Escolha {correctCount}</span>}
         </div>
         <div className="q-tools">
           <button className="icon-btn nav-toggle" onClick={onOpenNavigator} aria-label="Abrir navegação e filtros"><Icon name="grid" size={19}/></button>
-          {isSimRunning && <button className={`icon-btn ${isFlagged ? 'is-flagged' : ''}`} onClick={onToggleFlag} aria-pressed={isFlagged} aria-label="Marcar para rever" title="Marcar para rever"><Icon name="flag" size={19}/></button>}
+          {isSimRunning && <button className={`icon-btn ${isFlagged ? 'is-flagged' : ''}`} onClick={onToggleFlag} aria-pressed={isFlagged} aria-label="Marcar para revisão" title="Marcar para revisão"><Icon name="flag" size={19}/></button>}
           <button className={`icon-btn ${isFavorite ? 'is-fav' : ''}`} onClick={onToggleFavorite} aria-pressed={isFavorite} aria-label={isFavorite ? 'Remover das favoritas' : 'Adicionar às favoritas'} title="Favorita"><Icon name="star" size={19}/></button>
-          <button className="icon-btn" onClick={onReport} aria-label="Reportar problema nesta questão" title="Reportar"><Icon name="alert" size={19}/></button>
+          <button className="icon-btn" onClick={onReport} aria-label="Relatar problema nesta questão" title="Relatar problema"><Icon name="alert" size={19}/></button>
         </div>
       </header>
 
@@ -96,7 +96,7 @@ export function QuestionCard({
 
       <div className="q-statement"><TextWithImages text={statement} images={questionImages} label="Imagem da questão" onZoom={onZoom}/></div>
 
-      {isMulti && !revealed && <p className="q-hint"><Icon name="check" size={15}/>Seleciona {correctCount} respostas{isSimRunning ? '' : ' e carrega em “Verificar resposta”'}.</p>}
+      {isMulti && !revealed && <p className="q-hint"><Icon name="check" size={15}/>Selecione {correctCount} respostas{isSimRunning ? '' : ' e clique em “Verificar resposta”'}.</p>}
 
       <div className="options" role={isMulti ? 'group' : 'radiogroup'} aria-label="Opções de resposta">
         {question.opcoes.map(option => {
@@ -153,7 +153,7 @@ export function QuestionCard({
         <div className="q-foot-center">
           {!isSimRunning && isMulti && !revealed && <button className="btn btn-success" onClick={onVerify} disabled={!selected.length}><Icon name="check" size={17}/><span>Verificar resposta</span></button>}
           {!isSimRunning && (revealed || !isMulti) && <button className="btn btn-ghost" onClick={onToggleExplanation}><Icon name="bulb" size={17}/><span>{explanationOpen ? 'Ocultar explicação' : 'Ver explicação'}</span></button>}
-          {isSimRunning && <button className="btn btn-danger" onClick={onFinish}><Icon name="flag" size={17}/><span>Terminar</span></button>}
+          {isSimRunning && <button className="btn btn-danger" onClick={onFinish}><Icon name="flag" size={17}/><span>Finalizar</span></button>}
           <button className={`btn btn-ghost fav-inline ${isFavorite ? 'is-fav' : ''}`} onClick={onToggleFavorite}><Icon name="star" size={17}/><span>{isFavorite ? 'Nas favoritas' : 'Adicionar às favoritas'}</span></button>
         </div>
         <button className="btn btn-primary" onClick={onNext} disabled={index >= total - 1}><span>Próxima<span className="hide-xs"> questão</span></span><Icon name="arrowRight" size={17}/></button>
@@ -165,8 +165,8 @@ export function QuestionCard({
 
 export function EmptyState({ mode, onClear }) {
   const copy = {
-    erros: ['Sem erros para rever', 'Ainda não erraste nenhuma questão. Continua a treinar e as que errares aparecem aqui.'],
-    favoritas: ['Ainda não tens favoritas', 'Marca questões com a estrela para as reveres mais tarde.'],
+    erros: ['Nenhum erro para revisar', 'Você ainda não errou nenhuma questão. Continue treinando e as que você errar aparecerão aqui.'],
+    favoritas: ['Você ainda não tem favoritas', 'Marque questões com a estrela para revisá-las depois.'],
   }[mode] || ['Nenhuma questão encontrada', 'Nenhuma questão corresponde aos filtros ou à pesquisa.'];
   return (
     <div className="panel empty">

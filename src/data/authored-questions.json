@@ -4,55 +4,55 @@
     "origem": "Questões autorais 2026",
     "dominio": "Implementar e gerenciar armazenamento",
     "tipo": "multiple-choice",
-    "pergunta": "Uma equipa precisa de recuperar um blob eliminado acidentalmente durante um período configurável. Que funcionalidade deve ativar na conta de armazenamento?",
+    "pergunta": "Uma equipe precisa recuperar um blob excluído acidentalmente durante um período configurável. Qual funcionalidade você deve habilitar na conta de armazenamento?",
     "pergunta_en": "A team needs to recover a blob that was accidentally deleted within a configurable period. Which feature should be enabled on the storage account?",
     "opcoes": [
-      { "letra": "A", "texto": "Eliminação recuperável de blobs (soft delete).", "texto_en": "Blob soft delete.", "assets": [] },
-      { "letra": "B", "texto": "Gestão do ciclo de vida com ação de eliminação.", "texto_en": "Lifecycle management with a delete action.", "assets": [] },
+      { "letra": "A", "texto": "Exclusão reversível de blobs (soft delete).", "texto_en": "Blob soft delete.", "assets": [] },
+      { "letra": "B", "texto": "Gerenciamento do ciclo de vida com ação de exclusão.", "texto_en": "Lifecycle management with a delete action.", "assets": [] },
       { "letra": "C", "texto": "Azure Files com identidade híbrida.", "texto_en": "Azure Files with hybrid identity.", "assets": [] },
       { "letra": "D", "texto": "Uma regra de processamento de alertas.", "texto_en": "An alert processing rule.", "assets": [] }
     ],
     "opcao_correta": ["A"],
-    "explicacao": "A eliminação recuperável mantém blobs eliminados durante o período de retenção configurado e permite restaurá-los nesse intervalo. B automatiza a transição ou eliminação, não é o mecanismo de recuperação pedido. C trata de partilhas de ficheiros e autenticação. D altera o processamento de alertas do Azure Monitor.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/soft-delete-blob-overview"
+    "explicacao": "A exclusão reversível mantém os blobs excluídos durante o período de retenção configurado e permite restaurá-los nesse intervalo. B automatiza a transição ou a exclusão, mas não é o mecanismo de recuperação solicitado. C trata de compartilhamentos de arquivos e autenticação. D altera o processamento de alertas do Azure Monitor.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/soft-delete-blob-overview"
   },
   {
     "id": 2026101702,
     "origem": "Questões autorais 2026",
     "dominio": "Implementar e gerenciar redes virtuais",
     "tipo": "multiple-choice",
-    "pergunta": "VNet-Hub tem emparelhamento com VNet-A e VNet-B. Sem encaminhamento por uma NVA ou Azure Firewall, as máquinas de VNet-A comunicam automaticamente com as máquinas de VNet-B através do Hub?",
+    "pergunta": "A VNet-Hub tem emparelhamento com a VNet-A e a VNet-B. Sem roteamento por meio de uma NVA ou do Azure Firewall, as máquinas da VNet-A se comunicam automaticamente com as máquinas da VNet-B por meio do Hub?",
     "pergunta_en": "VNet-Hub is peered with VNet-A and VNet-B. Without routing through an NVA or Azure Firewall, can machines in VNet-A automatically communicate with machines in VNet-B through the hub?",
     "opcoes": [
-      { "letra": "A", "texto": "Sim. O peering de redes virtuais é transitivo por predefinição.", "texto_en": "Yes. Virtual network peering is transitive by default.", "assets": [] },
+      { "letra": "A", "texto": "Sim. O peering de redes virtuais é transitivo por padrão.", "texto_en": "Yes. Virtual network peering is transitive by default.", "assets": [] },
       { "letra": "B", "texto": "Não. O peering não encaminha tráfego entre redes emparelhadas de forma transitiva.", "texto_en": "No. Peering does not transitively route traffic between peered networks.", "assets": [] },
       { "letra": "C", "texto": "Sim, desde que ambas as redes usem o mesmo grupo de recursos.", "texto_en": "Yes, if both networks use the same resource group.", "assets": [] },
       { "letra": "D", "texto": "Não, porque o peering impede qualquer comunicação entre redes.", "texto_en": "No, because peering prevents all communication between networks.", "assets": [] }
     ],
     "opcao_correta": ["B"],
-    "explicacao": "O peering permite tráfego entre as duas redes que emparelha, mas não o encaminha automaticamente para uma terceira rede emparelhada. Para permitir comunicação entre spokes, configure encaminhamento através de uma NVA ou firewall e as rotas necessárias. A confunde peering com encaminhamento transitivo. C: o grupo de recursos não altera o encaminhamento. D: as redes emparelhadas podem comunicar entre si.\n\nDocumentação: https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview"
+    "explicacao": "O peering permite tráfego entre as duas redes que ele emparelha, mas não o encaminha automaticamente para uma terceira rede emparelhada. Para permitir a comunicação entre spokes, configure o roteamento por meio de uma NVA ou de um firewall e as rotas necessárias. A confunde peering com roteamento transitivo. C: o grupo de recursos não altera o roteamento. D: as redes emparelhadas podem se comunicar entre si.\n\nDocumentação: https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview"
   },
   {
     "id": 2026101703,
     "origem": "Questões autorais 2026",
     "dominio": "Monitorar e manter recursos do Azure",
     "tipo": "multiple-choice",
-    "pergunta": "Durante uma janela de manutenção, pretende suprimir temporariamente as notificações de alertas de determinados recursos. Os alertas devem continuar visíveis. O que configura?",
+    "pergunta": "Durante uma janela de manutenção, você deseja suprimir temporariamente as notificações de alertas de determinados recursos. Os alertas devem continuar visíveis. O que você deve configurar?",
     "pergunta_en": "During a maintenance window, you want to temporarily suppress notifications for alerts on specific resources. The alerts must remain visible. What should you configure?",
     "opcoes": [
-      { "letra": "A", "texto": "Eliminar as regras de alerta métricas.", "texto_en": "Delete the metric alert rules.", "assets": [] },
-      { "letra": "B", "texto": "Uma regra de processamento de alertas com supressão e horário definido.", "texto_en": "An alert processing rule with suppression and a schedule.", "assets": [] },
-      { "letra": "C", "texto": "Desativar o Azure Monitor na subscrição.", "texto_en": "Disable Azure Monitor on the subscription.", "assets": [] },
-      { "letra": "D", "texto": "Remover os grupos de ações de todos os alertas permanentemente.", "texto_en": "Permanently remove action groups from all alerts.", "assets": [] }
+      { "letra": "A", "texto": "Excluir as regras de alerta de métrica.", "texto_en": "Delete the metric alert rules.", "assets": [] },
+      { "letra": "B", "texto": "Uma regra de processamento de alertas com supressão e agendamento definido.", "texto_en": "An alert processing rule with suppression and a schedule.", "assets": [] },
+      { "letra": "C", "texto": "Desabilitar o Azure Monitor na assinatura.", "texto_en": "Disable Azure Monitor on the subscription.", "assets": [] },
+      { "letra": "D", "texto": "Remover permanentemente os grupos de ações de todos os alertas.", "texto_en": "Permanently remove action groups from all alerts.", "assets": [] }
     ],
     "opcao_correta": ["B"],
-    "explicacao": "As regras de processamento de alertas podem suprimir grupos de ações para alertas abrangidos e podem ter um horário de manutenção. O alerta continua disponível para consulta. A elimina a deteção de alertas. C afeta a monitorização em excesso. D é permanente e não oferece a janela temporária pedida.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/alerts/alerts-processing-rules"
+    "explicacao": "As regras de processamento de alertas podem suprimir grupos de ações para os alertas abrangidos e podem ter um agendamento de manutenção. O alerta continua disponível para consulta. A remove a detecção de alertas. C afeta o monitoramento além do necessário. D é permanente e não oferece a janela temporária solicitada.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/alerts/alerts-processing-rules"
   },
   {
     "id": 2026101704,
     "origem": "Questões autorais 2026",
     "dominio": "Gerenciar identidades e governança do Azure",
     "tipo": "multiple-choice",
-    "pergunta": "Uma organização quer impedir implementações de recursos fora das regiões aprovadas. A regra deve aplicar-se à subscrição e permitir a criação de recursos conformes. Que efeito de Azure Policy é adequado?",
+    "pergunta": "Uma organização quer impedir implantações de recursos fora das regiões aprovadas. A regra deve se aplicar à assinatura e permitir a criação de recursos em conformidade. Qual efeito do Azure Policy é adequado?",
     "pergunta_en": "An organization wants to prevent resource deployments outside approved regions. The policy should apply to the subscription and allow compliant resources. Which Azure Policy effect is appropriate?",
     "opcoes": [
       { "letra": "A", "texto": "Audit", "texto_en": "Audit", "assets": [] },
@@ -61,30 +61,30 @@
       { "letra": "D", "texto": "Append", "texto_en": "Append", "assets": [] }
     ],
     "opcao_correta": ["B"],
-    "explicacao": "O efeito Deny bloqueia operações que criariam ou atualizariam recursos incompatíveis com a política. A atribuição à subscrição aplica a regra aos recursos abrangidos nesse âmbito. Audit regista a não conformidade sem bloquear. Disabled não aplica a regra. Append acrescenta propriedades à requisição, não rejeita localizações não permitidas.\n\nDocumentação: https://learn.microsoft.com/azure/governance/policy/concepts/effect-deny"
+    "explicacao": "O efeito Deny bloqueia operações que criariam ou atualizariam recursos incompatíveis com a política. A atribuição à assinatura aplica a regra aos recursos abrangidos nesse escopo. Audit registra a não conformidade sem bloquear. Disabled não aplica a regra. Append acrescenta propriedades à solicitação, mas não rejeita locais não permitidos.\n\nDocumentação: https://learn.microsoft.com/azure/governance/policy/concepts/effect-deny"
   },
   {
     "id": 2026101705,
     "origem": "Questões autorais 2026",
     "dominio": "Implementar e gerenciar armazenamento",
     "tipo": "multiple-choice",
-    "pergunta": "Ativa a eliminação recuperável de blobs por 14 dias e uma política de ciclo de vida que elimina blobs após 90 dias. Quando a política elimina um blob, o que acontece primeiro?",
+    "pergunta": "Você habilita a exclusão reversível de blobs por 14 dias e uma política de ciclo de vida que exclui blobs após 90 dias. Quando a política exclui um blob, o que acontece primeiro?",
     "pergunta_en": "You enable blob soft delete for 14 days and a lifecycle policy that deletes blobs after 90 days. When the policy deletes a blob, what happens first?",
     "opcoes": [
-      { "letra": "A", "texto": "O blob entra no estado de eliminação recuperável durante o período de retenção.", "texto_en": "The blob enters the soft-deleted state for the retention period.", "assets": [] },
-      { "letra": "B", "texto": "O blob é eliminado permanentemente e não pode ser restaurado.", "texto_en": "The blob is permanently deleted and cannot be restored.", "assets": [] },
-      { "letra": "C", "texto": "A política de ciclo de vida é ignorada sempre que existe eliminação recuperável.", "texto_en": "The lifecycle policy is ignored whenever soft delete is enabled.", "assets": [] },
+      { "letra": "A", "texto": "O blob entra no estado de exclusão reversível durante o período de retenção.", "texto_en": "The blob enters the soft-deleted state for the retention period.", "assets": [] },
+      { "letra": "B", "texto": "O blob é excluído permanentemente e não pode ser restaurado.", "texto_en": "The blob is permanently deleted and cannot be restored.", "assets": [] },
+      { "letra": "C", "texto": "A política de ciclo de vida é ignorada sempre que existe exclusão reversível.", "texto_en": "The lifecycle policy is ignored whenever soft delete is enabled.", "assets": [] },
       { "letra": "D", "texto": "O blob é movido para o nível Archive, independentemente da regra.", "texto_en": "The blob is moved to the Archive tier regardless of the rule.", "assets": [] }
     ],
     "opcao_correta": ["A"],
-    "explicacao": "Com a eliminação recuperável ativa, uma ação de eliminação de ciclo de vida coloca o blob nesse estado; ele permanece recuperável até terminar o prazo de retenção. B ignora a proteção. C está errada porque a política continua a agir. D descreve uma ação de transição de nível, diferente de eliminar.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/lifecycle-management-overview"
+    "explicacao": "Com a exclusão reversível habilitada, uma ação de exclusão do ciclo de vida coloca o blob nesse estado; ele permanece recuperável até o fim do período de retenção. B ignora a proteção. C está errada porque a política continua agindo. D descreve uma ação de transição de nível, que é diferente de excluir.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/lifecycle-management-overview"
   },
   {
     "id": 2026101706,
     "origem": "Questões autorais 2026",
     "dominio": "Monitorar e manter recursos do Azure",
     "tipo": "multiple-choice",
-    "pergunta": "Precisa de enviar uma notificação por correio eletrónico e executar uma função quando uma regra de alerta é acionada. Que recurso define estas ações?",
+    "pergunta": "Você precisa enviar uma notificação por email e executar uma função quando uma regra de alerta é acionada. Qual recurso define essas ações?",
     "pergunta_en": "You need to send an email notification and run a function when an alert rule fires. Which resource defines these actions?",
     "opcoes": [
       { "letra": "A", "texto": "Grupo de ações (Action Group).", "texto_en": "Action group.", "assets": [] },
@@ -93,6 +93,6 @@
       { "letra": "D", "texto": "Consulta do Log Analytics.", "texto_en": "Log Analytics query.", "assets": [] }
     ],
     "opcao_correta": ["A"],
-    "explicacao": "Um grupo de ações reúne notificações e automatizações, como correio eletrónico e execução de uma Azure Function, e pode ser associado a uma regra de alerta. Uma regra de processamento altera os grupos de ações associados a alertas já acionados ou suprime notificações. Um Workbook apresenta dados e uma consulta KQL analisa registos.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/alerts/action-groups"
+    "explicacao": "Um grupo de ações reúne notificações e automações, como email e execução de uma Azure Function, e pode ser associado a uma regra de alerta. Uma regra de processamento altera os grupos de ações associados a alertas já acionados ou suprime notificações. Um Workbook apresenta dados, e uma consulta KQL analisa logs.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/alerts/action-groups"
   }
 ]

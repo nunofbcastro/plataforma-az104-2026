@@ -45,7 +45,7 @@ export function StatsModal({ stats, domainStats, onClose }) {
   return (
     <Modal title="Estatísticas de estudo" icon="chart" onClose={onClose}>
       <div className="mini-stats">
-        <div><span>Total no banco</span><strong>{stats.total.toLocaleString('pt-PT')}</strong></div>
+        <div><span>Total no banco</span><strong>{stats.total.toLocaleString('pt-BR')}</strong></div>
         <div><span>Respondidas</span><strong className="c-blue">{stats.answered}</strong></div>
         <div><span>Certas</span><strong className="c-green">{stats.correct}</strong></div>
         <div><span>Erradas</span><strong className="c-red">{stats.incorrect}</strong></div>
@@ -68,7 +68,7 @@ export function StatsModal({ stats, domainStats, onClose }) {
           );
         })}
       </div>
-      <p className="muted-sm">Procura manter pelo menos 70% de acerto em todos os domínios antes de marcar o exame.</p>
+      <p className="muted-sm">Procure manter pelo menos 70% de acerto em todos os domínios antes de agendar o exame.</p>
     </Modal>
   );
 }
@@ -81,14 +81,14 @@ export function ReportModal({ question, onClose }) {
     body: `**Questão:** ${question.id} (${question.origem})\n**Motivo:** ${reason}\n\n${notes}`,
   })}`;
   return (
-    <Modal title={`Reportar questão #${question.id}`} icon="alert" onClose={onClose} size="sm">
+    <Modal title={`Relatar problema na questão #${question.id}`} icon="alert" onClose={onClose} size="sm">
       <label className="field">
         <span>Motivo</span>
         <span className="select-wrap">
           <select value={reason} onChange={e => setReason(e.target.value)}>
             <option>Resposta correta discordante</option>
             <option>Erro de tradução</option>
-            <option>Imagem em falta</option>
+            <option>Imagem ausente</option>
             <option>Texto truncado ou mal formatado</option>
             <option>Outro motivo</option>
           </select>
@@ -96,12 +96,12 @@ export function ReportModal({ question, onClose }) {
       </label>
       <label className="field">
         <span>Detalhes (opcional)</span>
-        <textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Descreve o problema que encontraste…"/>
+        <textarea rows={4} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Descreva o problema que você encontrou…"/>
       </label>
-      <p className="muted-sm">O reporte é aberto como issue no GitHub do projeto (precisa de conta GitHub).</p>
+      <p className="muted-sm">O relato é aberto como issue no GitHub do projeto (requer uma conta do GitHub).</p>
       <div className="modal-actions">
         <button className="btn btn-ghost" onClick={onClose}>Cancelar</button>
-        <a className="btn btn-primary" href={issueUrl} target="_blank" rel="noreferrer noopener" onClick={onClose}>Abrir reporte<Icon name="external" size={15}/></a>
+        <a className="btn btn-primary" href={issueUrl} target="_blank" rel="noreferrer noopener" onClick={onClose}>Abrir relato<Icon name="external" size={15}/></a>
       </div>
     </Modal>
   );
@@ -110,7 +110,7 @@ export function ReportModal({ question, onClose }) {
 export function SettingsModal({ lang, setLang, theme, setTheme, onResetAnswers, onClose }) {
   const [confirmReset, setConfirmReset] = useState(false);
   return (
-    <Modal title="Definições" icon="settings" onClose={onClose} size="sm">
+    <Modal title="Configurações" icon="settings" onClose={onClose} size="sm">
       <div className="setting-row">
         <div><strong>Idioma das questões</strong><span>Português ou inglês (original do exame)</span></div>
         <div className="segmented">
@@ -126,14 +126,14 @@ export function SettingsModal({ lang, setLang, theme, setTheme, onResetAnswers, 
         </div>
       </div>
       <div className="danger-zone">
-        <strong>Repor histórico de respostas</strong>
-        <span>Apaga todas as respostas guardadas neste dispositivo. As favoritas mantêm-se.</span>
+        <strong>Redefinir histórico de respostas</strong>
+        <span>Apaga todas as respostas salvas neste dispositivo. As favoritas são mantidas.</span>
         {confirmReset ? (
           <div className="modal-actions">
             <button className="btn btn-ghost btn-sm" onClick={() => setConfirmReset(false)}>Cancelar</button>
             <button className="btn btn-danger btn-sm" onClick={onResetAnswers}>Sim, apagar respostas</button>
           </div>
-        ) : <button className="btn btn-danger-ghost btn-sm" onClick={() => setConfirmReset(true)}>Repor respostas…</button>}
+        ) : <button className="btn btn-danger-ghost btn-sm" onClick={() => setConfirmReset(true)}>Redefinir respostas…</button>}
       </div>
     </Modal>
   );

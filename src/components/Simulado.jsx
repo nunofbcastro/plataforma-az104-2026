@@ -3,10 +3,10 @@ import { Icon } from './StudyChrome';
 
 export function SimuladoLobby({ countChoice, setCountChoice, onStart, total }) {
   const specs = [
-    ['timer', 'Duração', '100 min', 'Cronómetro regressivo'],
+    ['timer', 'Duração', '100 min', 'Cronômetro regressivo'],
     ['target', 'Aprovação', '700 / 1000', 'Pontuação escalada'],
     ['grid', 'Formato', 'Misto', 'Escolha única e múltipla'],
-    ['bulb', 'Correção', 'No fim', 'Explicações na revisão'],
+    ['bulb', 'Correção', 'No final', 'Explicações na revisão'],
   ];
   return (
     <section className="panel sim-lobby">
@@ -15,7 +15,7 @@ export function SimuladoLobby({ countChoice, setCountChoice, onStart, total }) {
         <div>
           <span className="eyebrow">Modo de exame</span>
           <h2>Simulado AZ-104</h2>
-          <p>Questões aleatórias de todos os domínios, sem ver as respostas até ao fim — tal como no exame real.</p>
+          <p>Questões aleatórias de todos os domínios, sem ver as respostas até o fim, assim como no exame real.</p>
         </div>
       </div>
       <div className="sim-specs">
@@ -24,10 +24,10 @@ export function SimuladoLobby({ countChoice, setCountChoice, onStart, total }) {
         ))}
       </div>
       <ul className="sim-rules">
-        <li>As respostas e explicações só são mostradas depois de terminares.</li>
-        <li>Podes navegar entre questões, alterar respostas e marcar questões <Icon name="flag" size={14}/> para rever.</li>
-        <li>Respostas erradas não descontam — responde a todas.</li>
-        <li>Se saíres do simulado a meio, as respostas são descartadas.</li>
+        <li>As respostas e explicações só são mostradas depois que você terminar.</li>
+        <li>Você pode navegar entre as questões, alterar respostas e marcar questões <Icon name="flag" size={14}/> para revisar.</li>
+        <li>Respostas erradas não descontam pontos — responda a todas.</li>
+        <li>Se você sair do simulado no meio, as respostas serão descartadas.</li>
       </ul>
       <div className="sim-start">
         <label className="field">
@@ -37,11 +37,11 @@ export function SimuladoLobby({ countChoice, setCountChoice, onStart, total }) {
               <option value="50">50 questões · formato do exame</option>
               <option value="30">30 questões · simulado rápido</option>
               <option value="65">65 questões · simulado longo</option>
-              <option value="all">Todas ({total.toLocaleString('pt-PT')}) · maratona</option>
+              <option value="all">Todas ({total.toLocaleString('pt-BR')}) · maratona</option>
             </select>
           </span>
         </label>
-        <button className="btn btn-primary btn-lg" onClick={onStart}><Icon name="play" size={18}/>Começar simulado</button>
+        <button className="btn btn-primary btn-lg" onClick={onStart}><Icon name="play" size={18}/>Iniciar simulado</button>
       </div>
     </section>
   );
@@ -77,7 +77,7 @@ export function SimuladoResults({ result, onReview, onReviewWrong, onRestart }) 
         })}
       </div>
       <div className="sim-actions">
-        <button className="btn btn-primary" onClick={onReview}><Icon name="search" size={17}/>Rever todas</button>
+        <button className="btn btn-primary" onClick={onReview}><Icon name="search" size={17}/>Revisar todas</button>
         <button className="btn btn-ghost" onClick={onReviewWrong}><Icon name="alert" size={17}/>Caderno de erros</button>
         <button className="btn btn-ghost" onClick={onRestart}><Icon name="refresh" size={17}/>Novo simulado</button>
       </div>

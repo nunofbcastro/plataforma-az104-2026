@@ -5,35 +5,35 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
-    "tema": "Templates ARM – parâmetros (allowedValues)",
-    "pergunta": "Tem uma subscrição do Azure que contém um grupo de recursos vazio chamado RG1.\n\nTem um ficheiro chamado storage.json com o seguinte template ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"skuName\": {\n      \"type\": \"string\",\n      \"defaultValue\": \"Standard_LRS\",\n      \"allowedValues\": [ \"Standard_LRS\", \"Standard_ZRS\" ]\n    }\n  },\n  \"variables\": {\n    \"storageName\": \"[format('stdata{0}', uniqueString(resourceGroup().id))]\"\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[variables('storageName')]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"[parameters('skuName')]\" },\n      \"kind\": \"StorageV2\"\n    }\n  ]\n}\n```\n\nExecuta o seguinte comando:\n\n```bash\naz deployment group create --resource-group RG1 --template-file storage.json --parameters skuName=Standard_GRS\n```\n\nQual é o resultado da implementação?",
+    "tema": "Modelos do ARM – parâmetros (allowedValues)",
+    "pergunta": "Você tem uma assinatura do Azure que contém um grupo de recursos vazio chamado RG1.\n\nVocê tem um arquivo chamado storage.json com o seguinte modelo do ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"skuName\": {\n      \"type\": \"string\",\n      \"defaultValue\": \"Standard_LRS\",\n      \"allowedValues\": [ \"Standard_LRS\", \"Standard_ZRS\" ]\n    }\n  },\n  \"variables\": {\n    \"storageName\": \"[format('stdata{0}', uniqueString(resourceGroup().id))]\"\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[variables('storageName')]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"[parameters('skuName')]\" },\n      \"kind\": \"StorageV2\"\n    }\n  ]\n}\n```\n\nVocê executa o seguinte comando:\n\n```bash\naz deployment group create --resource-group RG1 --template-file storage.json --parameters skuName=Standard_GRS\n```\n\nQual é o resultado da implantação?",
     "pergunta_en": "You have an Azure subscription that contains an empty resource group named RG1.\n\nYou have a file named storage.json that contains the following ARM template:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"skuName\": {\n      \"type\": \"string\",\n      \"defaultValue\": \"Standard_LRS\",\n      \"allowedValues\": [ \"Standard_LRS\", \"Standard_ZRS\" ]\n    }\n  },\n  \"variables\": {\n    \"storageName\": \"[format('stdata{0}', uniqueString(resourceGroup().id))]\"\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[variables('storageName')]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"[parameters('skuName')]\" },\n      \"kind\": \"StorageV2\"\n    }\n  ]\n}\n```\n\nYou run the following command:\n\n```bash\naz deployment group create --resource-group RG1 --template-file storage.json --parameters skuName=Standard_GRS\n```\n\nWhat is the result of the deployment?",
     "opcoes": [
       {
         "letra": "A",
-        "texto": "É criada uma conta de armazenamento com o SKU Standard_GRS, porque o valor passado na linha de comandos substitui allowedValues.",
+        "texto": "Uma conta de armazenamento é criada com o SKU Standard_GRS, porque o valor passado na linha de comando substitui allowedValues.",
         "texto_en": "A storage account is created with the Standard_GRS SKU because the value passed on the command line overrides allowedValues."
       },
       {
         "letra": "B",
-        "texto": "É criada uma conta de armazenamento com o SKU Standard_LRS, porque é usado o defaultValue quando o valor fornecido não é permitido.",
+        "texto": "Uma conta de armazenamento é criada com o SKU Standard_LRS, porque o defaultValue é usado quando o valor fornecido não é permitido.",
         "texto_en": "A storage account is created with the Standard_LRS SKU because defaultValue is used when the supplied value is not allowed."
       },
       {
         "letra": "C",
-        "texto": "A implementação falha na validação e não é criada nenhuma conta de armazenamento.",
+        "texto": "A implantação falha na validação e nenhuma conta de armazenamento é criada.",
         "texto_en": "The deployment fails during validation and no storage account is created."
       },
       {
         "letra": "D",
-        "texto": "É criada uma conta de armazenamento com o SKU Standard_ZRS, o valor permitido mais próximo de Standard_GRS.",
+        "texto": "Uma conta de armazenamento é criada com o SKU Standard_ZRS, o valor permitido mais próximo de Standard_GRS.",
         "texto_en": "A storage account is created with the Standard_ZRS SKU, the allowed value closest to Standard_GRS."
       }
     ],
     "opcao_correta": [
       "C"
     ],
-    "explicacao": "O parâmetro skuName define allowedValues com apenas Standard_LRS e Standard_ZRS. Quando é passado um valor que não consta da lista, o Resource Manager rejeita a implementação durante a validação, antes de criar qualquer recurso. O defaultValue só é usado quando não é fornecido nenhum valor para o parâmetro.\n\nA está errada: um valor passado com --parameters continua sujeito às restrições do parâmetro; não as substitui. B está errada: o defaultValue não é um valor de recurso para valores inválidos; só se aplica quando o parâmetro é omitido. D está errada: o Resource Manager não escolhe um valor \"aproximado\"; ou o valor é permitido ou a validação falha.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/parameters",
+    "explicacao": "O parâmetro skuName define allowedValues com apenas Standard_LRS e Standard_ZRS. Quando é passado um valor que não consta na lista, o Resource Manager rejeita a implantação durante a validação, antes de criar qualquer recurso. O defaultValue só é usado quando nenhum valor é fornecido para o parâmetro.\n\nA está errada: um valor passado com --parameters continua sujeito às restrições do parâmetro; ele não as substitui. B está errada: o defaultValue não é um valor de fallback para valores inválidos; ele só se aplica quando o parâmetro é omitido. D está errada: o Resource Manager não escolhe um valor \"aproximado\"; ou o valor é permitido ou a validação falha.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/parameters",
     "assets": []
   },
   {
@@ -42,8 +42,8 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
-    "tema": "Templates ARM – ciclos copy",
-    "pergunta": "Tem uma subscrição do Azure que contém um grupo de recursos vazio chamado RG1.\n\nTem um ficheiro chamado azuredeploy.json com o seguinte template ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"instanceCount\": { \"type\": \"int\", \"defaultValue\": 2 },\n    \"prefix\": { \"type\": \"string\", \"defaultValue\": \"stcontoso\" }\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[format('{0}{1}', parameters('prefix'), copyIndex(1))]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\",\n      \"copy\": {\n        \"name\": \"storagecopy\",\n        \"count\": \"[parameters('instanceCount')]\"\n      }\n    }\n  ]\n}\n```\n\nExecuta o seguinte comando:\n\n```bash\naz deployment group create --resource-group RG1 --template-file azuredeploy.json --parameters instanceCount=3\n```\n\nQue contas de armazenamento são criadas em RG1?",
+    "tema": "Modelos do ARM – loops copy",
+    "pergunta": "Você tem uma assinatura do Azure que contém um grupo de recursos vazio chamado RG1.\n\nVocê tem um arquivo chamado azuredeploy.json com o seguinte modelo do ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"instanceCount\": { \"type\": \"int\", \"defaultValue\": 2 },\n    \"prefix\": { \"type\": \"string\", \"defaultValue\": \"stcontoso\" }\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[format('{0}{1}', parameters('prefix'), copyIndex(1))]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\",\n      \"copy\": {\n        \"name\": \"storagecopy\",\n        \"count\": \"[parameters('instanceCount')]\"\n      }\n    }\n  ]\n}\n```\n\nVocê executa o seguinte comando:\n\n```bash\naz deployment group create --resource-group RG1 --template-file azuredeploy.json --parameters instanceCount=3\n```\n\nQuais contas de armazenamento são criadas em RG1?",
     "pergunta_en": "You have an Azure subscription that contains an empty resource group named RG1.\n\nYou have a file named azuredeploy.json that contains the following ARM template:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"instanceCount\": { \"type\": \"int\", \"defaultValue\": 2 },\n    \"prefix\": { \"type\": \"string\", \"defaultValue\": \"stcontoso\" }\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[format('{0}{1}', parameters('prefix'), copyIndex(1))]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\",\n      \"copy\": {\n        \"name\": \"storagecopy\",\n        \"count\": \"[parameters('instanceCount')]\"\n      }\n    }\n  ]\n}\n```\n\nYou run the following command:\n\n```bash\naz deployment group create --resource-group RG1 --template-file azuredeploy.json --parameters instanceCount=3\n```\n\nWhich storage accounts are created in RG1?",
     "opcoes": [
       {
@@ -70,7 +70,7 @@
     "opcao_correta": [
       "A"
     ],
-    "explicacao": "O número de iterações é definido por count, que usa o parâmetro instanceCount. Como o comando passa instanceCount=3, o valor predefinido 2 é ignorado e o ciclo executa três iterações. A função copyIndex() é baseada em zero, mas copyIndex(1) aplica um deslocamento de 1 ao índice, pelo que os nomes gerados são stcontoso1, stcontoso2 e stcontoso3.\n\nB está errada: usa o valor predefinido (2) e ignora o deslocamento de copyIndex(1). C está errada: tem o número certo de iterações, mas ignora o deslocamento (seria o resultado de copyIndex()). D está errada: aplica o deslocamento, mas usa o valor predefinido de instanceCount em vez do valor passado no comando.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/copy-resources",
+    "explicacao": "O número de iterações é definido por count, que usa o parâmetro instanceCount. Como o comando passa instanceCount=3, o valor padrão 2 é ignorado e o loop executa três iterações. A função copyIndex() é baseada em zero, mas copyIndex(1) aplica um deslocamento de 1 ao índice, portanto os nomes gerados são stcontoso1, stcontoso2 e stcontoso3.\n\nB está errada: usa o valor padrão (2) e ignora o deslocamento de copyIndex(1). C está errada: tem o número certo de iterações, mas ignora o deslocamento (seria o resultado de copyIndex()). D está errada: aplica o deslocamento, mas usa o valor padrão de instanceCount em vez do valor passado no comando.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/copy-resources",
     "assets": []
   },
   {
@@ -79,8 +79,8 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
-    "tema": "Bicep – ciclos",
-    "pergunta": "Tem uma subscrição do Azure que contém um grupo de recursos vazio chamado RG1.\n\nImplementa o seguinte ficheiro Bicep em RG1:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource nsg 'Microsoft.Network/networkSecurityGroups@2025-01-01' = [for i in range(1, 3): if (i != 2) {\n  name: 'nsg-app-${i}'\n  location: location\n}]\n```\n\nQue grupos de segurança de rede (NSG) existem em RG1 após a implementação?",
+    "tema": "Bicep – loops",
+    "pergunta": "Você tem uma assinatura do Azure que contém um grupo de recursos vazio chamado RG1.\n\nVocê implanta o seguinte arquivo Bicep em RG1:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource nsg 'Microsoft.Network/networkSecurityGroups@2025-01-01' = [for i in range(1, 3): if (i != 2) {\n  name: 'nsg-app-${i}'\n  location: location\n}]\n```\n\nQuais grupos de segurança de rede (NSG) existem em RG1 após a implantação?",
     "pergunta_en": "You have an Azure subscription that contains an empty resource group named RG1.\n\nYou deploy the following Bicep file to RG1:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource nsg 'Microsoft.Network/networkSecurityGroups@2025-01-01' = [for i in range(1, 3): if (i != 2) {\n  name: 'nsg-app-${i}'\n  location: location\n}]\n```\n\nWhich network security groups (NSGs) exist in RG1 after the deployment?",
     "opcoes": [
       {
@@ -100,14 +100,14 @@
       },
       {
         "letra": "D",
-        "texto": "Nenhum. A implementação falha porque não é possível combinar uma condição `if` com um ciclo `for`.",
+        "texto": "Nenhum. A implantação falha porque não é possível combinar uma condição `if` com um loop `for`.",
         "texto_en": "None. The deployment fails because an `if` condition cannot be combined with a `for` loop."
       }
     ],
     "opcao_correta": [
       "B"
     ],
-    "explicacao": "Em Bicep, range(startIndex, count) cria uma matriz que começa em startIndex e contém count elementos. Assim, range(1, 3) devolve [1, 2, 3] (e não 1 a 2). O ciclo inclui a condição if (i != 2), pelo que a instância com i = 2 não é implementada. Resultado: nsg-app-1 e nsg-app-3.\n\nA está errada: trata o segundo argumento de range() como limite superior exclusivo, quando na verdade é o número de elementos. C está errada: ignora a condição if, que é avaliada para cada iteração. D está errada: o Bicep suporta ciclos com condição para recursos e módulos, com a sintaxe [for ... : if (...) { ... }].\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/loops",
+    "explicacao": "No Bicep, range(startIndex, count) cria uma matriz que começa em startIndex e contém count elementos. Assim, range(1, 3) retorna [1, 2, 3] (e não 1 a 2). O loop inclui a condição if (i != 2), portanto a instância com i = 2 não é implantada. Resultado: nsg-app-1 e nsg-app-3.\n\nA está errada: trata o segundo argumento de range() como limite superior exclusivo, quando na verdade ele é o número de elementos. C está errada: ignora a condição if, que é avaliada para cada iteração. D está errada: o Bicep dá suporte a loops com condição para recursos e módulos, com a sintaxe [for ... : if (...) { ... }].\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/loops",
     "assets": []
   },
   {
@@ -116,8 +116,8 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
-    "tema": "Templates ARM – dependsOn",
-    "pergunta": "Tem uma subscrição do Azure que contém um grupo de recursos vazio chamado RG1.\n\nTem o seguinte template ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Network/virtualNetworks\", \"apiVersion\": \"2025-01-01\",\n      \"name\": \"vnet-app\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": {\n        \"addressSpace\": { \"addressPrefixes\": [ \"10.10.0.0/16\" ] },\n        \"subnets\": [ { \"name\": \"snet-web\", \"properties\": { \"addressPrefix\": \"10.10.1.0/24\" } } ]\n      }\n    },\n    {\n      \"type\": \"Microsoft.Network/networkInterfaces\", \"apiVersion\": \"2025-01-01\",\n      \"name\": \"nic-web1\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": {\n        \"ipConfigurations\": [ { \"name\": \"ipconfig1\", \"properties\": {\n          \"subnet\": { \"id\": \"[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-app', 'snet-web')]\" }\n        } } ]\n      }\n    }\n  ]\n}\n```\n\nQuando implementa o template em RG1, a implementação falha porque o Resource Manager tenta criar nic-web1 antes de a sub-rede snet-web existir.\n\nPrecisa de modificar o template para garantir que nic-web1 só é implementada depois de vnet-app.\n\nQue alteração deve fazer?",
+    "tema": "Modelos do ARM – dependsOn",
+    "pergunta": "Você tem uma assinatura do Azure que contém um grupo de recursos vazio chamado RG1.\n\nVocê tem o seguinte modelo do ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Network/virtualNetworks\", \"apiVersion\": \"2025-01-01\",\n      \"name\": \"vnet-app\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": {\n        \"addressSpace\": { \"addressPrefixes\": [ \"10.10.0.0/16\" ] },\n        \"subnets\": [ { \"name\": \"snet-web\", \"properties\": { \"addressPrefix\": \"10.10.1.0/24\" } } ]\n      }\n    },\n    {\n      \"type\": \"Microsoft.Network/networkInterfaces\", \"apiVersion\": \"2025-01-01\",\n      \"name\": \"nic-web1\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": {\n        \"ipConfigurations\": [ { \"name\": \"ipconfig1\", \"properties\": {\n          \"subnet\": { \"id\": \"[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-app', 'snet-web')]\" }\n        } } ]\n      }\n    }\n  ]\n}\n```\n\nQuando você implanta o modelo em RG1, a implantação falha porque o Resource Manager tenta criar nic-web1 antes de a sub-rede snet-web existir.\n\nVocê precisa modificar o modelo para garantir que nic-web1 só seja implantada depois de vnet-app.\n\nQual alteração você deve fazer?",
     "pergunta_en": "You have an Azure subscription that contains an empty resource group named RG1.\n\nYou have the following ARM template:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Network/virtualNetworks\", \"apiVersion\": \"2025-01-01\",\n      \"name\": \"vnet-app\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": {\n        \"addressSpace\": { \"addressPrefixes\": [ \"10.10.0.0/16\" ] },\n        \"subnets\": [ { \"name\": \"snet-web\", \"properties\": { \"addressPrefix\": \"10.10.1.0/24\" } } ]\n      }\n    },\n    {\n      \"type\": \"Microsoft.Network/networkInterfaces\", \"apiVersion\": \"2025-01-01\",\n      \"name\": \"nic-web1\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": {\n        \"ipConfigurations\": [ { \"name\": \"ipconfig1\", \"properties\": {\n          \"subnet\": { \"id\": \"[resourceId('Microsoft.Network/virtualNetworks/subnets', 'vnet-app', 'snet-web')]\" }\n        } } ]\n      }\n    }\n  ]\n}\n```\n\nWhen you deploy the template to RG1, the deployment fails because Resource Manager tries to create nic-web1 before the snet-web subnet exists.\n\nYou need to modify the template to ensure that nic-web1 is deployed only after vnet-app.\n\nWhich change should you make?",
     "opcoes": [
       {
@@ -144,7 +144,7 @@
     "opcao_correta": [
       "D"
     ],
-    "explicacao": "A função resourceId() apenas constrói uma cadeia com o identificador do recurso; não cria qualquer dependência. Como os recursos sem dependências são implementados em paralelo, é preciso declarar uma dependência explícita em nic-web1 com o elemento dependsOn, que aceita o nome ou o ID do recurso do qual depende.\n\nA está errada: a ordem dos recursos no template não determina a ordem de implementação; o Resource Manager avalia apenas as dependências. B está errada: inverte a relação, fazendo a rede virtual esperar pela interface de rede, o que não resolve o problema. C está errada: a função reference() só cria uma dependência implícita quando se refere ao recurso pelo nome; se receber o ID do recurso (resourceId), não é criada nenhuma dependência implícita.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/resource-dependency",
+    "explicacao": "A função resourceId() apenas constrói uma cadeia de caracteres com o identificador do recurso; ela não cria nenhuma dependência. Como os recursos sem dependências são implantados em paralelo, é preciso declarar uma dependência explícita em nic-web1 com o elemento dependsOn, que aceita o nome ou a ID do recurso do qual ele depende.\n\nA está errada: a ordem dos recursos no modelo não determina a ordem de implantação; o Resource Manager avalia apenas as dependências. B está errada: inverte a relação, fazendo a rede virtual esperar pelo adaptador de rede, o que não resolve o problema. C está errada: a função reference() só cria uma dependência implícita quando se refere ao recurso pelo nome; se receber a ID do recurso (resourceId), nenhuma dependência implícita é criada.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/resource-dependency",
     "assets": []
   },
   {
@@ -154,27 +154,27 @@
     "tipo": "Seleção Múltipla",
     "dificuldade": "Médio",
     "tema": "Bicep – dependências implícitas",
-    "pergunta": "Tem o seguinte ficheiro Bicep, que vai implementar num grupo de recursos vazio:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource sa 'Microsoft.Storage/storageAccounts@2025-06-01' = {\n  name: 'stapp${uniqueString(resourceGroup().id)}'\n  location: location\n  sku: {\n    name: 'Standard_LRS'\n  }\n  kind: 'StorageV2'\n}\n\nresource blobSvc 'Microsoft.Storage/storageAccounts/blobServices@2025-06-01' = {\n  parent: sa\n  name: 'default'\n}\n\nresource plan 'Microsoft.Web/serverfarms@2024-04-01' = {\n  name: 'plan-app1'\n  location: location\n  sku: {\n    name: 'B1'\n  }\n}\n\noutput blobEndpoint string = sa.properties.primaryEndpoints.blob\n```\n\nQuais são as duas afirmações verdadeiras? Cada resposta correta apresenta uma solução completa.",
+    "pergunta": "Você tem o seguinte arquivo Bicep, que vai implantar em um grupo de recursos vazio:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource sa 'Microsoft.Storage/storageAccounts@2025-06-01' = {\n  name: 'stapp${uniqueString(resourceGroup().id)}'\n  location: location\n  sku: {\n    name: 'Standard_LRS'\n  }\n  kind: 'StorageV2'\n}\n\nresource blobSvc 'Microsoft.Storage/storageAccounts/blobServices@2025-06-01' = {\n  parent: sa\n  name: 'default'\n}\n\nresource plan 'Microsoft.Web/serverfarms@2024-04-01' = {\n  name: 'plan-app1'\n  location: location\n  sku: {\n    name: 'B1'\n  }\n}\n\noutput blobEndpoint string = sa.properties.primaryEndpoints.blob\n```\n\nQuais são as duas afirmações verdadeiras? Cada resposta correta apresenta uma solução completa.",
     "pergunta_en": "You have the following Bicep file that you will deploy to an empty resource group:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource sa 'Microsoft.Storage/storageAccounts@2025-06-01' = {\n  name: 'stapp${uniqueString(resourceGroup().id)}'\n  location: location\n  sku: {\n    name: 'Standard_LRS'\n  }\n  kind: 'StorageV2'\n}\n\nresource blobSvc 'Microsoft.Storage/storageAccounts/blobServices@2025-06-01' = {\n  parent: sa\n  name: 'default'\n}\n\nresource plan 'Microsoft.Web/serverfarms@2024-04-01' = {\n  name: 'plan-app1'\n  location: location\n  sku: {\n    name: 'B1'\n  }\n}\n\noutput blobEndpoint string = sa.properties.primaryEndpoints.blob\n```\n\nWhich two statements are true? Each correct answer presents a complete solution.",
     "opcoes": [
       {
         "letra": "A",
-        "texto": "Para garantir que blobSvc é implementado depois de sa, tem de adicionar `dependsOn: [ sa ]` a blobSvc.",
+        "texto": "Para garantir que blobSvc seja implantado depois de sa, você deve adicionar `dependsOn: [ sa ]` a blobSvc.",
         "texto_en": "To ensure that blobSvc is deployed after sa, you must add `dependsOn: [ sa ]` to blobSvc."
       },
       {
         "letra": "B",
-        "texto": "blobSvc só é implementado depois de sa, porque a propriedade `parent` cria uma dependência implícita.",
+        "texto": "blobSvc só é implantado depois de sa, porque a propriedade `parent` cria uma dependência implícita.",
         "texto_en": "blobSvc is deployed only after sa because the `parent` property creates an implicit dependency."
       },
       {
         "letra": "C",
-        "texto": "plan só é implementado depois de sa terminar, porque está declarado a seguir no ficheiro.",
+        "texto": "plan só é implantado depois que sa terminar, porque está declarado em seguida no arquivo.",
         "texto_en": "plan is deployed only after sa finishes because it is declared later in the file."
       },
       {
         "letra": "D",
-        "texto": "O Resource Manager pode implementar plan e sa em paralelo.",
+        "texto": "O Resource Manager pode implantar plan e sa em paralelo.",
         "texto_en": "Resource Manager can deploy plan and sa in parallel."
       }
     ],
@@ -182,7 +182,7 @@
       "B",
       "D"
     ],
-    "explicacao": "Em Bicep, um recurso que usa a propriedade parent tem uma dependência implícita do recurso pai, por isso blobSvc só é implementado depois de sa (B). O plano do App Service (plan) não referencia sa nem é referenciado por ele, logo não existe dependência entre ambos e o Resource Manager implementa-os em paralelo (D).\n\nA está errada: quando já existe uma dependência implícita, a documentação recomenda não adicionar uma dependência explícita; dependsOn seria redundante. C está errada: o Bicep é declarativo e a ordem dos elementos no ficheiro não afeta a ordem de implementação; apenas as dependências contam.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/resource-dependencies",
+    "explicacao": "No Bicep, um recurso que usa a propriedade parent tem uma dependência implícita do recurso pai, por isso blobSvc só é implantado depois de sa (B). O plano do App Service (plan) não referencia sa nem é referenciado por ele, logo não existe dependência entre os dois e o Resource Manager os implanta em paralelo (D).\n\nA está errada: quando já existe uma dependência implícita, a documentação recomenda não adicionar uma dependência explícita; dependsOn seria redundante. C está errada: o Bicep é declarativo e a ordem dos elementos no arquivo não afeta a ordem de implantação; apenas as dependências contam.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/resource-dependencies",
     "assets": []
   },
   {
@@ -192,7 +192,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Bicep – uniqueString()",
-    "pergunta": "Tem uma subscrição do Azure que contém dois grupos de recursos vazios chamados RG1 e RG2.\n\nTem um ficheiro chamado logs.bicep com o seguinte conteúdo:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource sa 'Microsoft.Storage/storageAccounts@2025-06-01' = {\n  name: 'stlogs${uniqueString(resourceGroup().id)}'\n  location: location\n  sku: {\n    name: 'Standard_LRS'\n  }\n  kind: 'StorageV2'\n}\n```\n\nExecuta os seguintes comandos, por esta ordem:\n\n```bash\naz deployment group create --resource-group RG1 --template-file logs.bicep\naz deployment group create --resource-group RG1 --template-file logs.bicep\naz deployment group create --resource-group RG2 --template-file logs.bicep\n```\n\nQuantas contas de armazenamento existem na subscrição depois de os três comandos terminarem?",
+    "pergunta": "Você tem uma assinatura do Azure que contém dois grupos de recursos vazios chamados RG1 e RG2.\n\nVocê tem um arquivo chamado logs.bicep com o seguinte conteúdo:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource sa 'Microsoft.Storage/storageAccounts@2025-06-01' = {\n  name: 'stlogs${uniqueString(resourceGroup().id)}'\n  location: location\n  sku: {\n    name: 'Standard_LRS'\n  }\n  kind: 'StorageV2'\n}\n```\n\nVocê executa os seguintes comandos, nesta ordem:\n\n```bash\naz deployment group create --resource-group RG1 --template-file logs.bicep\naz deployment group create --resource-group RG1 --template-file logs.bicep\naz deployment group create --resource-group RG2 --template-file logs.bicep\n```\n\nQuantas contas de armazenamento existem na assinatura depois que os três comandos terminarem?",
     "pergunta_en": "You have an Azure subscription that contains two empty resource groups named RG1 and RG2.\n\nYou have a file named logs.bicep that contains the following code:\n\n```bicep\nparam location string = resourceGroup().location\n\nresource sa 'Microsoft.Storage/storageAccounts@2025-06-01' = {\n  name: 'stlogs${uniqueString(resourceGroup().id)}'\n  location: location\n  sku: {\n    name: 'Standard_LRS'\n  }\n  kind: 'StorageV2'\n}\n```\n\nYou run the following commands in sequence:\n\n```bash\naz deployment group create --resource-group RG1 --template-file logs.bicep\naz deployment group create --resource-group RG1 --template-file logs.bicep\naz deployment group create --resource-group RG2 --template-file logs.bicep\n```\n\nHow many storage accounts exist in the subscription after the three commands finish?",
     "opcoes": [
       {
@@ -212,14 +212,14 @@
       },
       {
         "letra": "D",
-        "texto": "1, porque o terceiro comando falha: o nome da conta de armazenamento já está a ser usado em RG1.",
+        "texto": "1, porque o terceiro comando falha: o nome da conta de armazenamento já está sendo usado em RG1.",
         "texto_en": "1, because the third command fails: the storage account name is already in use in RG1."
       }
     ],
     "opcao_correta": [
       "C"
     ],
-    "explicacao": "uniqueString() não gera um valor aleatório: devolve um hash determinístico de 13 caracteres calculado a partir dos argumentos. Com resourceGroup().id como argumento, o nome é sempre o mesmo dentro de RG1, pelo que o segundo comando volta a implementar a mesma conta (operação idempotente, sem criar outra). Em RG2 o ID do grupo de recursos é diferente, logo o hash e o nome também são diferentes e é criada uma segunda conta. Total: 2.\n\nA está errada: ignora que o ID de RG2 produz um nome diferente. B está errada: o segundo comando em RG1 gera exatamente o mesmo nome e não cria uma nova conta. D está errada: como o hash depende do ID do grupo de recursos, o nome gerado em RG2 é diferente do de RG1 e não há conflito de nomes.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/bicep-functions-string#uniquestring",
+    "explicacao": "uniqueString() não gera um valor aleatório: retorna um hash determinístico de 13 caracteres calculado a partir dos argumentos. Com resourceGroup().id como argumento, o nome é sempre o mesmo dentro de RG1, portanto o segundo comando implanta novamente a mesma conta (operação idempotente, sem criar outra). Em RG2, a ID do grupo de recursos é diferente, logo o hash e o nome também são diferentes e uma segunda conta é criada. Total: 2.\n\nA está errada: ignora que a ID de RG2 produz um nome diferente. B está errada: o segundo comando em RG1 gera exatamente o mesmo nome e não cria uma nova conta. D está errada: como o hash depende da ID do grupo de recursos, o nome gerado em RG2 é diferente do de RG1 e não há conflito de nomes.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/bicep-functions-string#uniquestring",
     "assets": []
   },
   {
@@ -228,8 +228,8 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
-    "tema": "Bicep – âmbito de implementação (targetScope)",
-    "pergunta": "Está a criar um ficheiro Bicep chamado main.bicep que cria um grupo de recursos e implementa um módulo de armazenamento nesse grupo de recursos.\n\n```bicep\ntargetScope = '...' // line A\n\nparam rgName string = 'rg-app-prod'\nparam location string = 'westeurope'\n\nresource rg 'Microsoft.Resources/resourceGroups@2025-04-01' = {\n  name: rgName\n  location: location\n}\n\nmodule storage './storage.bicep' = {\n  name: 'storageDeploy'\n  scope: rg\n  params: {\n    location: location\n  }\n}\n```\n\nVai implementar o ficheiro com o seguinte comando:\n\n```bash\naz deployment sub create --location westeurope --template-file main.bicep\n```\n\nQue valor deve usar na linha A?",
+    "tema": "Bicep – escopo de implantação (targetScope)",
+    "pergunta": "Você está criando um arquivo Bicep chamado main.bicep que cria um grupo de recursos e implanta um módulo de armazenamento nesse grupo de recursos.\n\n```bicep\ntargetScope = '...' // line A\n\nparam rgName string = 'rg-app-prod'\nparam location string = 'westeurope'\n\nresource rg 'Microsoft.Resources/resourceGroups@2025-04-01' = {\n  name: rgName\n  location: location\n}\n\nmodule storage './storage.bicep' = {\n  name: 'storageDeploy'\n  scope: rg\n  params: {\n    location: location\n  }\n}\n```\n\nVocê vai implantar o arquivo com o seguinte comando:\n\n```bash\naz deployment sub create --location westeurope --template-file main.bicep\n```\n\nQual valor você deve usar na linha A?",
     "pergunta_en": "You are creating a Bicep file named main.bicep that creates a resource group and deploys a storage module to that resource group.\n\n```bicep\ntargetScope = '...' // line A\n\nparam rgName string = 'rg-app-prod'\nparam location string = 'westeurope'\n\nresource rg 'Microsoft.Resources/resourceGroups@2025-04-01' = {\n  name: rgName\n  location: location\n}\n\nmodule storage './storage.bicep' = {\n  name: 'storageDeploy'\n  scope: rg\n  params: {\n    location: location\n  }\n}\n```\n\nYou will deploy the file by using the following command:\n\n```bash\naz deployment sub create --location westeurope --template-file main.bicep\n```\n\nWhich value should you use at line A?",
     "opcoes": [
       {
@@ -256,7 +256,7 @@
     "opcao_correta": [
       "B"
     ],
-    "explicacao": "Os grupos de recursos (Microsoft.Resources/resourceGroups) são criados ao nível da subscrição, e o comando az deployment sub create faz uma implementação no âmbito da subscrição. Por isso o ficheiro tem de declarar targetScope = 'subscription'. O módulo usa scope: rg (o nome simbólico do grupo de recursos criado no mesmo ficheiro) para implementar o armazenamento dentro desse grupo de recursos.\n\nA está errada: resourceGroup é o âmbito predefinido e corresponde a az deployment group create; num ficheiro com esse âmbito não é possível declarar o próprio grupo de recursos com a palavra-chave resource. C e D estão erradas: managementGroup e tenant correspondem a az deployment mg create e az deployment tenant create, e não ao comando de subscrição usado.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-to-subscription",
+    "explicacao": "Os grupos de recursos (Microsoft.Resources/resourceGroups) são criados no nível da assinatura, e o comando az deployment sub create faz uma implantação no escopo da assinatura. Por isso, o arquivo deve declarar targetScope = 'subscription'. O módulo usa scope: rg (o nome simbólico do grupo de recursos criado no mesmo arquivo) para implantar o armazenamento dentro desse grupo de recursos.\n\nA está errada: resourceGroup é o escopo padrão e corresponde a az deployment group create; em um arquivo com esse escopo, não é possível declarar o próprio grupo de recursos com a palavra-chave resource. C e D estão erradas: managementGroup e tenant correspondem a az deployment mg create e az deployment tenant create, e não ao comando de assinatura usado.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/deploy-to-subscription",
     "assets": []
   },
   {
@@ -265,35 +265,35 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
-    "tema": "Templates ARM – modo Complete e condições",
-    "pergunta": "Tem uma subscrição do Azure que contém um grupo de recursos chamado RG1. RG1 contém os seguintes recursos:\n\n- stdiagapp001: uma conta de armazenamento criada por uma implementação anterior do mesmo template com deployDiag definido como true\n- vnet-app: uma rede virtual\n- pip-bastion: um endereço IP público criado manualmente no portal do Azure\n\nNenhum recurso nem o grupo de recursos têm bloqueios.\n\nTem um ficheiro chamado app.json com o seguinte template ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": { \"deployDiag\": { \"type\": \"bool\", \"defaultValue\": false } },\n  \"resources\": [\n    {\n      \"condition\": \"[parameters('deployDiag')]\",\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"stdiagapp001\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\"\n    },\n    {\n      \"type\": \"Microsoft.Network/virtualNetworks\",\n      \"apiVersion\": \"2025-01-01\",\n      \"name\": \"vnet-app\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": { \"addressSpace\": { \"addressPrefixes\": [ \"10.20.0.0/16\" ] } }\n    }\n  ]\n}\n```\n\nExecuta o seguinte comando com a versão mais recente da CLI do Azure:\n\n```bash\naz deployment group create --resource-group RG1 --template-file app.json --mode Complete\n```\n\nQual é o resultado?",
+    "tema": "Modelos do ARM – modo Complete e condições",
+    "pergunta": "Você tem uma assinatura do Azure que contém um grupo de recursos chamado RG1. RG1 contém os seguintes recursos:\n\n- stdiagapp001: uma conta de armazenamento criada por uma implantação anterior do mesmo modelo com deployDiag definido como true\n- vnet-app: uma rede virtual\n- pip-bastion: um endereço IP público criado manualmente no portal do Azure\n\nNenhum recurso nem o grupo de recursos têm bloqueios.\n\nVocê tem um arquivo chamado app.json com o seguinte modelo do ARM:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": { \"deployDiag\": { \"type\": \"bool\", \"defaultValue\": false } },\n  \"resources\": [\n    {\n      \"condition\": \"[parameters('deployDiag')]\",\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"stdiagapp001\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\"\n    },\n    {\n      \"type\": \"Microsoft.Network/virtualNetworks\",\n      \"apiVersion\": \"2025-01-01\",\n      \"name\": \"vnet-app\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": { \"addressSpace\": { \"addressPrefixes\": [ \"10.20.0.0/16\" ] } }\n    }\n  ]\n}\n```\n\nVocê executa o seguinte comando com a versão mais recente da CLI do Azure:\n\n```bash\naz deployment group create --resource-group RG1 --template-file app.json --mode Complete\n```\n\nQual é o resultado?",
     "pergunta_en": "You have an Azure subscription that contains a resource group named RG1. RG1 contains the following resources:\n\n- stdiagapp001: a storage account created by an earlier deployment of the same template with deployDiag set to true\n- vnet-app: a virtual network\n- pip-bastion: a public IP address created manually in the Azure portal\n\nNeither the resources nor the resource group have locks.\n\nYou have a file named app.json that contains the following ARM template:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": { \"deployDiag\": { \"type\": \"bool\", \"defaultValue\": false } },\n  \"resources\": [\n    {\n      \"condition\": \"[parameters('deployDiag')]\",\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"stdiagapp001\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\"\n    },\n    {\n      \"type\": \"Microsoft.Network/virtualNetworks\",\n      \"apiVersion\": \"2025-01-01\",\n      \"name\": \"vnet-app\",\n      \"location\": \"[resourceGroup().location]\",\n      \"properties\": { \"addressSpace\": { \"addressPrefixes\": [ \"10.20.0.0/16\" ] } }\n    }\n  ]\n}\n```\n\nYou run the following command by using the latest version of the Azure CLI:\n\n```bash\naz deployment group create --resource-group RG1 --template-file app.json --mode Complete\n```\n\nWhat is the result?",
     "opcoes": [
       {
         "letra": "A",
-        "texto": "stdiagapp001 e pip-bastion são eliminados; vnet-app permanece.",
+        "texto": "stdiagapp001 e pip-bastion são excluídos; vnet-app permanece.",
         "texto_en": "stdiagapp001 and pip-bastion are deleted; vnet-app remains."
       },
       {
         "letra": "B",
-        "texto": "Apenas pip-bastion é eliminado; stdiagapp001 permanece porque está declarado no template.",
+        "texto": "Apenas pip-bastion é excluído; stdiagapp001 permanece porque está declarado no modelo.",
         "texto_en": "Only pip-bastion is deleted; stdiagapp001 remains because it is declared in the template."
       },
       {
         "letra": "C",
-        "texto": "Apenas stdiagapp001 é eliminado; pip-bastion permanece porque não foi criado por uma implementação.",
+        "texto": "Apenas stdiagapp001 é excluído; pip-bastion permanece porque não foi criado por uma implantação.",
         "texto_en": "Only stdiagapp001 is deleted; pip-bastion remains because it was not created by a deployment."
       },
       {
         "letra": "D",
-        "texto": "A implementação falha porque stdiagapp001 existe e a condição do recurso é false.",
+        "texto": "A implantação falha porque stdiagapp001 existe e a condição do recurso é false.",
         "texto_en": "The deployment fails because stdiagapp001 exists and the resource condition is false."
       }
     ],
     "opcao_correta": [
       "A"
     ],
-    "explicacao": "No modo Complete, o Resource Manager elimina os recursos do grupo de recursos que não estão especificados no template, independentemente de como foram criados; por isso pip-bastion é eliminado. Quanto a stdiagapp001, o parâmetro deployDiag usa o valor predefinido false e o recurso não é implementado. Com a API REST 2019-05-10 ou posterior (usada pelas versões recentes da CLI do Azure e do Azure PowerShell), um recurso cuja condition é avaliada como false é eliminado no modo Complete. vnet-app está no template e permanece.\n\nB está errada: o comportamento de manter o recurso condicional aplicava-se apenas a versões da API anteriores a 2019-05-10. C está errada: o modo Complete não distingue recursos criados no portal de recursos criados por implementações. D está errada: uma condição false não provoca falha; apenas faz com que o recurso não seja implementado. Antes de usar o modo Complete deve executar what-if (por exemplo, az deployment group what-if --mode Complete), e a Microsoft recomenda deployment stacks em vez do modo Complete para eliminar recursos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-modes",
+    "explicacao": "No modo Complete, o Resource Manager exclui os recursos do grupo de recursos que não estão especificados no modelo, independentemente de como foram criados; por isso, pip-bastion é excluído. Quanto a stdiagapp001, o parâmetro deployDiag usa o valor padrão false e o recurso não é implantado. Com a API REST 2019-05-10 ou posterior (usada pelas versões recentes da CLI do Azure e do Azure PowerShell), um recurso cuja condition é avaliada como false é excluído no modo Complete. vnet-app está no modelo e permanece.\n\nB está errada: o comportamento de manter o recurso condicional se aplicava apenas a versões da API anteriores a 2019-05-10. C está errada: o modo Complete não distingue recursos criados no portal de recursos criados por implantações. D está errada: uma condição false não provoca falha; apenas faz com que o recurso não seja implantado. Antes de usar o modo Complete, você deve executar what-if (por exemplo, az deployment group what-if --mode Complete), e a Microsoft recomenda deployment stacks em vez do modo Complete para excluir recursos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/deployment-modes",
     "assets": []
   },
   {
@@ -302,8 +302,8 @@
     "dominio": "Implantar e gerenciar recursos de computação do Azure",
     "tipo": "Seleção Múltipla",
     "dificuldade": "Difícil",
-    "tema": "Templates ARM – reference() e outputs",
-    "pergunta": "Tem o seguinte template ARM, que implementa uma conta de armazenamento:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"storageName\": { \"type\": \"string\" }\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[parameters('storageName')]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\"\n    }\n  ],\n  \"outputs\": {\n    \"blobUri\": {\n      \"type\": \"string\",\n      \"value\": \"...\"\n    }\n  }\n}\n```\n\nPrecisa de devolver na saída blobUri o ponto final primário do serviço Blob da conta de armazenamento implementada.\n\nQue duas expressões pode usar para substituir \"...\"? Cada resposta correta apresenta uma solução completa.",
+    "tema": "Modelos do ARM – reference() e outputs",
+    "pergunta": "Você tem o seguinte modelo do ARM, que implanta uma conta de armazenamento:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"storageName\": { \"type\": \"string\" }\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[parameters('storageName')]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\"\n    }\n  ],\n  \"outputs\": {\n    \"blobUri\": {\n      \"type\": \"string\",\n      \"value\": \"...\"\n    }\n  }\n}\n```\n\nVocê precisa retornar na saída blobUri o ponto de extremidade primário do serviço Blob da conta de armazenamento implantada.\n\nQuais duas expressões você pode usar para substituir \"...\"? Cada resposta correta apresenta uma solução completa.",
     "pergunta_en": "You have the following ARM template that deploys a storage account:\n\n```json\n{\n  \"$schema\": \"https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#\",\n  \"contentVersion\": \"1.0.0.0\",\n  \"parameters\": {\n    \"storageName\": { \"type\": \"string\" }\n  },\n  \"resources\": [\n    {\n      \"type\": \"Microsoft.Storage/storageAccounts\",\n      \"apiVersion\": \"2025-06-01\",\n      \"name\": \"[parameters('storageName')]\",\n      \"location\": \"[resourceGroup().location]\",\n      \"sku\": { \"name\": \"Standard_LRS\" },\n      \"kind\": \"StorageV2\"\n    }\n  ],\n  \"outputs\": {\n    \"blobUri\": {\n      \"type\": \"string\",\n      \"value\": \"...\"\n    }\n  }\n}\n```\n\nYou need the blobUri output to return the primary Blob service endpoint of the deployed storage account.\n\nWhich two expressions can you use to replace \"...\"? Each correct answer presents a complete solution.",
     "opcoes": [
       {
@@ -331,7 +331,7 @@
       "A",
       "C"
     ],
-    "explicacao": "A função reference() devolve o estado de execução de um recurso. Para um recurso implementado no mesmo template basta indicar o nome do recurso (A); também pode indicar o identificador completo obtido com resourceId() (C). Em ambos os casos o apiVersion é opcional, porque o recurso é aprovisionado no mesmo template. Sem o argumento 'Full', reference() devolve apenas o objeto properties do recurso, pelo que o caminho correto é .primaryEndpoints.blob.\n\nB está errada: resourceId() devolve apenas uma cadeia com o ID do recurso; não tem propriedades como primaryEndpoints. D está errada: como não foi especificado 'Full', o valor devolvido já é o objeto properties, e não existe uma propriedade properties dentro dele.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-resource#reference",
+    "explicacao": "A função reference() retorna o estado de runtime de um recurso. Para um recurso implantado no mesmo modelo, basta indicar o nome do recurso (A); também é possível indicar o identificador completo obtido com resourceId() (C). Em ambos os casos, o apiVersion é opcional, porque o recurso é provisionado no mesmo modelo. Sem o argumento 'Full', reference() retorna apenas o objeto properties do recurso, portanto o caminho correto é .primaryEndpoints.blob.\n\nB está errada: resourceId() retorna apenas uma cadeia de caracteres com a ID do recurso; ela não tem propriedades como primaryEndpoints. D está errada: como 'Full' não foi especificado, o valor retornado já é o objeto properties, e não existe uma propriedade properties dentro dele.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/templates/template-functions-resource#reference",
     "assets": []
   },
   {
@@ -341,7 +341,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Bicep – exportar e descompilar",
-    "pergunta": "Na semana passada executou os seguintes comandos para obter um ficheiro Bicep a partir dos recursos de um grupo de recursos chamado RG1:\n\n```bash\naz group export --name RG1 > rg1.json\naz bicep decompile --file rg1.json\n```\n\nOs comandos foram concluídos com êxito e criaram o ficheiro rg1.bicep na mesma pasta.\n\nHoje voltou a exportar RG1 para rg1.json, depois de terem sido adicionados novos recursos. Precisa de gerar novamente rg1.bicep a partir do novo template e substituir o ficheiro existente.\n\nQue comando deve executar?",
+    "pergunta": "Na semana passada, você executou os seguintes comandos para obter um arquivo Bicep a partir dos recursos de um grupo de recursos chamado RG1:\n\n```bash\naz group export --name RG1 > rg1.json\naz bicep decompile --file rg1.json\n```\n\nOs comandos foram concluídos com êxito e criaram o arquivo rg1.bicep na mesma pasta.\n\nHoje, você exportou RG1 novamente para rg1.json, depois que novos recursos foram adicionados. Você precisa gerar novamente rg1.bicep a partir do novo modelo e substituir o arquivo existente.\n\nQual comando você deve executar?",
     "pergunta_en": "Last week, you ran the following commands to get a Bicep file from the resources in a resource group named RG1:\n\n```bash\naz group export --name RG1 > rg1.json\naz bicep decompile --file rg1.json\n```\n\nThe commands completed successfully and created a file named rg1.bicep in the same folder.\n\nToday, you exported RG1 to rg1.json again after new resources were added. You need to regenerate rg1.bicep from the new template and overwrite the existing file.\n\nWhich command should you run?",
     "opcoes": [
       {
@@ -368,7 +368,7 @@
     "opcao_correta": [
       "D"
     ],
-    "explicacao": "az bicep decompile converte um template ARM JSON num ficheiro Bicep com o mesmo nome base (rg1.json gera rg1.bicep) na mesma pasta. Se o ficheiro Bicep já existir, tem de usar o parâmetro --force para o substituir. A descompilação é feita com o melhor esforço possível, pelo que pode ter de corrigir avisos ou erros no ficheiro gerado.\n\nA está errada: az bicep build faz a conversão inversa (de Bicep para ARM JSON). B está errada: sem --force, o comando não substitui o rg1.bicep existente. C está errada: az bicep decompile-params converte um ficheiro de parâmetros JSON num ficheiro .bicepparam, e não um template.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/decompile",
+    "explicacao": "az bicep decompile converte um modelo do ARM JSON em um arquivo Bicep com o mesmo nome base (rg1.json gera rg1.bicep) na mesma pasta. Se o arquivo Bicep já existir, você deve usar o parâmetro --force para substituí-lo. A descompilação é feita com base no melhor esforço, portanto talvez seja necessário corrigir avisos ou erros no arquivo gerado.\n\nA está errada: az bicep build faz a conversão inversa (de Bicep para ARM JSON). B está errada: sem --force, o comando não substitui o rg1.bicep existente. C está errada: az bicep decompile-params converte um arquivo de parâmetros JSON em um arquivo .bicepparam, e não um modelo.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/decompile",
     "assets": []
   }
 ]

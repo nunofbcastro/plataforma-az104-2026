@@ -6,7 +6,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
     "tema": "Função personalizada – Actions",
-    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um grupo de recursos chamado RG1. RG1 contém uma máquina virtual chamada VM1 que está em execução.\n\nCriou a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"VM Restart Operator\",\n  \"IsCustom\": true,\n  \"Description\": \"Can view and restart virtual machines.\",\n  \"Actions\": [\n    \"Microsoft.Compute/*/read\",\n    \"Microsoft.Compute/virtualMachines/start/action\",\n    \"Microsoft.Compute/virtualMachines/restart/action\",\n    \"Microsoft.Network/networkInterfaces/read\",\n    \"Microsoft.Resources/subscriptions/resourceGroups/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nAtribuiu a função `VM Restart Operator` ao utilizador User1 no âmbito de RG1. User1 não tem outras atribuições de funções.\n\nQue operação pode User1 executar em VM1?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure que contém um grupo de recursos chamado RG1. RG1 contém uma máquina virtual chamada VM1 que está em execução.\n\nVocê criou a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"VM Restart Operator\",\n  \"IsCustom\": true,\n  \"Description\": \"Can view and restart virtual machines.\",\n  \"Actions\": [\n    \"Microsoft.Compute/*/read\",\n    \"Microsoft.Compute/virtualMachines/start/action\",\n    \"Microsoft.Compute/virtualMachines/restart/action\",\n    \"Microsoft.Network/networkInterfaces/read\",\n    \"Microsoft.Resources/subscriptions/resourceGroups/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nVocê atribuiu a função `VM Restart Operator` ao usuário User1 no escopo de RG1. User1 não tem outras atribuições de função.\n\nQual operação User1 pode executar em VM1?",
     "pergunta_en": "Your company has an Azure subscription that contains a resource group named RG1. RG1 contains a virtual machine named VM1 that is running.\n\nYou created the following custom role:\n\n```json\n{\n  \"Name\": \"VM Restart Operator\",\n  \"IsCustom\": true,\n  \"Description\": \"Can view and restart virtual machines.\",\n  \"Actions\": [\n    \"Microsoft.Compute/*/read\",\n    \"Microsoft.Compute/virtualMachines/start/action\",\n    \"Microsoft.Compute/virtualMachines/restart/action\",\n    \"Microsoft.Network/networkInterfaces/read\",\n    \"Microsoft.Resources/subscriptions/resourceGroups/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nYou assigned the `VM Restart Operator` role to a user named User1 at the RG1 scope. User1 has no other role assignments.\n\nWhich operation can User1 perform on VM1?",
     "opcoes": [
       {
@@ -26,14 +26,14 @@
       },
       {
         "letra": "D",
-        "texto": "Eliminar VM1",
+        "texto": "Excluir VM1",
         "texto_en": "Delete VM1"
       }
     ],
     "opcao_correta": [
       "C"
     ],
-    "explicacao": "As permissões efetivas de uma função são as operações listadas em Actions menos as de NotActions. A função inclui explicitamente `Microsoft.Compute/virtualMachines/restart/action`, pelo que User1 pode reiniciar VM1 (também pode iniciá-la e ler os recursos de computação graças a `Microsoft.Compute/*/read`).\n\nA está errada: parar e desalocar requer `Microsoft.Compute/virtualMachines/deallocate/action`, que não está na lista. B está errada: alterar o tamanho é uma operação de escrita (`Microsoft.Compute/virtualMachines/write`); o curinga `Microsoft.Compute/*/read` só concede operações de leitura. D está errada: eliminar requer `Microsoft.Compute/virtualMachines/delete`.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
+    "explicacao": "As permissões efetivas de uma função são as operações listadas em Actions menos as de NotActions. A função inclui explicitamente `Microsoft.Compute/virtualMachines/restart/action`, portanto User1 pode reiniciar VM1 (também pode iniciá-la e ler os recursos de computação graças a `Microsoft.Compute/*/read`).\n\nA está errada: parar e desalocar requer `Microsoft.Compute/virtualMachines/deallocate/action`, que não está na lista. B está errada: alterar o tamanho é uma operação de gravação (`Microsoft.Compute/virtualMachines/write`); o curinga `Microsoft.Compute/*/read` só concede operações de leitura. D está errada: excluir requer `Microsoft.Compute/virtualMachines/delete`.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
     "assets": []
   },
   {
@@ -43,7 +43,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Função personalizada – NotActions",
-    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1 que contém um grupo de recursos chamado RG1. RG1 contém uma conta de armazenamento chamada storage1.\n\nCriou a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"Storage Operator - No Keys\",\n  \"IsCustom\": true,\n  \"Description\": \"Manage storage accounts without access to the account keys.\",\n  \"Actions\": [\n    \"Microsoft.Storage/*\"\n  ],\n  \"NotActions\": [\n    \"Microsoft.Storage/storageAccounts/listKeys/action\",\n    \"Microsoft.Storage/storageAccounts/regenerateKey/action\"\n  ],\n  \"DataActions\": [],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nTem as seguintes atribuições de funções:\n\n- O utilizador User1 tem a função `Storage Operator - No Keys` no âmbito de RG1.\n- O grupo Group1 tem a função incorporada `Contributor` no âmbito de Sub1. User1 é membro de Group1.\n\nUser1 tenta listar as chaves de acesso de storage1.\n\nQual é o resultado?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure chamada Sub1 que contém um grupo de recursos chamado RG1. RG1 contém uma conta de armazenamento chamada storage1.\n\nVocê criou a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"Storage Operator - No Keys\",\n  \"IsCustom\": true,\n  \"Description\": \"Manage storage accounts without access to the account keys.\",\n  \"Actions\": [\n    \"Microsoft.Storage/*\"\n  ],\n  \"NotActions\": [\n    \"Microsoft.Storage/storageAccounts/listKeys/action\",\n    \"Microsoft.Storage/storageAccounts/regenerateKey/action\"\n  ],\n  \"DataActions\": [],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nVocê tem as seguintes atribuições de função:\n\n- O usuário User1 tem a função `Storage Operator - No Keys` no escopo de RG1.\n- O grupo Group1 tem a função interna `Contributor` no escopo de Sub1. User1 é membro de Group1.\n\nUser1 tenta listar as chaves de acesso de storage1.\n\nQual é o resultado?",
     "pergunta_en": "Your company has an Azure subscription named Sub1 that contains a resource group named RG1. RG1 contains a storage account named storage1.\n\nYou created the following custom role:\n\n```json\n{\n  \"Name\": \"Storage Operator - No Keys\",\n  \"IsCustom\": true,\n  \"Description\": \"Manage storage accounts without access to the account keys.\",\n  \"Actions\": [\n    \"Microsoft.Storage/*\"\n  ],\n  \"NotActions\": [\n    \"Microsoft.Storage/storageAccounts/listKeys/action\",\n    \"Microsoft.Storage/storageAccounts/regenerateKey/action\"\n  ],\n  \"DataActions\": [],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nYou have the following role assignments:\n\n- A user named User1 has the `Storage Operator - No Keys` role at the RG1 scope.\n- A group named Group1 has the built-in `Contributor` role at the Sub1 scope. User1 is a member of Group1.\n\nUser1 attempts to list the access keys of storage1.\n\nWhat is the result?",
     "opcoes": [
       {
@@ -58,19 +58,19 @@
       },
       {
         "letra": "C",
-        "texto": "A operação falha, porque a atribuição no âmbito do grupo de recursos é mais específica do que a atribuição no âmbito da subscrição.",
+        "texto": "A operação falha, porque a atribuição no escopo do grupo de recursos é mais específica do que a atribuição no escopo da assinatura.",
         "texto_en": "The operation fails because the assignment at the resource group scope is more specific than the assignment at the subscription scope."
       },
       {
         "letra": "D",
-        "texto": "A operação só é bem-sucedida depois de remover `Microsoft.Storage/storageAccounts/regenerateKey/action` de NotActions.",
+        "texto": "A operação só é bem-sucedida depois que você remover `Microsoft.Storage/storageAccounts/regenerateKey/action` de NotActions.",
         "texto_en": "The operation succeeds only after you remove `Microsoft.Storage/storageAccounts/regenerateKey/action` from NotActions."
       }
     ],
     "opcao_correta": [
       "B"
     ],
-    "explicacao": "O Azure RBAC é aditivo: as permissões efetivas são a união de todas as atribuições de funções do principal (diretas e através de grupos), herdadas dos âmbitos superiores. NotActions apenas subtrai ações das Actions da própria função; não é uma regra de negação. Como `Contributor` tem Actions `*` e não exclui `Microsoft.Storage/storageAccounts/listKeys/action`, User1 consegue listar as chaves através da atribuição de Group1.\n\nA está errada: a documentação refere explicitamente que, se outra função conceder a ação excluída, o utilizador pode executá-la; para bloquear seria necessária uma atribuição de negação. C está errada: não existe precedência por âmbito mais específico no RBAC; as permissões somam-se. D está errada: `regenerateKey/action` é uma operação diferente e não interfere com a listagem de chaves; além disso, a listagem já é permitida pela função `Contributor`.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
+    "explicacao": "O Azure RBAC é aditivo: as permissões efetivas são a união de todas as atribuições de função da entidade de segurança (diretas e por meio de grupos), herdadas dos escopos superiores. NotActions apenas subtrai ações das Actions da própria função; não é uma regra de negação. Como `Contributor` tem Actions `*` e não exclui `Microsoft.Storage/storageAccounts/listKeys/action`, User1 consegue listar as chaves por meio da atribuição de Group1.\n\nA está errada: a documentação informa explicitamente que, se outra função conceder a ação excluída, o usuário poderá executá-la; para bloquear, seria necessária uma atribuição de negação. C está errada: não existe precedência por escopo mais específico no RBAC; as permissões se somam. D está errada: `regenerateKey/action` é uma operação diferente e não interfere na listagem de chaves; além disso, a listagem já é permitida pela função `Contributor`.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
     "assets": []
   },
   {
@@ -80,7 +80,7 @@
     "tipo": "Seleção Múltipla",
     "dificuldade": "Médio",
     "tema": "Função personalizada – DataActions",
-    "pergunta": "A sua empresa tem uma conta de armazenamento chamada storage1 que contém um contentor de blobs chamado container1. O acesso por chave partilhada está desativado em storage1.\n\nCriou a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"Blob Data Editor\",\n  \"IsCustom\": true,\n  \"Description\": \"Read and write blobs without deleting them.\",\n  \"Actions\": [\n    \"Microsoft.Storage/storageAccounts/read\",\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*\"\n  ],\n  \"NotDataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete\"\n  ],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nAtribuiu a função `Blob Data Editor` ao utilizador User1 no âmbito de storage1. User1 não tem outras atribuições de funções e autentica-se com o Microsoft Entra ID.\n\nQue DUAS operações pode User1 executar? Cada resposta correta apresenta uma solução completa.",
+    "pergunta": "Sua empresa tem uma conta de armazenamento chamada storage1 que contém um contêiner de blobs chamado container1. O acesso por chave compartilhada está desabilitado em storage1.\n\nVocê criou a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"Blob Data Editor\",\n  \"IsCustom\": true,\n  \"Description\": \"Read and write blobs without deleting them.\",\n  \"Actions\": [\n    \"Microsoft.Storage/storageAccounts/read\",\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*\"\n  ],\n  \"NotDataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete\"\n  ],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nVocê atribuiu a função `Blob Data Editor` ao usuário User1 no escopo de storage1. User1 não tem outras atribuições de função e se autentica com o Microsoft Entra ID.\n\nQuais DUAS operações User1 pode executar? Cada resposta correta apresenta uma solução completa.",
     "pergunta_en": "Your company has a storage account named storage1 that contains a blob container named container1. Shared key access is disabled on storage1.\n\nYou created the following custom role:\n\n```json\n{\n  \"Name\": \"Blob Data Editor\",\n  \"IsCustom\": true,\n  \"Description\": \"Read and write blobs without deleting them.\",\n  \"Actions\": [\n    \"Microsoft.Storage/storageAccounts/read\",\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*\"\n  ],\n  \"NotDataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/delete\"\n  ],\n  \"AssignableScopes\": [\n    \"/subscriptions/00000000-0000-0000-0000-000000000000\"\n  ]\n}\n```\n\nYou assigned the `Blob Data Editor` role to a user named User1 at the storage1 scope. User1 has no other role assignments and authenticates by using Microsoft Entra ID.\n\nWhich TWO operations can User1 perform? Each correct answer presents a complete solution.",
     "opcoes": [
       {
@@ -90,17 +90,17 @@
       },
       {
         "letra": "B",
-        "texto": "Eliminar um blob em container1",
+        "texto": "Excluir um blob em container1",
         "texto_en": "Delete a blob in container1"
       },
       {
         "letra": "C",
-        "texto": "Criar um novo contentor chamado logs em storage1",
+        "texto": "Criar um novo contêiner chamado logs em storage1",
         "texto_en": "Create a new container named logs in storage1"
       },
       {
         "letra": "D",
-        "texto": "Carregar um novo blob para container1",
+        "texto": "Carregar um novo blob em container1",
         "texto_en": "Upload a new blob to container1"
       },
       {
@@ -113,7 +113,7 @@
       "A",
       "D"
     ],
-    "explicacao": "As operações sobre os dados (plano de dados) são controladas por DataActions menos NotDataActions. O curinga `Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*` concede todas as ações de dados sobre blobs (ler, escrever, adicionar, mover, etc.), exceto a que foi subtraída em NotDataActions (`.../blobs/delete`). Assim, User1 pode ler blobs (A) e carregar novos blobs (D).\n\nB está errada: a eliminação de blobs foi removida através de NotDataActions e User1 não tem outra função que a conceda. C está errada: criar contentores é uma operação do plano de controlo (`Microsoft.Storage/storageAccounts/blobServices/containers/write`), que não está em Actions — a função só concede leitura de contentores. E está errada: `Microsoft.Storage/storageAccounts/listKeys/action` não está em Actions.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
+    "explicacao": "As operações sobre os dados (plano de dados) são controladas por DataActions menos NotDataActions. O curinga `Microsoft.Storage/storageAccounts/blobServices/containers/blobs/*` concede todas as ações de dados sobre blobs (ler, gravar, adicionar, mover etc.), exceto a que foi subtraída em NotDataActions (`.../blobs/delete`). Assim, User1 pode ler blobs (A) e carregar novos blobs (D).\n\nB está errada: a exclusão de blobs foi removida por meio de NotDataActions e User1 não tem outra função que a conceda. C está errada: criar contêineres é uma operação do plano de controle (`Microsoft.Storage/storageAccounts/blobServices/containers/write`), que não está em Actions — a função só concede leitura de contêineres. E está errada: `Microsoft.Storage/storageAccounts/listKeys/action` não está em Actions.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/role-definitions",
     "assets": []
   },
   {
@@ -123,34 +123,34 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
     "tema": "Função personalizada – AssignableScopes",
-    "pergunta": "A sua empresa tem um grupo de gestão chamado MG-Finance que contém duas subscrições chamadas Sub1 e Sub2.\n\nCriou com sucesso a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"Contoso Blob Auditor\",\n  \"IsCustom\": true,\n  \"Description\": \"Read blob data for compliance audits.\",\n  \"Actions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read\"\n  ],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/providers/Microsoft.Management/managementGroups/MG-Finance\"\n  ]\n}\n```\n\nPrecisa de garantir que os membros de um grupo chamado Auditors conseguem ler os blobs de todas as contas de armazenamento em Sub1 e Sub2 utilizando a função `Contoso Blob Auditor`. A solução deve minimizar o número de funções personalizadas.\n\nO que deve fazer?",
+    "pergunta": "Sua empresa tem um grupo de gerenciamento chamado MG-Finance que contém duas assinaturas chamadas Sub1 e Sub2.\n\nVocê criou com êxito a seguinte função personalizada:\n\n```json\n{\n  \"Name\": \"Contoso Blob Auditor\",\n  \"IsCustom\": true,\n  \"Description\": \"Read blob data for compliance audits.\",\n  \"Actions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read\"\n  ],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/providers/Microsoft.Management/managementGroups/MG-Finance\"\n  ]\n}\n```\n\nVocê precisa garantir que os membros de um grupo chamado Auditors consigam ler os blobs de todas as contas de armazenamento em Sub1 e Sub2 usando a função `Contoso Blob Auditor`. A solução deve minimizar o número de funções personalizadas.\n\nO que você deve fazer?",
     "pergunta_en": "Your company has a management group named MG-Finance that contains two subscriptions named Sub1 and Sub2.\n\nYou successfully created the following custom role:\n\n```json\n{\n  \"Name\": \"Contoso Blob Auditor\",\n  \"IsCustom\": true,\n  \"Description\": \"Read blob data for compliance audits.\",\n  \"Actions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/read\"\n  ],\n  \"NotActions\": [],\n  \"DataActions\": [\n    \"Microsoft.Storage/storageAccounts/blobServices/containers/blobs/read\"\n  ],\n  \"NotDataActions\": [],\n  \"AssignableScopes\": [\n    \"/providers/Microsoft.Management/managementGroups/MG-Finance\"\n  ]\n}\n```\n\nYou need to ensure that the members of a group named Auditors can read the blobs in all the storage accounts in Sub1 and Sub2 by using the `Contoso Blob Auditor` role. The solution must minimize the number of custom roles.\n\nWhat should you do?",
     "opcoes": [
       {
         "letra": "A",
-        "texto": "Atribuir a função a Auditors no âmbito de MG-Finance.",
+        "texto": "Atribuir a função a Auditors no escopo de MG-Finance.",
         "texto_en": "Assign the role to Auditors at the MG-Finance scope."
       },
       {
         "letra": "B",
-        "texto": "Alterar AssignableScopes para `\"/\"` e atribuir a função no grupo de gestão raiz.",
+        "texto": "Alterar AssignableScopes para `\"/\"` e atribuir a função no grupo de gerenciamento raiz.",
         "texto_en": "Change AssignableScopes to `\"/\"` and assign the role at the root management group."
       },
       {
         "letra": "C",
-        "texto": "Substituir o valor de AssignableScopes por `/providers/Microsoft.Management/managementGroups/*` e atribuir a função no âmbito de MG-Finance.",
+        "texto": "Substituir o valor de AssignableScopes por `/providers/Microsoft.Management/managementGroups/*` e atribuir a função no escopo de MG-Finance.",
         "texto_en": "Replace the AssignableScopes value with `/providers/Microsoft.Management/managementGroups/*` and assign the role at the MG-Finance scope."
       },
       {
         "letra": "D",
-        "texto": "Atribuir a função a Auditors no âmbito de Sub1 e no âmbito de Sub2.",
+        "texto": "Atribuir a função a Auditors no escopo de Sub1 e no escopo de Sub2.",
         "texto_en": "Assign the role to Auditors at the Sub1 scope and at the Sub2 scope."
       }
     ],
     "opcao_correta": [
       "D"
     ],
-    "explicacao": "Uma função personalizada com DataActions pode ter um grupo de gestão em AssignableScopes, mas não pode ser atribuída no âmbito do próprio grupo de gestão. Pode, no entanto, ser atribuída no âmbito das subscrições que pertencem a esse grupo de gestão. Atribuir a mesma função em Sub1 e em Sub2 cumpre o requisito com uma única função personalizada.\n\nA está errada: funções personalizadas com DataActions não podem ser atribuídas no âmbito de um grupo de gestão. B está errada: não é possível definir AssignableScopes de uma função personalizada como o âmbito raiz `\"/\"` (só as funções incorporadas o usam). C está errada: não são permitidos curingas (`*`) em AssignableScopes e, mesmo assim, a atribuição no grupo de gestão continuaria a não ser suportada.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles",
+    "explicacao": "Uma função personalizada com DataActions pode ter um grupo de gerenciamento em AssignableScopes, mas não pode ser atribuída no escopo do próprio grupo de gerenciamento. No entanto, ela pode ser atribuída no escopo das assinaturas que pertencem a esse grupo de gerenciamento. Atribuir a mesma função em Sub1 e em Sub2 atende ao requisito com uma única função personalizada.\n\nA está errada: funções personalizadas com DataActions não podem ser atribuídas no escopo de um grupo de gerenciamento. B está errada: não é possível definir AssignableScopes de uma função personalizada como o escopo raiz `\"/\"` (só as funções internas o usam). C está errada: curingas (`*`) não são permitidos em AssignableScopes e, mesmo assim, a atribuição no grupo de gerenciamento continuaria sem suporte.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles",
     "assets": []
   },
   {
@@ -160,7 +160,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Fácil",
     "tema": "Azure Policy – Deny com parâmetros",
-    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1.\n\nCriou a seguinte definição do Azure Policy:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"parameters\": {\n    \"allowedLocations\": {\n      \"type\": \"Array\"\n    }\n  },\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        {\n          \"field\": \"type\",\n          \"equals\": \"Microsoft.Compute/virtualMachines\"\n        },\n        {\n          \"field\": \"location\",\n          \"notIn\": \"[parameters('allowedLocations')]\"\n        }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"deny\"\n    }\n  }\n}\n```\n\nAtribuiu a definição a Sub1 e definiu o parâmetro allowedLocations com o valor `[\"westeurope\", \"northeurope\"]`.\n\nQue operação será bem-sucedida em Sub1?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure chamada Sub1.\n\nVocê criou a seguinte definição do Azure Policy:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"parameters\": {\n    \"allowedLocations\": {\n      \"type\": \"Array\"\n    }\n  },\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        {\n          \"field\": \"type\",\n          \"equals\": \"Microsoft.Compute/virtualMachines\"\n        },\n        {\n          \"field\": \"location\",\n          \"notIn\": \"[parameters('allowedLocations')]\"\n        }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"deny\"\n    }\n  }\n}\n```\n\nVocê atribuiu a definição a Sub1 e definiu o parâmetro allowedLocations com o valor `[\"westeurope\", \"northeurope\"]`.\n\nQual operação será bem-sucedida em Sub1?",
     "pergunta_en": "Your company has an Azure subscription named Sub1.\n\nYou created the following Azure Policy definition:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"parameters\": {\n    \"allowedLocations\": {\n      \"type\": \"Array\"\n    }\n  },\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        {\n          \"field\": \"type\",\n          \"equals\": \"Microsoft.Compute/virtualMachines\"\n        },\n        {\n          \"field\": \"location\",\n          \"notIn\": \"[parameters('allowedLocations')]\"\n        }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"deny\"\n    }\n  }\n}\n```\n\nYou assigned the definition to Sub1 and set the allowedLocations parameter to `[\"westeurope\", \"northeurope\"]`.\n\nWhich operation will succeed in Sub1?",
     "opcoes": [
       {
@@ -187,7 +187,7 @@
     "opcao_correta": [
       "A"
     ],
-    "explicacao": "O operador allOf exige que todas as condições sejam verdadeiras para que o efeito deny seja aplicado: o recurso tem de ser do tipo `Microsoft.Compute/virtualMachines` E a sua localização tem de estar fora da lista passada através de `[parameters('allowedLocations')]`. Uma conta de armazenamento não satisfaz a primeira condição, por isso a regra não corresponde e a criação em East US é permitida.\n\nB, C e D estão erradas: são máquinas virtuais em regiões que não estão na lista (westeurope, northeurope), pelo que ambas as condições são verdadeiras e o pedido é rejeitado com 403 (Forbidden) antes de chegar ao fornecedor de recursos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/definition-structure-policy-rule",
+    "explicacao": "O operador allOf exige que todas as condições sejam verdadeiras para que o efeito deny seja aplicado: o recurso deve ser do tipo `Microsoft.Compute/virtualMachines` E sua localização deve estar fora da lista passada por meio de `[parameters('allowedLocations')]`. Uma conta de armazenamento não atende à primeira condição, por isso a regra não corresponde e a criação em East US é permitida.\n\nB, C e D estão erradas: são máquinas virtuais em regiões que não estão na lista (westeurope, northeurope), portanto ambas as condições são verdadeiras e a solicitação é rejeitada com 403 (Forbidden) antes de chegar ao provedor de recursos.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/definition-structure-policy-rule",
     "assets": []
   },
   {
@@ -196,8 +196,8 @@
     "dominio": "Gerenciar identidades e governança do Azure",
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
-    "tema": "Azure Policy – Modify (herança de etiquetas)",
-    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1 que contém um grupo de recursos chamado RG1. RG1 tem a etiqueta CostCenter com o valor CC100 e contém uma máquina virtual chamada VM1 com a etiqueta CostCenter com o valor CC999.\n\nCriou a seguinte definição do Azure Policy:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        { \"field\": \"tags['CostCenter']\", \"notEquals\": \"[resourceGroup().tags['CostCenter']]\" },\n        { \"value\": \"[resourceGroup().tags['CostCenter']]\", \"notEquals\": \"\" }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"modify\",\n      \"details\": {\n        \"roleDefinitionIds\": [\"/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c\"],\n        \"operations\": [\n          {\n            \"operation\": \"addOrReplace\",\n            \"field\": \"tags['CostCenter']\",\n            \"value\": \"[resourceGroup().tags['CostCenter']]\"\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\nAtribuiu a definição a Sub1 através do portal do Azure, com uma identidade gerida atribuída pelo sistema. Não criou nenhuma tarefa de remediação.\n\nEm seguida, cria uma máquina virtual chamada VM2 em RG1 com a etiqueta CostCenter com o valor CC555. Depois de concluída a avaliação de conformidade, que valores tem a etiqueta CostCenter em VM1 e VM2?",
+    "tema": "Azure Policy – Modify (herança de marcas)",
+    "pergunta": "Sua empresa tem uma assinatura do Azure chamada Sub1 que contém um grupo de recursos chamado RG1. RG1 tem a marca CostCenter com o valor CC100 e contém uma máquina virtual chamada VM1 com a marca CostCenter com o valor CC999.\n\nVocê criou a seguinte definição do Azure Policy:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        { \"field\": \"tags['CostCenter']\", \"notEquals\": \"[resourceGroup().tags['CostCenter']]\" },\n        { \"value\": \"[resourceGroup().tags['CostCenter']]\", \"notEquals\": \"\" }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"modify\",\n      \"details\": {\n        \"roleDefinitionIds\": [\"/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c\"],\n        \"operations\": [\n          {\n            \"operation\": \"addOrReplace\",\n            \"field\": \"tags['CostCenter']\",\n            \"value\": \"[resourceGroup().tags['CostCenter']]\"\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\nVocê atribuiu a definição a Sub1 por meio do portal do Azure, com uma identidade gerenciada atribuída pelo sistema. Você não criou nenhuma tarefa de correção.\n\nEm seguida, você cria uma máquina virtual chamada VM2 em RG1 com a marca CostCenter com o valor CC555. Depois de concluída a avaliação de conformidade, quais valores a marca CostCenter tem em VM1 e VM2?",
     "pergunta_en": "Your company has an Azure subscription named Sub1 that contains a resource group named RG1. RG1 has a CostCenter tag set to CC100 and contains a virtual machine named VM1 that has a CostCenter tag set to CC999.\n\nYou created the following Azure Policy definition:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        { \"field\": \"tags['CostCenter']\", \"notEquals\": \"[resourceGroup().tags['CostCenter']]\" },\n        { \"value\": \"[resourceGroup().tags['CostCenter']]\", \"notEquals\": \"\" }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"modify\",\n      \"details\": {\n        \"roleDefinitionIds\": [\"/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c\"],\n        \"operations\": [\n          {\n            \"operation\": \"addOrReplace\",\n            \"field\": \"tags['CostCenter']\",\n            \"value\": \"[resourceGroup().tags['CostCenter']]\"\n          }\n        ]\n      }\n    }\n  }\n}\n```\n\nYou assigned the definition to Sub1 by using the Azure portal, with a system-assigned managed identity. You did not create a remediation task.\n\nYou then create a virtual machine named VM2 in RG1 with a CostCenter tag set to CC555. After the compliance evaluation completes, what are the values of the CostCenter tag on VM1 and VM2?",
     "opcoes": [
       {
@@ -224,7 +224,7 @@
     "opcao_correta": [
       "C"
     ],
-    "explicacao": "O efeito modify é aplicado ao conteúdo do pedido durante a criação ou atualização de um recurso. Como o valor de CostCenter em VM2 (CC555) é diferente do valor do grupo de recursos (CC100), a operação `addOrReplace` substitui o valor e VM2 é criada com CC100 — `addOrReplace` altera a etiqueta mesmo que já exista com outro valor. Para recursos existentes, o modify não faz alterações durante o ciclo de avaliação: VM1 é apenas marcada como não conforme e mantém CC999 até ser executada uma tarefa de remediação (que usará a identidade gerida da atribuição).\n\nA está errada: VM1 só seria alterada por uma tarefa de remediação ou por uma atualização do recurso. B está errada: ignora que `addOrReplace` substitui o valor no pedido de criação de VM2. D está errada: modify não nega o pedido; altera-o (o conflictEffect só se aplica quando há conflitos entre definições ou propriedades não modificáveis, o que não acontece com etiquetas neste cenário).\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-modify",
+    "explicacao": "O efeito modify é aplicado ao conteúdo da solicitação durante a criação ou atualização de um recurso. Como o valor de CostCenter em VM2 (CC555) é diferente do valor do grupo de recursos (CC100), a operação `addOrReplace` substitui o valor e VM2 é criada com CC100 — `addOrReplace` altera a marca mesmo que ela já exista com outro valor. Para recursos existentes, o modify não faz alterações durante o ciclo de avaliação: VM1 é apenas marcada como não conforme e mantém CC999 até que uma tarefa de correção seja executada (que usará a identidade gerenciada da atribuição).\n\nA está errada: VM1 só seria alterada por uma tarefa de correção ou por uma atualização do recurso. B está errada: ignora que `addOrReplace` substitui o valor na solicitação de criação de VM2. D está errada: modify não nega a solicitação; ele a altera (o conflictEffect só se aplica quando há conflitos entre definições ou propriedades não modificáveis, o que não acontece com marcas neste cenário).\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-modify",
     "assets": []
   },
   {
@@ -233,8 +233,8 @@
     "dominio": "Gerenciar identidades e governança do Azure",
     "tipo": "Seleção Múltipla",
     "dificuldade": "Difícil",
-    "tema": "Azure Policy – remediação e identidade gerida",
-    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1 com centenas de recursos sem a etiqueta CostCenter.\n\nTem uma definição personalizada do Azure Policy chamada inherit-costcenter que usa o efeito `modify` e define `roleDefinitionIds` com o ID da função `Contributor`. Um administrador atribuiu a definição a Sub1 através da CLI do Azure. A atribuição tem a seguinte configuração:\n\n```json\n{\n  \"name\": \"inherit-costcenter\",\n  \"scope\": \"/subscriptions/00000000-0000-0000-0000-000000000000\",\n  \"policyDefinitionId\": \"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/policyDefinitions/inherit-costcenter\",\n  \"enforcementMode\": \"Default\",\n  \"parameters\": {},\n  \"notScopes\": [],\n  \"identity\": null,\n  \"location\": null\n}\n```\n\nPrecisa de aplicar a etiqueta aos recursos existentes através de uma tarefa de remediação.\n\nQue DUAS ações deve executar antes de criar a tarefa de remediação? Cada resposta correta apresenta parte da solução.",
+    "tema": "Azure Policy – correção e identidade gerenciada",
+    "pergunta": "Sua empresa tem uma assinatura do Azure chamada Sub1 com centenas de recursos sem a marca CostCenter.\n\nVocê tem uma definição personalizada do Azure Policy chamada inherit-costcenter que usa o efeito `modify` e define `roleDefinitionIds` com a ID da função `Contributor`. Um administrador atribuiu a definição a Sub1 por meio da CLI do Azure. A atribuição tem a seguinte configuração:\n\n```json\n{\n  \"name\": \"inherit-costcenter\",\n  \"scope\": \"/subscriptions/00000000-0000-0000-0000-000000000000\",\n  \"policyDefinitionId\": \"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/policyDefinitions/inherit-costcenter\",\n  \"enforcementMode\": \"Default\",\n  \"parameters\": {},\n  \"notScopes\": [],\n  \"identity\": null,\n  \"location\": null\n}\n```\n\nVocê precisa aplicar a marca aos recursos existentes por meio de uma tarefa de correção.\n\nQuais DUAS ações você deve executar antes de criar a tarefa de correção? Cada resposta correta apresenta parte da solução.",
     "pergunta_en": "Your company has an Azure subscription named Sub1 with hundreds of resources that do not have the CostCenter tag.\n\nYou have a custom Azure Policy definition named inherit-costcenter that uses the `modify` effect and sets `roleDefinitionIds` to the ID of the `Contributor` role. An administrator assigned the definition to Sub1 by using the Azure CLI. The assignment has the following configuration:\n\n```json\n{\n  \"name\": \"inherit-costcenter\",\n  \"scope\": \"/subscriptions/00000000-0000-0000-0000-000000000000\",\n  \"policyDefinitionId\": \"/subscriptions/00000000-0000-0000-0000-000000000000/providers/Microsoft.Authorization/policyDefinitions/inherit-costcenter\",\n  \"enforcementMode\": \"Default\",\n  \"parameters\": {},\n  \"notScopes\": [],\n  \"identity\": null,\n  \"location\": null\n}\n```\n\nYou need to apply the tag to the existing resources by using a remediation task.\n\nWhich TWO actions should you perform before you create the remediation task? Each correct answer presents part of the solution.",
     "opcoes": [
       {
@@ -244,7 +244,7 @@
       },
       {
         "letra": "B",
-        "texto": "Associar uma identidade gerida à atribuição da política e definir a localização da atribuição.",
+        "texto": "Associar uma identidade gerenciada à atribuição da política e definir a localização da atribuição.",
         "texto_en": "Associate a managed identity with the policy assignment and set the location of the assignment."
       },
       {
@@ -254,12 +254,12 @@
       },
       {
         "letra": "D",
-        "texto": "Atribuir a função `Contributor` à sua própria conta de utilizador no âmbito de Sub1.",
+        "texto": "Atribuir a função `Contributor` à sua própria conta de usuário no escopo de Sub1.",
         "texto_en": "Assign the `Contributor` role to your own user account at the Sub1 scope."
       },
       {
         "letra": "E",
-        "texto": "Conceder à identidade gerida da atribuição a função `Contributor` no âmbito de Sub1.",
+        "texto": "Conceder à identidade gerenciada da atribuição a função `Contributor` no escopo de Sub1.",
         "texto_en": "Grant the managed identity of the assignment the `Contributor` role at the Sub1 scope."
       }
     ],
@@ -267,7 +267,7 @@
       "B",
       "E"
     ],
-    "explicacao": "As tarefas de remediação de políticas com modify ou deployIfNotExists são executadas com a identidade gerida associada à atribuição. A atribuição mostrada tem `\"identity\": null`, por isso é necessário associar uma identidade gerida (B); uma identidade atribuída pelo sistema exige também a propriedade `location` na atribuição. Essa identidade precisa das funções listadas em `roleDefinitionIds`: o portal concede-as automaticamente, mas quando a atribuição é criada pela CLI, PowerShell ou SDK as funções têm de ser concedidas manualmente (por exemplo, com `az role assignment create`) (E).\n\nA está errada: DoNotEnforce apenas deixa de aplicar o efeito nas criações e atualizações; não é necessário para remediar. C está errada: para etiquetas em recursos, a definição com modify deve usar o mode Indexed; mudar para All não resolve a falta de identidade. D está errada: a remediação não usa as permissões da sua conta, mas sim as da identidade gerida da atribuição.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources",
+    "explicacao": "As tarefas de correção de políticas com modify ou deployIfNotExists são executadas com a identidade gerenciada associada à atribuição. A atribuição mostrada tem `\"identity\": null`, por isso é necessário associar uma identidade gerenciada (B); uma identidade atribuída pelo sistema também exige a propriedade `location` na atribuição. Essa identidade precisa das funções listadas em `roleDefinitionIds`: o portal as concede automaticamente, mas quando a atribuição é criada pela CLI, pelo PowerShell ou pelo SDK, as funções devem ser concedidas manualmente (por exemplo, com `az role assignment create`) (E).\n\nA está errada: DoNotEnforce apenas deixa de aplicar o efeito nas criações e atualizações; não é necessário para corrigir. C está errada: para marcas em recursos, a definição com modify deve usar o mode Indexed; mudar para All não resolve a falta de identidade. D está errada: a correção não usa as permissões da sua conta, mas sim as da identidade gerenciada da atribuição.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/how-to/remediate-resources",
     "assets": []
   },
   {
@@ -277,7 +277,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Médio",
     "tema": "Azure Policy – allOf/anyOf e Audit",
-    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1.\n\nAtribuiu a seguinte definição do Azure Policy a Sub1:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        { \"field\": \"type\", \"equals\": \"Microsoft.Storage/storageAccounts\" },\n        {\n          \"anyOf\": [\n            { \"field\": \"name\", \"notLike\": \"st*\" },\n            { \"field\": \"tags['Env']\", \"exists\": \"false\" }\n          ]\n        }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"audit\"\n    }\n  }\n}\n```\n\nSub1 contém os seguintes recursos:\n\n- `stprod01`: conta de armazenamento com a etiqueta Env = Prod\n- `stdev02`: conta de armazenamento sem etiquetas\n- `datalake03`: conta de armazenamento com a etiqueta Env = Dev\n- `stweb04`: aplicação Web (`Microsoft.Web/sites`) sem etiquetas\n\nDepois de concluído o ciclo de avaliação, que recursos são reportados como não conformes?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure chamada Sub1.\n\nVocê atribuiu a seguinte definição do Azure Policy a Sub1:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        { \"field\": \"type\", \"equals\": \"Microsoft.Storage/storageAccounts\" },\n        {\n          \"anyOf\": [\n            { \"field\": \"name\", \"notLike\": \"st*\" },\n            { \"field\": \"tags['Env']\", \"exists\": \"false\" }\n          ]\n        }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"audit\"\n    }\n  }\n}\n```\n\nSub1 contém os seguintes recursos:\n\n- `stprod01`: conta de armazenamento com a marca Env = Prod\n- `stdev02`: conta de armazenamento sem marcas\n- `datalake03`: conta de armazenamento com a marca Env = Dev\n- `stweb04`: aplicativo Web (`Microsoft.Web/sites`) sem marcas\n\nDepois de concluído o ciclo de avaliação, quais recursos são relatados como não conformes?",
     "pergunta_en": "Your company has an Azure subscription named Sub1.\n\nYou assigned the following Azure Policy definition to Sub1:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"allOf\": [\n        { \"field\": \"type\", \"equals\": \"Microsoft.Storage/storageAccounts\" },\n        {\n          \"anyOf\": [\n            { \"field\": \"name\", \"notLike\": \"st*\" },\n            { \"field\": \"tags['Env']\", \"exists\": \"false\" }\n          ]\n        }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"audit\"\n    }\n  }\n}\n```\n\nSub1 contains the following resources:\n\n- `stprod01`: storage account with the tag Env = Prod\n- `stdev02`: storage account with no tags\n- `datalake03`: storage account with the tag Env = Dev\n- `stweb04`: web app (`Microsoft.Web/sites`) with no tags\n\nAfter the evaluation cycle completes, which resources are reported as non-compliant?",
     "opcoes": [
       {
@@ -304,7 +304,7 @@
     "opcao_correta": [
       "D"
     ],
-    "explicacao": "A regra só corresponde a contas de armazenamento (allOf exige o tipo `Microsoft.Storage/storageAccounts`) que satisfaçam pelo menos uma das condições do anyOf: o nome não começa por \"st\" (notLike \"st*\") OU a etiqueta Env não existe. `stdev02` não tem a etiqueta Env e `datalake03` não começa por \"st\", pelo que ambas ficam não conformes com o efeito audit. `stprod01` começa por \"st\" e tem Env, por isso está conforme.\n\nA está errada: esquece que `datalake03` falha a condição do nome. B está errada: esquece que `stdev02` não tem a etiqueta. C está errada: `stweb04` é do tipo `Microsoft.Web/sites`, falha a primeira condição do allOf e, portanto, não é avaliada como não conforme por esta regra.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/definition-structure-policy-rule",
+    "explicacao": "A regra só corresponde a contas de armazenamento (allOf exige o tipo `Microsoft.Storage/storageAccounts`) que atendam a pelo menos uma das condições do anyOf: o nome não começa com \"st\" (notLike \"st*\") OU a marca Env não existe. `stdev02` não tem a marca Env e `datalake03` não começa com \"st\", portanto ambas ficam não conformes com o efeito audit. `stprod01` começa com \"st\" e tem Env, por isso está em conformidade.\n\nA está errada: esquece que `datalake03` não atende à condição do nome. B está errada: esquece que `stdev02` não tem a marca. C está errada: `stweb04` é do tipo `Microsoft.Web/sites`, não atende à primeira condição do allOf e, portanto, não é avaliado como não conforme por esta regra.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/definition-structure-policy-rule",
     "assets": []
   },
   {
@@ -314,7 +314,7 @@
     "tipo": "Múltipla Escolha",
     "dificuldade": "Difícil",
     "tema": "Azure Policy – ordem de avaliação de efeitos",
-    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1 que contém dois grupos de recursos chamados RG1 e RG2.\n\nTem as seguintes atribuições do Azure Policy:\n\n- Policy1, atribuída a RG1, com a seguinte definição:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"field\": \"tags['Environment']\",\n      \"exists\": \"false\"\n    },\n    \"then\": {\n      \"effect\": \"modify\",\n      \"details\": {\n        \"roleDefinitionIds\": [\"/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c\"],\n        \"operations\": [\n          { \"operation\": \"add\", \"field\": \"tags['Environment']\", \"value\": \"Production\" }\n        ]\n      }\n    }\n  }\n}\n```\n\n- Policy2, atribuída a Sub1, com a seguinte definição:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"anyOf\": [\n        { \"field\": \"tags['Environment']\", \"exists\": \"false\" },\n        { \"field\": \"tags['Environment']\", \"notIn\": [\"Production\", \"Development\"] }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"deny\"\n    }\n  }\n}\n```\n\nPlaneia criar as seguintes contas de armazenamento:\n\n- storage1 em RG1, sem etiquetas\n- storage2 em RG2, sem etiquetas\n- storage3 em RG1, com a etiqueta Environment = Test\n- storage4 em RG2, com a etiqueta Environment = development\n\nQue contas de armazenamento serão criadas com sucesso?",
+    "pergunta": "Sua empresa tem uma assinatura do Azure chamada Sub1 que contém dois grupos de recursos chamados RG1 e RG2.\n\nVocê tem as seguintes atribuições do Azure Policy:\n\n- Policy1, atribuída a RG1, com a seguinte definição:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"field\": \"tags['Environment']\",\n      \"exists\": \"false\"\n    },\n    \"then\": {\n      \"effect\": \"modify\",\n      \"details\": {\n        \"roleDefinitionIds\": [\"/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c\"],\n        \"operations\": [\n          { \"operation\": \"add\", \"field\": \"tags['Environment']\", \"value\": \"Production\" }\n        ]\n      }\n    }\n  }\n}\n```\n\n- Policy2, atribuída a Sub1, com a seguinte definição:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"anyOf\": [\n        { \"field\": \"tags['Environment']\", \"exists\": \"false\" },\n        { \"field\": \"tags['Environment']\", \"notIn\": [\"Production\", \"Development\"] }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"deny\"\n    }\n  }\n}\n```\n\nVocê planeja criar as seguintes contas de armazenamento:\n\n- storage1 em RG1, sem marcas\n- storage2 em RG2, sem marcas\n- storage3 em RG1, com a marca Environment = Test\n- storage4 em RG2, com a marca Environment = development\n\nQuais contas de armazenamento serão criadas com êxito?",
     "pergunta_en": "Your company has an Azure subscription named Sub1 that contains two resource groups named RG1 and RG2.\n\nYou have the following Azure Policy assignments:\n\n- Policy1, assigned to RG1, with the following definition:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"field\": \"tags['Environment']\",\n      \"exists\": \"false\"\n    },\n    \"then\": {\n      \"effect\": \"modify\",\n      \"details\": {\n        \"roleDefinitionIds\": [\"/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c\"],\n        \"operations\": [\n          { \"operation\": \"add\", \"field\": \"tags['Environment']\", \"value\": \"Production\" }\n        ]\n      }\n    }\n  }\n}\n```\n\n- Policy2, assigned to Sub1, with the following definition:\n\n```json\n{\n  \"mode\": \"Indexed\",\n  \"policyRule\": {\n    \"if\": {\n      \"anyOf\": [\n        { \"field\": \"tags['Environment']\", \"exists\": \"false\" },\n        { \"field\": \"tags['Environment']\", \"notIn\": [\"Production\", \"Development\"] }\n      ]\n    },\n    \"then\": {\n      \"effect\": \"deny\"\n    }\n  }\n}\n```\n\nYou plan to create the following storage accounts:\n\n- storage1 in RG1, with no tags\n- storage2 in RG2, with no tags\n- storage3 in RG1, with the tag Environment = Test\n- storage4 in RG2, with the tag Environment = development\n\nWhich storage accounts will be created successfully?",
     "opcoes": [
       {
@@ -341,7 +341,7 @@
     "opcao_correta": [
       "B"
     ],
-    "explicacao": "O Azure Policy avalia modify (e append) antes de deny, e o deny é avaliado sobre o pedido já alterado. storage1 (RG1, sem etiquetas): Policy1 adiciona Environment = Production; Policy2 já não corresponde e a conta é criada. storage4 (RG2): Policy1 não se aplica a RG2, mas as comparações de cadeias de carateres de condições como in/notIn não distinguem maiúsculas de minúsculas, por isso \"development\" corresponde a \"Development\" e Policy2 não nega.\n\nA está errada: ignora que storage4 é permitida. C está errada: storage1 recebe a etiqueta através do modify antes de o deny ser avaliado. D está errada: em storage3 a etiqueta já existe, pelo que o modify (que só atua quando a etiqueta não existe) não faz nada, e o valor Test não está na lista, logo Policy2 nega o pedido. storage2 também é negada, porque está fora do âmbito de Policy1 e não tem a etiqueta.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-basics",
+    "explicacao": "O Azure Policy avalia modify (e append) antes de deny, e o deny é avaliado sobre a solicitação já alterada. storage1 (RG1, sem marcas): Policy1 adiciona Environment = Production; Policy2 deixa de corresponder e a conta é criada. storage4 (RG2): Policy1 não se aplica a RG2, mas as comparações de cadeias de caracteres de condições como in/notIn não diferenciam maiúsculas de minúsculas, por isso \"development\" corresponde a \"Development\" e Policy2 não nega.\n\nA está errada: ignora que storage4 é permitida. C está errada: storage1 recebe a marca por meio do modify antes de o deny ser avaliado. D está errada: em storage3 a marca já existe, portanto o modify (que só atua quando a marca não existe) não faz nada, e o valor Test não está na lista, logo Policy2 nega a solicitação. storage2 também é negada, porque está fora do escopo de Policy1 e não tem a marca.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-basics",
     "assets": []
   },
   {
@@ -351,12 +351,12 @@
     "tipo": "Seleção Múltipla",
     "dificuldade": "Médio",
     "tema": "Bloqueios de recursos – ReadOnly",
-    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1 que contém um grupo de recursos chamado RG1. RG1 contém os seguintes recursos:\n\n- Uma máquina virtual chamada VM1 que está parada (desalocada)\n- Uma conta de armazenamento chamada storage1\n- Um servidor lógico do Azure SQL chamado sql1 com uma base de dados chamada db1\n- Um plano do App Service chamado ASP1\n\nO utilizador User1 tem a função `Owner` em Sub1. Executa o comando `az lock list --resource-group RG1` e obtém o seguinte resultado:\n\n```json\n[\n  {\n    \"id\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1/providers/Microsoft.Authorization/locks/freeze\",\n    \"level\": \"ReadOnly\",\n    \"name\": \"freeze\",\n    \"notes\": \"Change freeze until month end\",\n    \"owners\": null,\n    \"resourceGroup\": \"RG1\",\n    \"type\": \"Microsoft.Authorization/locks\"\n  }\n]\n```\n\nQue DUAS operações pode User1 executar sem remover o bloqueio? Cada resposta correta apresenta uma solução completa.",
+    "pergunta": "Sua empresa tem uma assinatura do Azure chamada Sub1 que contém um grupo de recursos chamado RG1. RG1 contém os seguintes recursos:\n\n- Uma máquina virtual chamada VM1 que está parada (desalocada)\n- Uma conta de armazenamento chamada storage1\n- Um servidor lógico do Azure SQL chamado sql1 com um banco de dados chamado db1\n- Um plano do App Service chamado ASP1\n\nO usuário User1 tem a função `Owner` em Sub1. Você executa o comando `az lock list --resource-group RG1` e obtém o seguinte resultado:\n\n```json\n[\n  {\n    \"id\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1/providers/Microsoft.Authorization/locks/freeze\",\n    \"level\": \"ReadOnly\",\n    \"name\": \"freeze\",\n    \"notes\": \"Change freeze until month end\",\n    \"owners\": null,\n    \"resourceGroup\": \"RG1\",\n    \"type\": \"Microsoft.Authorization/locks\"\n  }\n]\n```\n\nQuais DUAS operações User1 pode executar sem remover o bloqueio? Cada resposta correta apresenta uma solução completa.",
     "pergunta_en": "Your company has an Azure subscription named Sub1 that contains a resource group named RG1. RG1 contains the following resources:\n\n- A virtual machine named VM1 that is stopped (deallocated)\n- A storage account named storage1\n- An Azure SQL logical server named sql1 with a database named db1\n- An App Service plan named ASP1\n\nA user named User1 has the `Owner` role on Sub1. You run the `az lock list --resource-group RG1` command and get the following output:\n\n```json\n[\n  {\n    \"id\": \"/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/RG1/providers/Microsoft.Authorization/locks/freeze\",\n    \"level\": \"ReadOnly\",\n    \"name\": \"freeze\",\n    \"notes\": \"Change freeze until month end\",\n    \"owners\": null,\n    \"resourceGroup\": \"RG1\",\n    \"type\": \"Microsoft.Authorization/locks\"\n  }\n]\n```\n\nWhich TWO operations can User1 perform without removing the lock? Each correct answer presents a complete solution.",
     "opcoes": [
       {
         "letra": "A",
-        "texto": "Inserir linhas numa tabela de db1 através de uma ligação SQL",
+        "texto": "Inserir linhas em uma tabela de db1 por meio de uma conexão SQL",
         "texto_en": "Insert rows into a table in db1 by using a SQL connection"
       },
       {
@@ -366,7 +366,7 @@
       },
       {
         "letra": "C",
-        "texto": "Carregar um blob para storage1 com um token SAS existente",
+        "texto": "Carregar um blob em storage1 com um token SAS existente",
         "texto_en": "Upload a blob to storage1 by using an existing SAS token"
       },
       {
@@ -376,7 +376,7 @@
       },
       {
         "letra": "E",
-        "texto": "Aumentar o escalão (scale up) de ASP1",
+        "texto": "Escalar verticalmente (scale up) ASP1",
         "texto_en": "Scale up ASP1"
       }
     ],
@@ -384,7 +384,7 @@
       "A",
       "C"
     ],
-    "explicacao": "O bloqueio ReadOnly está aplicado a RG1 e é herdado por todos os recursos do grupo. Os bloqueios só se aplicam a operações do plano de controlo (pedidos a `https://management.azure.com`) e não ao plano de dados. Por isso, inserir dados em db1 através de uma ligação SQL (A) e carregar um blob com um token SAS já emitido (C) continuam a funcionar — o bloqueio não protege os dados.\n\nB está errada: iniciar uma VM requer um pedido POST ao Resource Manager, que o bloqueio ReadOnly impede. D está errada: listar chaves (List Keys) é uma operação POST bloqueada por um bloqueio ReadOnly na conta de armazenamento. E está errada: um bloqueio ReadOnly num grupo de recursos que contém um plano do App Service impede o aumento de escalão ou de instâncias do plano. A função `Owner` não ultrapassa o bloqueio: o bloqueio aplica-se a todos os utilizadores e funções.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources",
+    "explicacao": "O bloqueio ReadOnly está aplicado a RG1 e é herdado por todos os recursos do grupo. Os bloqueios só se aplicam a operações do plano de controle (solicitações para `https://management.azure.com`) e não ao plano de dados. Por isso, inserir dados em db1 por meio de uma conexão SQL (A) e carregar um blob com um token SAS já emitido (C) continuam funcionando — o bloqueio não protege os dados.\n\nB está errada: iniciar uma VM requer uma solicitação POST ao Resource Manager, que o bloqueio ReadOnly impede. D está errada: listar chaves (List Keys) é uma operação POST bloqueada por um bloqueio ReadOnly na conta de armazenamento. E está errada: um bloqueio ReadOnly em um grupo de recursos que contém um plano do App Service impede escalar verticalmente ou horizontalmente o plano. A função `Owner` não ignora o bloqueio: o bloqueio se aplica a todos os usuários e funções.\n\nDocumentação: https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources",
     "assets": []
   }
 ]
