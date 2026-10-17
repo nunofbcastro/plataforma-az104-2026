@@ -1,0 +1,271 @@
+[
+  {
+    "id": "AUT26-ST-01",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Firewall e regras de rede virtual",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma conta de armazenamento chamada `stfinance01` na região West Europe. A firewall da conta está configurada para permitir o acesso apenas a partir de redes virtuais e endereços IP selecionados.\n\nUma máquina virtual chamada `VM1`, também em West Europe, está ligada à sub-rede `Subnet1` da rede virtual `VNet1` e tem um endereço IP público. Adicionou o endereço IP público de `VM1` às regras de rede IP da conta de armazenamento, mas `VM1` continua a receber erros 403 ao aceder aos blobs.\n\nPrecisa de permitir que `VM1` aceda a `stfinance01` sem abrir a conta a todas as redes.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has an Azure subscription that contains a storage account named `stfinance01` in the West Europe region. The account firewall is configured to allow access only from selected virtual networks and IP addresses.\n\nA virtual machine named `VM1`, also in West Europe, is connected to subnet `Subnet1` of virtual network `VNet1` and has a public IP address. You added the public IP address of `VM1` to the storage account IP network rules, but `VM1` still receives 403 errors when accessing blobs.\n\nYou need to allow `VM1` to access `stfinance01` without opening the account to all networks.\n\nWhat should you do?",
+    "opcoes": [
+      { "letra": "A", "texto": "Ativar a exceção «Permitir que os serviços do Azure na lista de serviços fidedignos acedam a esta conta de armazenamento».", "texto_en": "Enable the 'Allow Azure services on the trusted services list to access this storage account' exception." },
+      { "letra": "B", "texto": "Criar uma regra de saída num grupo de segurança de rede (NSG) de `Subnet1` que permita a etiqueta de serviço `Storage`.", "texto_en": "Create an outbound rule in a network security group (NSG) on `Subnet1` that allows the `Storage` service tag." },
+      { "letra": "C", "texto": "Ativar o ponto final de serviço `Microsoft.Storage` em `Subnet1` e adicionar `VNet1/Subnet1` como regra de rede virtual na firewall da conta.", "texto_en": "Enable the `Microsoft.Storage` service endpoint on `Subnet1` and add `VNet1/Subnet1` as a virtual network rule in the account firewall." },
+      { "letra": "D", "texto": "Alterar a redundância da conta para RA-GRS e aceder através do ponto final secundário.", "texto_en": "Change the account redundancy to RA-GRS and access it through the secondary endpoint." }
+    ],
+    "opcao_correta": ["C"],
+    "explicacao": "As regras de rede IP não têm efeito em pedidos com origem na mesma região do Azure que a conta de armazenamento, porque esse tráfego usa endereços IP privados do Azure. Para permitir pedidos da mesma região, é necessário usar regras de rede virtual: ativar o ponto final de serviço `Microsoft.Storage` na sub-rede e adicionar a sub-rede à firewall da conta (uma alternativa seria um ponto final privado).\n\nA está errada: a exceção de serviços fidedignos aplica-se a determinados serviços do Azure (por exemplo, Azure Backup ou Event Grid), não a máquinas virtuais. B está errada: o NSG controla o tráfego de saída da sub-rede, mas o bloqueio acontece na firewall da conta de armazenamento. D está errada: a redundância não altera as regras de firewall, que se aplicam também ao ponto final secundário.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/storage-network-security",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-02",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "SAS",
+    "pergunta": "A sua empresa tem uma conta de armazenamento chamada `stmedia01` que contém um contentor de blobs chamado `relatorios`. Por motivos de segurança, a definição «Permitir acesso com chave de conta de armazenamento» (Shared Key) foi desativada na conta.\n\nPrecisa de fornecer a um parceiro externo um URL com acesso de leitura temporário a blobs do contentor `relatorios`. A solução deve funcionar com a autorização Shared Key desativada.\n\nQue tipo de assinatura de acesso partilhado (SAS) deve utilizar?",
+    "pergunta_en": "Your company has a storage account named `stmedia01` that contains a blob container named `relatorios`. For security reasons, the 'Allow storage account key access' (Shared Key) setting has been disabled on the account.\n\nYou need to give an external partner a URL with temporary read access to blobs in the `relatorios` container. The solution must work with Shared Key authorization disabled.\n\nWhich type of shared access signature (SAS) should you use?",
+    "opcoes": [
+      { "letra": "A", "texto": "SAS de delegação de utilizador, assinada com credenciais do Microsoft Entra ID.", "texto_en": "A user delegation SAS, signed with Microsoft Entra ID credentials." },
+      { "letra": "B", "texto": "SAS de serviço associada a uma política de acesso armazenada.", "texto_en": "A service SAS associated with a stored access policy." },
+      { "letra": "C", "texto": "SAS de conta com o serviço Blob e o tipo de recurso Objeto.", "texto_en": "An account SAS with the Blob service and the Object resource type." },
+      { "letra": "D", "texto": "SAS de serviço ad hoc assinada com `key2`.", "texto_en": "An ad hoc service SAS signed with `key2`." }
+    ],
+    "opcao_correta": ["A"],
+    "explicacao": "Uma SAS de delegação de utilizador é assinada com uma chave de delegação de utilizador obtida com credenciais do Microsoft Entra ID, e não com a chave da conta. Por isso continua a funcionar quando a autorização Shared Key está desativada. É suportada no Armazenamento de Blobs (incluindo Data Lake Storage), o serviço usado neste cenário, e é o tipo de SAS recomendado pela Microsoft.\n\nB, C e D estão erradas: as SAS de serviço (ad hoc ou associadas a uma política de acesso armazenada) e as SAS de conta são assinadas com uma chave de acesso da conta. Quando o acesso Shared Key está desativado, os pedidos autorizados com estas SAS são rejeitados.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/storage-sas-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-03",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Políticas de acesso armazenadas",
+    "pergunta": "A sua empresa tem uma conta de armazenamento chamada `stlogs01` com um contentor chamado `exportacoes`. No contentor existe uma política de acesso armazenada chamada `pol-parceiros`.\n\nForam emitidos vários tokens SAS de serviço associados a `pol-parceiros`. Outras aplicações utilizam SAS ad hoc assinadas com `key1` e cadeias de ligação com `key2`.\n\nDescobre que um dos tokens associados a `pol-parceiros` foi exposto. Precisa de revogar imediatamente todos os tokens SAS associados a `pol-parceiros` sem afetar as outras aplicações.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has a storage account named `stlogs01` with a container named `exportacoes`. The container has a stored access policy named `pol-parceiros`.\n\nSeveral service SAS tokens associated with `pol-parceiros` were issued. Other applications use ad hoc SAS tokens signed with `key1` and connection strings with `key2`.\n\nYou discover that one of the tokens associated with `pol-parceiros` was exposed. You need to immediately revoke all SAS tokens associated with `pol-parceiros` without affecting the other applications.\n\nWhat should you do?",
+    "opcoes": [
+      { "letra": "A", "texto": "Regenerar `key1`.", "texto_en": "Regenerate `key1`." },
+      { "letra": "B", "texto": "Regenerar `key1` e `key2`.", "texto_en": "Regenerate `key1` and `key2`." },
+      { "letra": "C", "texto": "Configurar a firewall da conta para bloquear o acesso a partir de todas as redes.", "texto_en": "Configure the account firewall to block access from all networks." },
+      { "letra": "D", "texto": "Eliminar `pol-parceiros` ou alterar a sua hora de expiração para uma data no passado.", "texto_en": "Delete `pol-parceiros` or change its expiry time to a date in the past." }
+    ],
+    "opcao_correta": ["D"],
+    "explicacao": "Uma SAS de serviço associada a uma política de acesso armazenada herda a hora de início, a expiração e as permissões dessa política. Eliminar a política, ou alterar a expiração para o passado, invalida todas as SAS associadas a ela sem afetar outras credenciais.\n\nA está errada: regenerar `key1` invalidaria também as SAS ad hoc assinadas com `key1` usadas por outras aplicações. B está errada: além disso, quebraria as aplicações que usam cadeias de ligação com `key2`. C está errada: bloquearia todas as aplicações e não revoga os tokens.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/storage-sas-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-04",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Rotação de chaves de acesso",
+    "pergunta": "A sua empresa tem uma conta de armazenamento chamada `stapp01`. Todas as aplicações utilizam uma cadeia de ligação baseada em `key1`.\n\nA política de segurança exige que rode `key1` sem provocar interrupção nas aplicações.\n\nQual deve ser a primeira ação?",
+    "pergunta_en": "Your company has a storage account named `stapp01`. All applications use a connection string based on `key1`.\n\nThe security policy requires you to rotate `key1` without causing application downtime.\n\nWhat should be your first action?",
+    "opcoes": [
+      { "letra": "A", "texto": "Regenerar `key1`.", "texto_en": "Regenerate `key1`." },
+      { "letra": "B", "texto": "Atualizar as aplicações para utilizarem uma cadeia de ligação baseada em `key2`.", "texto_en": "Update the applications to use a connection string based on `key2`." },
+      { "letra": "C", "texto": "Regenerar `key2`.", "texto_en": "Regenerate `key2`." },
+      { "letra": "D", "texto": "Criar uma política de acesso armazenada em cada contentor.", "texto_en": "Create a stored access policy on each container." }
+    ],
+    "opcao_correta": ["B"],
+    "explicacao": "A conta tem duas chaves precisamente para permitir a rotação sem interrupção. Primeiro atualiza as aplicações para usarem `key2`. Depois regenera `key1` e, numa rotação seguinte, repete o processo na direção inversa.\n\nA está errada: regenerar `key1` em primeiro lugar invalida imediatamente a chave em uso e provoca falhas. C está errada: `key2` não está em uso, por isso regenerá-la não roda `key1`, que é a chave que tem de ser rodada. D está errada: as políticas de acesso armazenadas controlam SAS de serviço e não substituem a rotação das chaves da conta.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/storage-account-keys-manage",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-05",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "Azure Files com Microsoft Entra Kerberos",
+    "pergunta": "A sua empresa tem um ambiente híbrido. As contas de utilizador são sincronizadas do Active Directory Domain Services (AD DS) local para o Microsoft Entra ID através do Microsoft Entra Connect.\n\nOs utilizadores trabalham em dispositivos Windows associados ao Microsoft Entra que não têm conectividade direta com os controladores de domínio. Tem uma conta de armazenamento chamada `stfiles01` com uma partilha de ficheiros SMB chamada `dados`.\n\nPrecisa de permitir que os utilizadores montem `dados` com as suas identidades, sem utilizar a chave da conta de armazenamento.\n\nQuais são as DUAS ações que deve realizar no Azure? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has a hybrid environment. User accounts are synchronized from on-premises Active Directory Domain Services (AD DS) to Microsoft Entra ID by using Microsoft Entra Connect.\n\nUsers work on Microsoft Entra joined Windows devices that have no direct connectivity to the domain controllers. You have a storage account named `stfiles01` with an SMB file share named `dados`.\n\nYou need to allow users to mount `dados` by using their identities, without using the storage account key.\n\nWhich TWO actions should you perform in Azure? Each correct answer presents part of the solution.",
+    "opcoes": [
+      { "letra": "A", "texto": "Ativar o Microsoft Entra Kerberos como origem de identidade em `stfiles01`.", "texto_en": "Enable Microsoft Entra Kerberos as the identity source on `stfiles01`." },
+      { "letra": "B", "texto": "Implementar o Microsoft Entra Domain Services e associar a conta de armazenamento ao domínio gerido.", "texto_en": "Deploy Microsoft Entra Domain Services and join the storage account to the managed domain." },
+      { "letra": "C", "texto": "Atribuir aos utilizadores a função `Storage Account Contributor` na conta de armazenamento.", "texto_en": "Assign the users the `Storage Account Contributor` role on the storage account." },
+      { "letra": "D", "texto": "Atribuir aos utilizadores a função `Storage File Data SMB Share Contributor` ao nível da partilha.", "texto_en": "Assign the users the `Storage File Data SMB Share Contributor` role at the share level." },
+      { "letra": "E", "texto": "Gerar um token SAS de conta com permissões de leitura e escrita para o serviço File.", "texto_en": "Generate an account SAS token with read and write permissions for the File service." }
+    ],
+    "opcao_correta": ["A", "D"],
+    "explicacao": "O Microsoft Entra Kerberos permite que identidades híbridas obtenham tickets Kerberos a partir do Microsoft Entra ID e acedam a partilhas SMB do Azure Files a partir de dispositivos associados ao Microsoft Entra, sem conectividade com os controladores de domínio (A). Depois, os utilizadores precisam de permissões ao nível da partilha, atribuídas por RBAC com uma função como `Storage File Data SMB Share Contributor` (D). As permissões NTFS controlam o acesso ao nível de diretórios e ficheiros. A configuração completa inclui ainda passos que não constam das opções, como conceder consentimento de administrador à aplicação criada para a conta de armazenamento no Microsoft Entra ID e configurar os clientes para obterem tickets Kerberos do Microsoft Entra.\n\nB está errada: o Microsoft Entra Domain Services é outra origem de identidade e não é necessário neste cenário. C está errada: `Storage Account Contributor` é uma função do plano de controlo e não concede acesso aos dados por SMB. E está errada: o SMB não suporta autenticação com tokens SAS, e o requisito é usar as identidades dos utilizadores.\n\nDocumentação: https://learn.microsoft.com/azure/storage/files/storage-files-identity-auth-hybrid-identities-enable",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-06",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Permissões de partilha e NTFS",
+    "pergunta": "A sua empresa utiliza autenticação baseada em identidade com AD DS para uma partilha do Azure Files chamada `projetos`.\n\nO utilizador `User1` tem a função `Storage File Data SMB Share Reader` atribuída ao nível da partilha `projetos`. Nas listas de controlo de acesso (ACL) do Windows, `User1` tem a permissão NTFS Modificar na pasta `\\projetos\\2026`.\n\nQue acesso efetivo tem `User1` à pasta `\\projetos\\2026` quando monta a partilha com a sua identidade?",
+    "pergunta_en": "Your company uses AD DS identity-based authentication for an Azure Files share named `projetos`.\n\nUser `User1` is assigned the `Storage File Data SMB Share Reader` role at the `projetos` share level. In the Windows access control lists (ACLs), `User1` has the NTFS Modify permission on the `\\projetos\\2026` folder.\n\nWhat effective access does `User1` have to the `\\projetos\\2026` folder when mounting the share with their identity?",
+    "opcoes": [
+      { "letra": "A", "texto": "Modificar, porque as permissões NTFS substituem as permissões ao nível da partilha.", "texto_en": "Modify, because NTFS permissions override share-level permissions." },
+      { "letra": "B", "texto": "Apenas leitura, porque se aplica a permissão mais restritiva entre a partilha e o NTFS.", "texto_en": "Read only, because the more restrictive of the share and NTFS permissions applies." },
+      { "letra": "C", "texto": "Controlo total, porque as permissões de partilha e de NTFS são cumulativas.", "texto_en": "Full control, because share and NTFS permissions are cumulative." },
+      { "letra": "D", "texto": "Nenhum acesso, porque as funções RBAC não se aplicam a partilhas SMB.", "texto_en": "No access, because RBAC roles do not apply to SMB shares." }
+    ],
+    "opcao_correta": ["B"],
+    "explicacao": "No Azure Files, o acesso é avaliado em dois níveis: as permissões ao nível da partilha, atribuídas por RBAC, e as permissões de diretório/ficheiro, definidas por ACL NTFS. O acesso efetivo corresponde ao mais restritivo dos dois. Como a função `Storage File Data SMB Share Reader` só concede leitura, `User1` fica com acesso apenas de leitura, mesmo tendo Modificar no NTFS.\n\nA e C estão erradas: as permissões não se substituem nem se somam, porque ambos os níveis têm de permitir a operação. D está errada: as funções RBAC `Storage File Data SMB Share *` são precisamente o mecanismo de permissões ao nível da partilha para SMB.\n\nDocumentação: https://learn.microsoft.com/azure/storage/files/storage-files-identity-configure-file-level-permissions",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-07",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Redundância",
+    "pergunta": "Precisa de criar uma conta de armazenamento v2 para fins gerais que cumpra os seguintes requisitos:\n\n- Os dados devem permanecer disponíveis se uma zona de disponibilidade da região primária falhar.\n- Os dados devem ser replicados para uma região secundária.\n- As aplicações devem conseguir ler os dados da região secundária sem ser necessário iniciar uma ativação pós-falha.\n\nQue opção de redundância deve escolher?",
+    "pergunta_en": "You need to create a general-purpose v2 storage account that meets the following requirements:\n\n- Data must remain available if an availability zone in the primary region fails.\n- Data must be replicated to a secondary region.\n- Applications must be able to read data from the secondary region without initiating a failover.\n\nWhich redundancy option should you choose?",
+    "opcoes": [
+      { "letra": "A", "texto": "GZRS (armazenamento georredundante com redundância de zona)", "texto_en": "GZRS (geo-zone-redundant storage)" },
+      { "letra": "B", "texto": "RA-GRS (armazenamento georredundante com acesso de leitura)", "texto_en": "RA-GRS (read-access geo-redundant storage)" },
+      { "letra": "C", "texto": "ZRS (armazenamento com redundância de zona)", "texto_en": "ZRS (zone-redundant storage)" },
+      { "letra": "D", "texto": "RA-GZRS (armazenamento georredundante com redundância de zona e acesso de leitura)", "texto_en": "RA-GZRS (read-access geo-zone-redundant storage)" }
+    ],
+    "opcao_correta": ["D"],
+    "explicacao": "O RA-GZRS replica os dados de forma síncrona por três ou mais zonas de disponibilidade na região primária, copia-os de forma assíncrona para a região secundária e disponibiliza um ponto final secundário só de leitura. Cumpre os três requisitos.\n\nA está errada: o GZRS replica para a região secundária, mas só permite ler aí após uma ativação pós-falha. B está errada: o RA-GRS usa LRS na região primária, por isso não protege contra a falha de uma zona. C está errada: o ZRS não replica para outra região.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/storage-redundancy",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-08",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Médio",
+    "tema": "Replicação de objetos",
+    "pergunta": "A sua empresa tem duas contas de armazenamento v2 para fins gerais: `stsource01` em West Europe e `stdest01` em North Europe. Nenhuma das contas tem o espaço de nomes hierárquico ativado. O controlo de versões de blobs já está ativado em `stdest01`.\n\nPrecisa de configurar a replicação de objetos para copiar blobs de blocos de forma assíncrona de um contentor em `stsource01` para um contentor em `stdest01`.\n\nQuais são as DUAS funcionalidades que tem de ativar em `stsource01`? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has two general-purpose v2 storage accounts: `stsource01` in West Europe and `stdest01` in North Europe. Neither account has hierarchical namespace enabled. Blob versioning is already enabled on `stdest01`.\n\nYou need to configure object replication to asynchronously copy block blobs from a container in `stsource01` to a container in `stdest01`.\n\nWhich TWO features must you enable on `stsource01`? Each correct answer presents part of the solution.",
+    "opcoes": [
+      { "letra": "A", "texto": "Restauro para um ponto anterior no tempo para contentores", "texto_en": "Point-in-time restore for containers" },
+      { "letra": "B", "texto": "Controlo de versões de blobs", "texto_en": "Blob versioning" },
+      { "letra": "C", "texto": "Espaço de nomes hierárquico", "texto_en": "Hierarchical namespace" },
+      { "letra": "D", "texto": "Controlo da hora do último acesso", "texto_en": "Last access time tracking" },
+      { "letra": "E", "texto": "Feed de alterações de blobs", "texto_en": "Blob change feed" }
+    ],
+    "opcao_correta": ["B", "E"],
+    "explicacao": "A replicação de objetos exige o controlo de versões de blobs ativado nas contas de origem e de destino, e o feed de alterações ativado na conta de origem. Como o destino já tem o controlo de versões ativado, falta ativar em `stsource01` o controlo de versões (B) e o feed de alterações (E).\n\nA está errada: o restauro para um ponto anterior no tempo não é pré-requisito. C está errada: a replicação de objetos não é suportada em contas com espaço de nomes hierárquico. D está errada: o controlo da hora do último acesso é usado pela gestão do ciclo de vida, não pela replicação de objetos.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/object-replication-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-09",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "Chaves geridas pelo cliente",
+    "pergunta": "A sua empresa tem uma conta de armazenamento chamada `stsecure01` com uma identidade gerida atribuída pelo sistema. Tem também um Azure Key Vault chamado `kv-corp01`, que usa o modelo de permissões RBAC do Azure e tem a eliminação recuperável ativada, mas não tem a proteção contra remoção ativada.\n\nPrecisa de configurar `stsecure01` para encriptar os dados com uma chave gerida pelo cliente guardada em `kv-corp01`.\n\nQuais são as DUAS ações que deve realizar? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has a storage account named `stsecure01` with a system-assigned managed identity. You also have an Azure Key Vault named `kv-corp01` that uses the Azure RBAC permission model and has soft delete enabled, but purge protection is not enabled.\n\nYou need to configure `stsecure01` to encrypt data with a customer-managed key stored in `kv-corp01`.\n\nWhich TWO actions should you perform? Each correct answer presents part of the solution.",
+    "opcoes": [
+      { "letra": "A", "texto": "Ativar a proteção contra remoção em `kv-corp01`.", "texto_en": "Enable purge protection on `kv-corp01`." },
+      { "letra": "B", "texto": "Ativar a encriptação de infraestrutura em `stsecure01`.", "texto_en": "Enable infrastructure encryption on `stsecure01`." },
+      { "letra": "C", "texto": "Atribuir à identidade gerida de `stsecure01` a função `Key Vault Crypto Service Encryption User` em `kv-corp01` ou na chave.", "texto_en": "Assign the `stsecure01` managed identity the `Key Vault Crypto Service Encryption User` role on `kv-corp01` or the key." },
+      { "letra": "D", "texto": "Atribuir à identidade gerida de `stsecure01` a função `Key Vault Reader` em `kv-corp01`.", "texto_en": "Assign the `stsecure01` managed identity the `Key Vault Reader` role on `kv-corp01`." },
+      { "letra": "E", "texto": "Alterar a redundância de `stsecure01` para GRS.", "texto_en": "Change the redundancy of `stsecure01` to GRS." }
+    ],
+    "opcao_correta": ["A", "C"],
+    "explicacao": "Para usar chaves geridas pelo cliente com o Azure Storage, o cofre de chaves tem de ter a eliminação recuperável e a proteção contra remoção ativadas (A). A identidade gerida da conta de armazenamento precisa de permissões para obter a chave e para a envolver e desenvolver (get, wrapKey, unwrapKey). No modelo RBAC, essas permissões são concedidas pela função `Key Vault Crypto Service Encryption User` (C).\n\nB está errada: a encriptação de infraestrutura acrescenta uma segunda camada de encriptação, não é pré-requisito das chaves geridas pelo cliente e só pode ser ativada na criação da conta. D está errada: `Key Vault Reader` só permite ler metadados, não executar operações criptográficas com a chave. E está errada: a redundância não está relacionada com a configuração das chaves de encriptação.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/customer-managed-keys-configure-existing-account",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-10",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Encriptação de infraestrutura",
+    "pergunta": "A sua empresa tem uma conta de armazenamento v2 para fins gerais chamada `stlegacy01`, criada há dois anos, que armazena blobs e partilhas do Azure Files. A conta usa encriptação com chaves geridas pela Microsoft.\n\nUm novo requisito de conformidade exige que todos os dados da conta, em todos os serviços, sejam encriptados duas vezes em repouso: ao nível do serviço e ao nível da infraestrutura.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has a general-purpose v2 storage account named `stlegacy01`, created two years ago, that stores blobs and Azure Files shares. The account uses encryption with Microsoft-managed keys.\n\nA new compliance requirement states that all data in the account, across all services, must be encrypted twice at rest: at the service level and at the infrastructure level.\n\nWhat should you do?",
+    "opcoes": [
+      { "letra": "A", "texto": "Configurar `stlegacy01` para usar uma chave gerida pelo cliente guardada no Azure Key Vault.", "texto_en": "Configure `stlegacy01` to use a customer-managed key stored in Azure Key Vault." },
+      { "letra": "B", "texto": "Executar `Set-AzStorageAccount` com o parâmetro `-RequireInfrastructureEncryption` em `stlegacy01`.", "texto_en": "Run `Set-AzStorageAccount` with the `-RequireInfrastructureEncryption` parameter on `stlegacy01`." },
+      { "letra": "C", "texto": "Criar uma nova conta de armazenamento com a encriptação de infraestrutura ativada e migrar os dados para ela.", "texto_en": "Create a new storage account with infrastructure encryption enabled and migrate the data to it." },
+      { "letra": "D", "texto": "Alterar a redundância de `stlegacy01` para GZRS.", "texto_en": "Change the redundancy of `stlegacy01` to GZRS." }
+    ],
+    "opcao_correta": ["C"],
+    "explicacao": "A encriptação de infraestrutura (dupla encriptação) só pode ser ativada quando a conta de armazenamento é criada; não pode ser ativada numa conta existente. Para cumprir o requisito em todos os serviços, é necessário criar uma nova conta com a encriptação de infraestrutura ativada e migrar os dados, por exemplo com o AzCopy.\n\nA está errada: as chaves geridas pelo cliente substituem a chave da encriptação ao nível do serviço, mas não acrescentam a segunda camada de infraestrutura. B está errada: o parâmetro `-RequireInfrastructureEncryption` só é aceite na criação da conta (`New-AzStorageAccount`). D está errada: a redundância não altera as camadas de encriptação.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/infrastructure-encryption-enable",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-11",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "AzCopy",
+    "pergunta": "Tem uma pasta local chamada `D:\\Arquivo` num servidor e um contentor de blobs chamado `arquivo` numa conta de armazenamento. Recebeu um token SAS com as permissões necessárias.\n\nPrecisa de executar diariamente um comando que cumpra os seguintes requisitos:\n\n- Carregar apenas os ficheiros novos ou alterados.\n- Eliminar do contentor os blobs cujos ficheiros correspondentes foram eliminados da pasta local.\n\nQue comando deve utilizar?",
+    "pergunta_en": "You have a local folder named `D:\\Arquivo` on a server and a blob container named `arquivo` in a storage account. You received a SAS token with the required permissions.\n\nYou need to run a command daily that meets the following requirements:\n\n- Upload only new or changed files.\n- Delete from the container the blobs whose corresponding files were deleted from the local folder.\n\nWhich command should you use?",
+    "opcoes": [
+      { "letra": "A", "texto": "`azcopy copy 'D:\\Arquivo' '<URL-do-contentor>?<SAS>' --recursive`", "texto_en": "`azcopy copy 'D:\\Arquivo' '<container-URL>?<SAS>' --recursive`" },
+      { "letra": "B", "texto": "`azcopy copy 'D:\\Arquivo' '<URL-do-contentor>?<SAS>' --recursive --overwrite=ifSourceNewer`", "texto_en": "`azcopy copy 'D:\\Arquivo' '<container-URL>?<SAS>' --recursive --overwrite=ifSourceNewer`" },
+      { "letra": "C", "texto": "`azcopy remove '<URL-do-contentor>?<SAS>' --recursive`, seguido de `azcopy copy`", "texto_en": "`azcopy remove '<container-URL>?<SAS>' --recursive`, followed by `azcopy copy`" },
+      { "letra": "D", "texto": "`azcopy sync 'D:\\Arquivo' '<URL-do-contentor>?<SAS>' --delete-destination=true`", "texto_en": "`azcopy sync 'D:\\Arquivo' '<container-URL>?<SAS>' --delete-destination=true`" }
+    ],
+    "opcao_correta": ["D"],
+    "explicacao": "O `azcopy sync` compara a origem com o destino pelos nomes e pelas datas da última modificação, e só transfere os ficheiros novos ou alterados. Com `--delete-destination=true`, elimina também do destino os itens que já não existem na origem. Por predefinição, o `sync` é recursivo.\n\nA está errada: copia tudo de novo e nunca elimina blobs do destino. B está errada: evita reescrever ficheiros que não mudaram, mas não elimina os blobs cujos ficheiros foram removidos localmente. C está errada: remover todos os blobs do contentor e copiar tudo diariamente volta a carregar todos os ficheiros, o que viola o primeiro requisito.\n\nDocumentação: https://learn.microsoft.com/azure/storage/common/storage-use-azcopy-blobs-synchronize",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-12",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Reidratação do Arquivo",
+    "pergunta": "A sua empresa tem uma conta de armazenamento com um blob de blocos chamado `contrato-2019.pdf` (cerca de 5 MB) na camada de acesso Arquivo.\n\nO departamento jurídico precisa de ler o documento o mais rapidamente possível.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has a storage account with a block blob named `contrato-2019.pdf` (about 5 MB) in the Archive access tier.\n\nThe legal department needs to read the document as soon as possible.\n\nWhat should you do?",
+    "opcoes": [
+      { "letra": "A", "texto": "Alterar a camada do blob para Frequente (Hot) com a prioridade de reidratação Alta.", "texto_en": "Change the blob tier to Hot with High rehydration priority." },
+      { "letra": "B", "texto": "Gerar um token SAS com permissão de leitura para o blob e enviá-lo ao departamento jurídico.", "texto_en": "Generate a SAS token with read permission for the blob and send it to the legal department." },
+      { "letra": "C", "texto": "Alterar a camada do blob para Esporádica (Cool) com a prioridade de reidratação Padrão.", "texto_en": "Change the blob tier to Cool with Standard rehydration priority." },
+      { "letra": "D", "texto": "Criar uma regra de gestão do ciclo de vida com `enableAutoTierToHotFromCool`.", "texto_en": "Create a lifecycle management rule with `enableAutoTierToHotFromCool`." }
+    ],
+    "opcao_correta": ["A"],
+    "explicacao": "Um blob na camada Arquivo está offline e não pode ser lido diretamente. Primeiro tem de ser reidratado para uma camada online, alterando a camada do blob ou copiando-o para uma camada online. Com a prioridade Alta, a reidratação de objetos com menos de 10 GB pode concluir-se em menos de uma hora, enquanto a prioridade Padrão pode demorar até 15 horas.\n\nB está errada: uma SAS não contorna o estado offline, e a leitura de um blob arquivado falha. C está errada: reidrata o blob, mas com prioridade Padrão, que não é a opção mais rápida. D está errada: `enableAutoTierToHotFromCool` move blobs da camada Esporádica para a Frequente quando são acedidos, mas não se aplica a blobs na camada Arquivo.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/archive-rehydrate-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-13",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Gestão do ciclo de vida",
+    "pergunta": "A sua empresa tem uma conta de armazenamento v2 para fins gerais que contém milhões de blobs de blocos na camada Frequente (Hot).\n\nPrecisa de criar uma política de gestão do ciclo de vida que mova automaticamente para a camada Esporádica (Cool) os blobs que não forem lidos nem escritos há 60 dias. A regra vai usar a condição `daysAfterLastAccessTimeGreaterThan`.\n\nO que deve fazer primeiro?",
+    "pergunta_en": "Your company has a general-purpose v2 storage account that contains millions of block blobs in the Hot tier.\n\nYou need to create a lifecycle management policy that automatically moves blobs that have not been read or written for 60 days to the Cool tier. The rule will use the `daysAfterLastAccessTimeGreaterThan` condition.\n\nWhat should you do first?",
+    "opcoes": [
+      { "letra": "A", "texto": "Ativar o controlo de versões de blobs.", "texto_en": "Enable blob versioning." },
+      { "letra": "B", "texto": "Ativar o feed de alterações de blobs.", "texto_en": "Enable the blob change feed." },
+      { "letra": "C", "texto": "Ativar o controlo da hora do último acesso na conta de armazenamento.", "texto_en": "Enable last access time tracking on the storage account." },
+      { "letra": "D", "texto": "Alterar a camada de acesso predefinida da conta para Esporádica (Cool).", "texto_en": "Change the account default access tier to Cool." }
+    ],
+    "opcao_correta": ["C"],
+    "explicacao": "As condições baseadas na hora do último acesso, como `daysAfterLastAccessTimeGreaterThan`, exigem que o controlo da hora do último acesso esteja ativado na conta. Só assim o Azure Storage regista quando cada blob foi acedido pela última vez.\n\nA está errada: o controlo de versões preserva versões anteriores, mas não regista acessos. B está errada: o feed de alterações regista as alterações aos blobs, mas não é usado pelas condições de último acesso. D está errada: alterar a camada predefinida afeta os blobs sem camada explicitamente definida, independentemente do acesso, e não cumpre o requisito dos 60 dias sem acesso.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/lifecycle-management-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ST-14",
+    "origem": "Questões autorais 2026",
+    "dominio": "Implementar e gerenciar armazenamento",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Eliminação recuperável de contentores",
+    "pergunta": "A sua empresa tem uma conta de armazenamento chamada `stdocs01`. Um administrador eliminou por engano um contentor inteiro de blobs no mês passado, e não foi possível recuperá-lo.\n\nPrecisa de garantir que, no futuro, um contentor eliminado por engano possa ser restaurado, com todo o seu conteúdo, durante 14 dias após a eliminação.\n\nQue funcionalidade deve ativar?",
+    "pergunta_en": "Your company has a storage account named `stdocs01`. Last month an administrator accidentally deleted an entire blob container, and it could not be recovered.\n\nYou need to ensure that, in the future, an accidentally deleted container can be restored, with all its contents, for 14 days after deletion.\n\nWhich feature should you enable?",
+    "opcoes": [
+      { "letra": "A", "texto": "Controlo de versões de blobs", "texto_en": "Blob versioning" },
+      { "letra": "B", "texto": "Eliminação recuperável para contentores", "texto_en": "Soft delete for containers" },
+      { "letra": "C", "texto": "Eliminação recuperável para partilhas de ficheiros", "texto_en": "Soft delete for file shares" },
+      { "letra": "D", "texto": "Instantâneos de partilha", "texto_en": "Share snapshots" }
+    ],
+    "opcao_correta": ["B"],
+    "explicacao": "A eliminação recuperável para contentores mantém um contentor eliminado, e todo o seu conteúdo, durante o período de retenção configurado (de 1 a 365 dias). Nesse período, o contentor pode ser restaurado.\n\nA está errada: o controlo de versões protege contra a substituição ou eliminação de blobs individuais, mas, se o contentor for eliminado, os blobs e as respetivas versões também são eliminados. C e D estão erradas: aplicam-se ao Azure Files, não a contentores de blobs.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/soft-delete-container-overview",
+    "assets": []
+  }
+]

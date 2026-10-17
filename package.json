@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run check:questions && vite build",
+    "check:questions": "node scripts/check-question-content.mjs",
     "preview": "vite preview",
     "deploy": "npm run build && node scripts/publish-pages.mjs"
   },

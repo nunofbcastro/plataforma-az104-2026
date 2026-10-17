@@ -1,0 +1,271 @@
+[
+  {
+    "id": "AUT26-MN-01",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Definições de diagnóstico",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um cofre de chaves chamado KV1. A equipa de segurança utiliza uma solução SIEM de terceiros alojada fora do Azure.\n\nPrecisa de enviar os registos de recursos de KV1 para a solução SIEM, quase em tempo real, através de uma definição de diagnóstico.\n\nQue destino deve configurar na definição de diagnóstico?",
+    "pergunta_en": "Your company has an Azure subscription that contains a key vault named KV1. The security team uses a third-party SIEM solution hosted outside Azure.\n\nYou need to send the resource logs of KV1 to the SIEM solution in near real time by using a diagnostic setting.\n\nWhich destination should you configure in the diagnostic setting?",
+    "opcoes": [
+      { "letra": "A", "texto": "Uma área de trabalho do Log Analytics.", "texto_en": "A Log Analytics workspace." },
+      { "letra": "B", "texto": "Uma conta de armazenamento.", "texto_en": "A storage account." },
+      { "letra": "C", "texto": "Um hub de eventos do Azure Event Hubs.", "texto_en": "An Azure Event Hubs event hub." },
+      { "letra": "D", "texto": "Um ponto final de recolha de dados (data collection endpoint).", "texto_en": "A data collection endpoint." }
+    ],
+    "opcao_correta": ["C"],
+    "explicacao": "O Event Hubs é o destino das definições de diagnóstico pensado para transmitir (streaming) registos e métricas para sistemas externos, como soluções SIEM de terceiros, quase em tempo real.\n\nA: o Log Analytics serve para consultar e analisar os dados com KQL dentro do Azure Monitor. Não é o mecanismo de streaming para ferramentas externas.\nB: a conta de armazenamento destina-se a arquivo e retenção de baixo custo, não a entrega contínua a um SIEM.\nD: os pontos finais de recolha de dados são usados com regras de recolha de dados (DCR) e com o Azure Monitor Agent. Não são um destino de uma definição de diagnóstico.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/data-collection/diagnostic-settings",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-02",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Registo de atividades",
+    "pergunta": "A sua empresa tem uma subscrição do Azure chamada Sub1 e uma área de trabalho do Log Analytics chamada Workspace1. Não foi configurada nenhuma definição de diagnóstico para Sub1.\n\nHá três dias, alguém eliminou um grupo de recursos chamado RG-Finance.\n\nPrecisa de identificar o utilizador que eliminou RG-Finance.\n\nO que deve utilizar?",
+    "pergunta_en": "Your company has an Azure subscription named Sub1 and a Log Analytics workspace named Workspace1. No diagnostic setting has been configured for Sub1.\n\nThree days ago, someone deleted a resource group named RG-Finance.\n\nYou need to identify the user who deleted RG-Finance.\n\nWhat should you use?",
+    "opcoes": [
+      { "letra": "A", "texto": "O registo de atividades (Activity log) de Sub1, filtrado pela operação de eliminação do grupo de recursos.", "texto_en": "The Activity log of Sub1, filtered by the resource group delete operation." },
+      { "letra": "B", "texto": "Uma consulta à tabela AzureActivity em Workspace1.", "texto_en": "A query against the AzureActivity table in Workspace1." },
+      { "letra": "C", "texto": "O explorador de métricas (Metrics explorer) de Sub1.", "texto_en": "Metrics explorer for Sub1." },
+      { "letra": "D", "texto": "O Resource Health de RG-Finance.", "texto_en": "Resource Health for RG-Finance." }
+    ],
+    "opcao_correta": ["A"],
+    "explicacao": "O registo de atividades guarda os eventos do plano de controlo da subscrição (operações de escrita e eliminação feitas através do Azure Resource Manager), incluindo quem iniciou a operação. Fica disponível no portal durante um período limitado sem precisar de configuração, por isso permite identificar o autor de uma eliminação feita há três dias.\n\nB: a tabela AzureActivity só tem dados se o registo de atividades tiver sido encaminhado para a área de trabalho através de uma definição de diagnóstico. Isso não foi configurado.\nC: as métricas são valores numéricos de desempenho e não registam quem executou operações.\nD: o Resource Health indica o estado de disponibilidade de recursos individuais e não audita operações de gestão. Além disso, o grupo de recursos já não existe.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/fundamentals/activity-log",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-03",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Regras de recolha de dados e Azure Monitor Agent",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém 25 máquinas virtuais com Windows Server e uma área de trabalho do Log Analytics chamada Workspace1.\n\nPrecisa de recolher os eventos de nível Erro e Crítico do registo Sistema de todas as máquinas virtuais para Workspace1. A solução deve usar o agente de monitorização suportado atualmente pela Microsoft.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has an Azure subscription that contains 25 virtual machines running Windows Server and a Log Analytics workspace named Workspace1.\n\nYou need to collect Error and Critical events from the System event log of all the virtual machines into Workspace1. The solution must use the monitoring agent that Microsoft currently supports.\n\nWhat should you do?",
+    "opcoes": [
+      { "letra": "A", "texto": "Configurar uma definição de diagnóstico em cada máquina virtual que envie os dados para Workspace1.", "texto_en": "Configure a diagnostic setting on each virtual machine that sends data to Workspace1." },
+      { "letra": "B", "texto": "Instalar o agente Log Analytics (MMA) em cada máquina virtual e configurar os registos de eventos nas definições de agentes de Workspace1.", "texto_en": "Install the Log Analytics agent (MMA) on each virtual machine and configure the event logs in the agents configuration of Workspace1." },
+      { "letra": "C", "texto": "Ativar o diagnóstico de arranque (boot diagnostics) em cada máquina virtual.", "texto_en": "Enable boot diagnostics on each virtual machine." },
+      { "letra": "D", "texto": "Criar uma regra de recolha de dados (DCR) com uma origem de dados de registos de eventos do Windows e o destino Workspace1, e adicionar as máquinas virtuais como recursos da regra.", "texto_en": "Create a data collection rule (DCR) that has a Windows event logs data source and Workspace1 as the destination, and add the virtual machines as resources of the rule." }
+    ],
+    "opcao_correta": ["D"],
+    "explicacao": "O Azure Monitor Agent (AMA) recolhe dados do sistema operativo convidado de acordo com regras de recolha de dados (DCR). Uma DCR com a origem «Registos de eventos do Windows» (filtrada por Sistema, níveis Erro e Crítico) e o destino Workspace1, associada às máquinas virtuais, resolve o requisito. Quando associa as máquinas virtuais através do portal, o AMA é instalado automaticamente.\n\nA: as definições de diagnóstico de uma máquina virtual só exportam métricas da plataforma. Não recolhem registos de eventos do sistema operativo convidado.\nB: o agente Log Analytics (MMA) foi descontinuado e foi substituído pelo Azure Monitor Agent.\nC: o diagnóstico de arranque captura a saída da consola e capturas de ecrã do arranque. Não envia eventos para o Log Analytics.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/vm/data-collection",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-04",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "KQL",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém 40 máquinas virtuais. Todas as máquinas virtuais enviam dados para uma área de trabalho do Log Analytics chamada Workspace1 através do Azure Monitor Agent.\n\nPrecisa de criar uma consulta que liste apenas as máquinas virtuais que não enviaram nenhum heartbeat nos últimos 15 minutos.\n\nQue consulta deve executar?",
+    "pergunta_en": "Your company has an Azure subscription that contains 40 virtual machines. All the virtual machines send data to a Log Analytics workspace named Workspace1 by using Azure Monitor Agent.\n\nYou need to create a query that lists only the virtual machines that have not sent any heartbeat in the last 15 minutes.\n\nWhich query should you run?",
+    "opcoes": [
+      { "letra": "A", "texto": "`Heartbeat | where TimeGenerated < ago(15m) | project Computer`", "texto_en": "`Heartbeat | where TimeGenerated < ago(15m) | project Computer`" },
+      { "letra": "B", "texto": "`Heartbeat | summarize LastHeartbeat = max(TimeGenerated) by Computer | where LastHeartbeat < ago(15m)`", "texto_en": "`Heartbeat | summarize LastHeartbeat = max(TimeGenerated) by Computer | where LastHeartbeat < ago(15m)`" },
+      { "letra": "C", "texto": "`Heartbeat | where TimeGenerated > ago(15m) | summarize count() by Computer`", "texto_en": "`Heartbeat | where TimeGenerated > ago(15m) | summarize count() by Computer`" },
+      { "letra": "D", "texto": "`Heartbeat | summarize count() by Computer, bin(TimeGenerated, 15m)`", "texto_en": "`Heartbeat | summarize count() by Computer, bin(TimeGenerated, 15m)`" }
+    ],
+    "opcao_correta": ["B"],
+    "explicacao": "A consulta B usa summarize com max(TimeGenerated) para obter o heartbeat mais recente de cada computador. Depois filtra com where os computadores cujo último heartbeat é anterior a 15 minutos. O resultado são apenas as máquinas que deixaram de comunicar.\n\nA: devolve todos os registos antigos. Inclui máquinas que continuam ativas, porque também têm heartbeats com mais de 15 minutos.\nC: devolve o oposto do pretendido, ou seja, as máquinas que enviaram heartbeats nos últimos 15 minutos.\nD: agrupa os heartbeats em intervalos de 15 minutos (bin) para mostrar uma série temporal, mas não identifica que máquinas estão sem comunicar.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/logs/get-started-queries",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-05",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Regras de alerta",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual chamada VM1 com Windows Server. Uma regra de recolha de dados envia os eventos do registo Aplicação de VM1 para a tabela Event de uma área de trabalho do Log Analytics chamada Workspace1.\n\nPrecisa de ser notificado quando o evento com o ID 1000 for registado mais de cinco vezes num período de 10 minutos.\n\nQue tipo de regra de alerta deve criar?",
+    "pergunta_en": "Your company has an Azure subscription that contains a virtual machine named VM1 that runs Windows Server. A data collection rule sends the Application event log entries of VM1 to the Event table of a Log Analytics workspace named Workspace1.\n\nYou need to be notified when event ID 1000 is logged more than five times within a 10-minute period.\n\nWhich type of alert rule should you create?",
+    "opcoes": [
+      { "letra": "A", "texto": "Uma regra de alerta de pesquisa de registos (log search) em Workspace1 com uma consulta à tabela Event e um limiar baseado no número de resultados.", "texto_en": "A log search alert rule on Workspace1 that has a query against the Event table and a threshold based on the number of results." },
+      { "letra": "B", "texto": "Uma regra de alerta de métrica no recurso VM1.", "texto_en": "A metric alert rule on the VM1 resource." },
+      { "letra": "C", "texto": "Uma regra de alerta do registo de atividades com a categoria Administrative.", "texto_en": "An activity log alert rule that uses the Administrative category." },
+      { "letra": "D", "texto": "Uma regra de alerta do Resource Health para VM1.", "texto_en": "A Resource Health alert rule for VM1." }
+    ],
+    "opcao_correta": ["A"],
+    "explicacao": "Os eventos do sistema operativo convidado ficam guardados como registos no Log Analytics. Uma regra de alerta de pesquisa de registos executa periodicamente uma consulta KQL, por exemplo `Event | where EventLog == \"Application\" and EventID == 1000`. Pode avaliar o número de resultados numa janela de 10 minutos e disparar quando houver mais de cinco.\n\nB: as métricas da plataforma de VM1, como CPU, disco ou rede, não contêm entradas do registo de eventos do Windows.\nC: o registo de atividades contém operações do plano de controlo do Azure e não eventos gerados dentro do sistema operativo.\nD: o Resource Health avisa sobre alterações no estado de disponibilidade do recurso por causa da plataforma, não sobre eventos de aplicações.\n\nDocumentação: https://learn.microsoft.com/azure/azure-monitor/alerts/alerts-types",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-06",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Alertas do Service Health",
+    "pergunta": "A sua empresa tem uma subscrição do Azure com várias bases de dados da Base de Dados SQL do Azure na região Oeste da Europa.\n\nPrecisa de receber uma notificação por correio eletrónico com antecedência sempre que a Microsoft agendar uma manutenção planeada que afete a Base de Dados SQL do Azure nessa região.\n\nQue tipo de alerta deve configurar?",
+    "pergunta_en": "Your company has an Azure subscription that contains several Azure SQL databases in the West Europe region.\n\nYou need to receive an email notification in advance whenever Microsoft schedules planned maintenance that affects Azure SQL Database in that region.\n\nWhich type of alert should you configure?",
+    "opcoes": [
+      { "letra": "A", "texto": "Um alerta do Resource Health para cada base de dados.", "texto_en": "A Resource Health alert for each database." },
+      { "letra": "B", "texto": "Um alerta do Azure Advisor.", "texto_en": "An Azure Advisor alert." },
+      { "letra": "C", "texto": "Uma regra de alerta de métrica com base na disponibilidade de cada base de dados.", "texto_en": "A metric alert rule based on the availability of each database." },
+      { "letra": "D", "texto": "Um alerta do Service Health filtrado pelo serviço Base de Dados SQL, pela região Oeste da Europa e pelo tipo de evento Manutenção planeada.", "texto_en": "A Service Health alert filtered by the SQL Database service, the West Europe region, and the Planned maintenance event type." }
+    ],
+    "opcao_correta": ["D"],
+    "explicacao": "O Service Health publica notificações sobre problemas de serviço, manutenção planeada, avisos de saúde e avisos de segurança que afetam os serviços e regiões usados pela subscrição. Um alerta do Service Health (um tipo de alerta do registo de atividades) filtrado por serviço, região e tipo de evento envia a notificação através de um grupo de ações antes da manutenção.\n\nA: o Resource Health informa sobre o estado de disponibilidade atual de recursos individuais e não dá aviso antecipado de manutenção agendada ao nível do serviço.\nB: o Azure Advisor gera recomendações de custo, segurança, fiabilidade e desempenho. Não dá aviso de manutenção planeada.\nC: um alerta de métrica só reage depois de a disponibilidade descer e não avisa com antecedência.\n\nDocumentação: https://learn.microsoft.com/azure/service-health/alerts-activity-log-service-notifications-portal",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-07",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Network Watcher",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual chamada VM1 ligada a uma sub-rede chamada Subnet1. Existe um grupo de segurança de rede (NSG) associado a Subnet1 e outro NSG associado à interface de rede de VM1.\n\nOs administradores não conseguem estabelecer ligações RDP (TCP 3389) a VM1 a partir do endereço 10.1.0.4.\n\nPrecisa de determinar se o tráfego é bloqueado e qual é a regra de segurança responsável.\n\nQue ferramenta do Network Watcher deve utilizar?",
+    "pergunta_en": "Your company has an Azure subscription that contains a virtual machine named VM1 that is connected to a subnet named Subnet1. A network security group (NSG) is associated with Subnet1, and another NSG is associated with the network interface of VM1.\n\nAdministrators cannot establish RDP connections (TCP 3389) to VM1 from the address 10.1.0.4.\n\nYou need to determine whether the traffic is blocked and which security rule is responsible.\n\nWhich Network Watcher tool should you use?",
+    "opcoes": [
+      { "letra": "A", "texto": "Próximo salto (Next hop)", "texto_en": "Next hop" },
+      { "letra": "B", "texto": "Connection Monitor", "texto_en": "Connection Monitor" },
+      { "letra": "C", "texto": "Verificação do fluxo de IP (IP flow verify)", "texto_en": "IP flow verify" },
+      { "letra": "D", "texto": "Captura de pacotes (Packet capture)", "texto_en": "Packet capture" }
+    ],
+    "opcao_correta": ["C"],
+    "explicacao": "A verificação do fluxo de IP testa um fluxo específico (protocolo, IP e porta de origem e de destino, direção) contra as regras de segurança efetivas aplicadas à interface de rede. Indica se o tráfego é permitido ou negado e devolve o nome da regra de NSG que tomou a decisão.\n\nA: o próximo salto mostra o tipo de próximo salto e a tabela de rotas usada para um destino. Serve para diagnosticar encaminhamento, não regras de NSG.\nB: o Connection Monitor monitoriza continuamente a conectividade e a latência entre pontos finais ao longo do tempo. Não é a ferramenta indicada para identificar a regra de NSG que bloqueia um fluxo específico.\nD: a captura de pacotes regista o tráfego que chega ou sai da máquina virtual, mas não indica que regra de segurança bloqueou o tráfego.\n\nDocumentação: https://learn.microsoft.com/azure/network-watcher/ip-flow-verify-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-08",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Registos de fluxo",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma rede virtual chamada VNet1 com cinco sub-redes. Algumas sub-redes não têm nenhum grupo de segurança de rede (NSG) associado.\n\nPrecisa de registar informações sobre o tráfego IP que flui por todos os recursos de VNet1 e analisar esse tráfego com o Traffic analytics. A solução deve seguir a abordagem recomendada atualmente pela Microsoft e minimizar o esforço administrativo.\n\nO que deve configurar?",
+    "pergunta_en": "Your company has an Azure subscription that contains a virtual network named VNet1 that has five subnets. Some subnets have no network security group (NSG) associated.\n\nYou need to log information about the IP traffic flowing through all the resources in VNet1 and analyze that traffic by using Traffic analytics. The solution must follow the approach currently recommended by Microsoft and minimize administrative effort.\n\nWhat should you configure?",
+    "opcoes": [
+      { "letra": "A", "texto": "Registos de fluxo de NSG em cada NSG existente.", "texto_en": "NSG flow logs on each existing NSG." },
+      { "letra": "B", "texto": "Registos de fluxo de rede virtual (VNet flow logs) em VNet1, com o Traffic analytics ativado.", "texto_en": "Virtual network flow logs on VNet1, with Traffic analytics enabled." },
+      { "letra": "C", "texto": "Uma sessão de captura de pacotes em cada máquina virtual de VNet1.", "texto_en": "A packet capture session on each virtual machine in VNet1." },
+      { "letra": "D", "texto": "Uma definição de diagnóstico em cada NSG que envie a categoria NetworkSecurityGroupEvent para uma área de trabalho do Log Analytics.", "texto_en": "A diagnostic setting on each NSG that sends the NetworkSecurityGroupEvent category to a Log Analytics workspace." }
+    ],
+    "opcao_correta": ["B"],
+    "explicacao": "Os registos de fluxo de rede virtual são configurados ao nível da rede virtual (ou da sub-rede ou da interface de rede). Registam o tráfego IP mesmo em recursos sem NSG associado e são compatíveis com o Traffic analytics. Um único registo em VNet1 cobre todas as sub-redes com pouco esforço administrativo.\n\nA: os registos de fluxo de NSG estão a ser descontinuados (retirement) e já não é possível criar novos. Além disso, não cobririam as sub-redes sem NSG.\nC: a captura de pacotes é uma ferramenta de diagnóstico temporária, configurada por máquina virtual, e não se integra com o Traffic analytics.\nD: a categoria NetworkSecurityGroupEvent regista a aplicação das regras de NSG. Não regista os fluxos de tráfego IP, e também não cobriria as sub-redes sem NSG.\n\nDocumentação: https://learn.microsoft.com/azure/network-watcher/vnet-flow-logs-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-09",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Azure Backup",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém as máquinas virtuais e os cofres seguintes:\n\n- VM1: máquina virtual na região Oeste da Europa\n- VM2: máquina virtual na região Norte da Europa\n- Vault1: cofre dos Serviços de Recuperação na região Oeste da Europa\n- Vault2: cofre dos Serviços de Recuperação na região Norte da Europa\n- Vault3: cofre de Cópia de Segurança (Backup vault) na região Oeste da Europa\n- Vault4: cofre de Cópia de Segurança (Backup vault) na região Norte da Europa\n\nPrecisa de configurar a cópia de segurança de VM1 e VM2 com o Azure Backup.\n\nQue cofres pode utilizar para cada máquina virtual?",
+    "pergunta_en": "Your company has an Azure subscription that contains the following virtual machines and vaults:\n\n- VM1: virtual machine in the West Europe region\n- VM2: virtual machine in the North Europe region\n- Vault1: Recovery Services vault in the West Europe region\n- Vault2: Recovery Services vault in the North Europe region\n- Vault3: Backup vault in the West Europe region\n- Vault4: Backup vault in the North Europe region\n\nYou need to configure backup for VM1 and VM2 by using Azure Backup.\n\nWhich vaults can you use for each virtual machine?",
+    "opcoes": [
+      { "letra": "A", "texto": "VM1: Vault1 ou Vault3. VM2: Vault2 ou Vault4.", "texto_en": "VM1: Vault1 or Vault3. VM2: Vault2 or Vault4." },
+      { "letra": "B", "texto": "VM1: Vault1 ou Vault2. VM2: Vault1 ou Vault2.", "texto_en": "VM1: Vault1 or Vault2. VM2: Vault1 or Vault2." },
+      { "letra": "C", "texto": "VM1: apenas Vault1. VM2: apenas Vault2.", "texto_en": "VM1: Vault1 only. VM2: Vault2 only." },
+      { "letra": "D", "texto": "VM1 e VM2: qualquer um dos quatro cofres.", "texto_en": "VM1 and VM2: any of the four vaults." }
+    ],
+    "opcao_correta": ["C"],
+    "explicacao": "A cópia de segurança de máquinas virtuais do Azure usa um cofre dos Serviços de Recuperação, e o cofre tem de estar na mesma região que a máquina virtual. Por isso, VM1 (Oeste da Europa) só pode usar Vault1 e VM2 (Norte da Europa) só pode usar Vault2.\n\nA: os cofres de Cópia de Segurança (Backup vault) protegem cargas de trabalho como Azure Blobs, Azure Disks e Base de Dados do Azure para PostgreSQL. Não protegem máquinas virtuais completas.\nB: um cofre dos Serviços de Recuperação noutra região não pode proteger a máquina virtual.\nD: falha nas duas restrições, a do tipo de cofre e a da região.\n\nDocumentação: https://learn.microsoft.com/azure/backup/backup-azure-arm-vms-prepare",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-10",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Médio",
+    "tema": "Azure Backup",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um cofre de Cópia de Segurança (Backup vault) chamado BV1.\n\nPrecisa de identificar que cargas de trabalho podem ser protegidas com BV1.\n\nQuais são as DUAS cargas de trabalho que pode proteger com BV1? Cada resposta correta apresenta uma solução completa.",
+    "pergunta_en": "Your company has an Azure subscription that contains a Backup vault named BV1.\n\nYou need to identify which workloads can be protected by using BV1.\n\nWhich TWO workloads can you protect by using BV1? Each correct answer presents a complete solution.",
+    "opcoes": [
+      { "letra": "A", "texto": "Blobs do Azure numa conta de armazenamento", "texto_en": "Azure Blobs in a storage account" },
+      { "letra": "B", "texto": "Máquinas virtuais do Azure", "texto_en": "Azure virtual machines" },
+      { "letra": "C", "texto": "SQL Server em máquinas virtuais do Azure", "texto_en": "SQL Server in Azure virtual machines" },
+      { "letra": "D", "texto": "Discos geridos do Azure", "texto_en": "Azure managed disks" },
+      { "letra": "E", "texto": "Partilhas de ficheiros do Azure Files", "texto_en": "Azure Files file shares" }
+    ],
+    "opcao_correta": ["A", "D"],
+    "explicacao": "O cofre de Cópia de Segurança (Backup vault) protege as cargas de trabalho mais recentes do Azure Backup, como Azure Blobs, discos geridos do Azure e Base de Dados do Azure para PostgreSQL.\n\nB, C e E: as máquinas virtuais do Azure, o SQL Server em máquinas virtuais do Azure e as partilhas do Azure Files são protegidos com um cofre dos Serviços de Recuperação, não com um cofre de Cópia de Segurança.\n\nDocumentação: https://learn.microsoft.com/azure/backup/backup-vault-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-11",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Políticas de cópia de segurança",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual chamada VM1 e um cofre dos Serviços de Recuperação chamado Vault1, na mesma região.\n\nPrecisa de configurar cópias de segurança de VM1 de quatro em quatro horas com o Azure Backup.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has an Azure subscription that contains a virtual machine named VM1 and a Recovery Services vault named Vault1 in the same region.\n\nYou need to configure backups of VM1 every four hours by using Azure Backup.\n\nWhat should you do?",
+    "opcoes": [
+      { "letra": "A", "texto": "Criar uma política Standard com cópia de segurança diária e aumentar a retenção dos pontos de restauro instantâneo.", "texto_en": "Create a Standard policy with a daily backup and increase the instant restore point retention." },
+      { "letra": "B", "texto": "Criar uma política Enhanced com agendamento Por hora (Hourly) e um intervalo de 4 horas, e associá-la a VM1.", "texto_en": "Create an Enhanced policy with an Hourly schedule and a 4-hour interval, and associate it with VM1." },
+      { "letra": "C", "texto": "Criar seis políticas Standard com horas de início diferentes e associá-las todas a VM1.", "texto_en": "Create six Standard policies with different start times and associate all of them with VM1." },
+      { "letra": "D", "texto": "Ativar a replicação de VM1 com o Azure Site Recovery e definir a frequência dos instantâneos consistentes com a aplicação para 4 horas.", "texto_en": "Enable replication of VM1 by using Azure Site Recovery and set the app-consistent snapshot frequency to 4 hours." }
+    ],
+    "opcao_correta": ["B"],
+    "explicacao": "A política Enhanced para máquinas virtuais do Azure permite várias cópias de segurança por dia, com agendamento por hora e intervalos de 4, 6, 8, 12 ou 24 horas. É a única opção que cumpre o requisito de uma cópia de segurança a cada quatro horas.\n\nA: a política Standard só suporta cópias de segurança diárias ou semanais. Aumentar a retenção não aumenta a frequência.\nC: cada máquina virtual só pode estar associada a uma política de cópia de segurança de cada vez.\nD: o Azure Site Recovery replica para recuperação após desastre. Não é uma solução de cópia de segurança com retenção de longo prazo.\n\nDocumentação: https://learn.microsoft.com/azure/backup/backup-azure-vms-enhanced-policy",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-12",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "Restauro do Azure Backup",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma máquina virtual Windows chamada VM1. Faz-se cópia de segurança diária de VM1 para um cofre dos Serviços de Recuperação chamado Vault1.\n\nUm utilizador eliminou por engano um ficheiro de VM1. Precisa de recuperar apenas esse ficheiro a partir do ponto de recuperação de ontem. A solução não pode afetar o funcionamento de VM1 nem criar novos recursos do Azure.\n\nQuais são as DUAS ações que deve realizar? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has an Azure subscription that contains a Windows virtual machine named VM1. VM1 is backed up daily to a Recovery Services vault named Vault1.\n\nA user accidentally deleted a file on VM1. You need to recover only that file from yesterday's recovery point. The solution must not affect the operation of VM1 and must not create new Azure resources.\n\nWhich TWO actions should you perform? Each correct answer presents part of the solution.",
+    "opcoes": [
+      { "letra": "A", "texto": "Restaurar os discos do ponto de recuperação para uma conta de armazenamento de transição e anexá-los a VM1.", "texto_en": "Restore the disks from the recovery point to a staging storage account and attach them to VM1." },
+      { "letra": "B", "texto": "Em Vault1, abrir a Recuperação de Ficheiros (File Recovery) de VM1, selecionar o ponto de recuperação de ontem e transferir o executável.", "texto_en": "In Vault1, open File Recovery for VM1, select yesterday's recovery point, and download the executable." },
+      { "letra": "C", "texto": "Substituir os discos existentes de VM1 pelos discos do ponto de recuperação.", "texto_en": "Replace the existing disks of VM1 with the disks from the recovery point." },
+      { "letra": "D", "texto": "Criar uma nova máquina virtual a partir do ponto de recuperação de ontem.", "texto_en": "Create a new virtual machine from yesterday's recovery point." },
+      { "letra": "E", "texto": "Executar o executável num computador compatível para montar os volumes do ponto de recuperação como unidades locais e copiar o ficheiro.", "texto_en": "Run the executable on a compatible computer to mount the recovery point volumes as local drives, and then copy the file." }
+    ],
+    "opcao_correta": ["B", "E"],
+    "explicacao": "A recuperação ao nível do ficheiro (File Recovery) gera um executável (Windows) ou um script (Linux) protegido por palavra-passe. Quando é executado num computador compatível, monta os volumes do ponto de recuperação como unidades locais. Pode então copiar o ficheiro e desmontar os discos no fim. Não é preciso criar recursos nem alterar VM1.\n\nA: restaurar discos cria novos discos geridos no Azure, o que viola o requisito.\nC: substituir os discos existentes repõe o estado de VM1 inteira. Isto afeta o funcionamento da máquina e faz perder alterações posteriores.\nD: criar uma nova máquina virtual cria novos recursos do Azure.\n\nDocumentação: https://learn.microsoft.com/azure/backup/backup-azure-restore-files-from-vm",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-13",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Médio",
+    "tema": "Azure Site Recovery",
+    "pergunta": "A sua empresa tem uma subscrição do Azure com máquinas virtuais na região Oeste da Europa. As máquinas virtuais são replicadas para a região Norte da Europa com o Azure Site Recovery.\n\nPrecisa de fazer um teste de recuperação após desastre (DR drill) que valide as máquinas virtuais replicadas na região secundária. A solução não pode afetar as máquinas virtuais de produção nem a replicação em curso, e os recursos criados no teste devem ser removidos no fim.\n\nQuais são as DUAS ações que deve realizar? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has an Azure subscription that has virtual machines in the West Europe region. The virtual machines are replicated to the North Europe region by using Azure Site Recovery.\n\nYou need to perform a disaster recovery drill that validates the replicated virtual machines in the secondary region. The solution must not affect the production virtual machines or the ongoing replication, and the resources created during the test must be removed at the end.\n\nWhich TWO actions should you perform? Each correct answer presents part of the solution.",
+    "opcoes": [
+      { "letra": "A", "texto": "Executar uma ativação pós-falha (Failover) para a região Norte da Europa.", "texto_en": "Run a failover to the North Europe region." },
+      { "letra": "B", "texto": "Executar a operação Reproteger (Re-protect).", "texto_en": "Run the Re-protect operation." },
+      { "letra": "C", "texto": "Executar uma ativação pós-falha de teste (Test failover) e selecionar uma rede virtual isolada na região Norte da Europa.", "texto_en": "Run a test failover and select an isolated virtual network in the North Europe region." },
+      { "letra": "D", "texto": "Executar a operação Consolidar (Commit).", "texto_en": "Run the Commit operation." },
+      { "letra": "E", "texto": "Executar a operação Limpar ativação pós-falha de teste (Cleanup test failover).", "texto_en": "Run the Cleanup test failover operation." }
+    ],
+    "opcao_correta": ["C", "E"],
+    "explicacao": "A ativação pós-falha de teste cria máquinas virtuais na região secundária a partir de um ponto de recuperação, numa rede virtual escolhida (de preferência isolada da produção), sem parar a replicação nem afetar as máquinas de origem. Depois da validação, a operação Limpar ativação pós-falha de teste elimina as máquinas virtuais criadas durante o teste.\n\nA: uma ativação pós-falha real move a carga de trabalho para a região secundária e afeta a produção.\nB: Reproteger inverte a direção da replicação depois de uma ativação pós-falha real e não faz parte de um teste.\nD: Consolidar finaliza uma ativação pós-falha real e não se aplica a uma ativação pós-falha de teste.\n\nDocumentação: https://learn.microsoft.com/azure/site-recovery/azure-to-azure-tutorial-dr-drill",
+    "assets": []
+  },
+  {
+    "id": "AUT26-MN-14",
+    "origem": "Questões autorais 2026",
+    "dominio": "Monitorar e manter recursos do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Azure Site Recovery",
+    "pergunta": "A sua empresa tem uma aplicação de três camadas com as máquinas virtuais VM-DB (base de dados), VM-APP (aplicação) e VM-WEB (web). As três máquinas virtuais são replicadas para uma região secundária com o Azure Site Recovery.\n\nPrecisa de automatizar a ativação pós-falha da aplicação de modo que:\n\n- VM-DB arranque primeiro, depois VM-APP e, por fim, VM-WEB.\n- Um script que atualiza registos DNS seja executado automaticamente depois de VM-DB arrancar e antes de VM-APP arrancar.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has a three-tier application that consists of the virtual machines VM-DB (database), VM-APP (application), and VM-WEB (web). The three virtual machines are replicated to a secondary region by using Azure Site Recovery.\n\nYou need to automate the failover of the application so that:\n\n- VM-DB starts first, then VM-APP, and finally VM-WEB.\n- A script that updates DNS records runs automatically after VM-DB starts and before VM-APP starts.\n\nWhat should you do?",
+    "opcoes": [
+      { "letra": "A", "texto": "Ativar a consistência multi-VM e adicionar as três máquinas virtuais ao mesmo grupo de replicação.", "texto_en": "Enable multi-VM consistency and add the three virtual machines to the same replication group." },
+      { "letra": "B", "texto": "Usar o Azure Backup com restauro entre regiões (Cross Region Restore) para restaurar as máquinas virtuais na região secundária pela ordem pretendida.", "texto_en": "Use Azure Backup with Cross Region Restore to restore the virtual machines in the secondary region in the required order." },
+      { "letra": "C", "texto": "Criar um plano de recuperação com três grupos (VM-DB no Grupo 1, VM-APP no Grupo 2 e VM-WEB no Grupo 3) e adicionar um runbook do Azure Automation como ação posterior do Grupo 1.", "texto_en": "Create a recovery plan with three groups (VM-DB in Group 1, VM-APP in Group 2, and VM-WEB in Group 3) and add an Azure Automation runbook as a post-action of Group 1." },
+      { "letra": "D", "texto": "Criar uma regra de alerta do Resource Health com um grupo de ações que execute um runbook para fazer a ativação pós-falha de cada máquina virtual pela ordem pretendida.", "texto_en": "Create a Resource Health alert rule with an action group that runs a runbook to fail over each virtual machine in the required order." }
+    ],
+    "opcao_correta": ["C"],
+    "explicacao": "Os planos de recuperação do Azure Site Recovery agrupam máquinas virtuais e definem a ordem de ativação pós-falha: as máquinas de um grupo arrancam antes das do grupo seguinte. Pode adicionar ações anteriores e posteriores a cada grupo, como runbooks do Azure Automation ou ações manuais. Um runbook como ação posterior do Grupo 1 é executado depois de VM-DB e antes de o Grupo 2 (VM-APP) arrancar.\n\nA: a consistência multi-VM garante pontos de recuperação consistentes entre as máquinas do grupo de replicação, mas não define a ordem de arranque nem executa scripts.\nB: o Azure Backup com restauro entre regiões é uma solução de restauro de cópias de segurança e não automatiza a ativação pós-falha das réplicas do Site Recovery.\nD: um alerta do Resource Health reage a problemas de disponibilidade de um recurso. Não é o mecanismo do Site Recovery para orquestrar uma ativação pós-falha ordenada.\n\nDocumentação: https://learn.microsoft.com/azure/site-recovery/recovery-plan-overview",
+    "assets": []
+  }
+]

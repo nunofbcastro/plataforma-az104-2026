@@ -1,1197 +1,452 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import authoredQuestions from './data/authored-questions.json';
-import './index.css';
-import { Icon, StudyHeader, StudySidebar, StudyStats } from './components/StudyChrome';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { DOMAINS, buildQuestionBank, isAnswerCorrect, readStorage, shuffle, writeStorage } from './lib/questions';
+import { BottomNav, Icon, Sidebar, StatsRow, Topbar } from './components/StudyChrome';
+import { DomainProgress, FiltersPanel, QuestionNavigator, QuickActions } from './components/StudyRail';
+import { EmptyState, QuestionCard } from './components/QuestionCard';
+import { SimuladoLobby, SimuladoResults } from './components/Simulado';
+import { ConfirmModal, ImageModal, ReportModal, SettingsModal, StatsModal } from './components/Modals';
+
+const SIM_SECONDS = 100 * 60;
+const DEFAULT_FILTERS = { domain: 'all', source: 'all', type: 'all', status: 'all' };
+
+function readRaw(key, fallback) {
+  try { return localStorage.getItem(key) || fallback; } catch { return fallback; }
+}
 
 function App() {
   const [questionBank, setQuestionBank] = useState([]);
-  const [dataLoading, setDataLoading] = useState(true);
-  const [dataError, setDataError] = useState(false);
+  const [dataState, setDataState] = useState('loading');
   useEffect(() => {
     const controller = new AbortController();
     fetch(`${import.meta.env.BASE_URL}data/questions.json`, { signal: controller.signal })
-      .then((response) => {
+      .then(response => {
         if (!response.ok) throw new Error('Não foi possível carregar o banco de perguntas.');
         return response.json();
       })
-      .then(setQuestionBank)
-      .catch((error) => {
-        if (error.name !== 'AbortError') setDataError(true);
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setDataLoading(false);
-      });
+      .then(data => { setQuestionBank(data); setDataState('ready'); })
+      .catch(error => { if (error.name !== 'AbortError') setDataState('error'); });
     return () => controller.abort();
   }, []);
-  const allQuestions = [...questionBank, ...authoredQuestions];
-  const sourceCounts = useMemo(() => allQuestions.reduce((counts, question) => {
-    counts[question.origem] = (counts[question.origem] || 0) + 1;
+  const allQuestions = useMemo(() => buildQuestionBank(questionBank), [questionBank]);
+  const sourceCounts = useMemo(() => allQuestions.reduce((counts, q) => {
+    counts[q.origem] = (counts[q.origem] || 0) + 1;
     return counts;
   }, {}), [allQuestions]);
-  const domainOptions = [
-    ['Manage Azure identities and governance', 'Identidades e governação · 20–25%'],
-    ['Implement and manage storage', 'Armazenamento · 15–20%'],
-    ['Deploy and manage Azure compute resources', 'Computação · 20–25%'],
-    ['Implement and manage virtual networking', 'Redes virtuais · 15–20%'],
-    ['Monitor and maintain Azure resources', 'Monitorização e recuperação · 10–15%']
-  ];
-  const domainAliases = [
-    ['manage azure identities', 'gerenciar identidades', 'identidades e governança'],
-    ['implement and manage storage', 'implementar e gerenciar armazenamento'],
-    ['deploy and manage azure compute', 'implantar e gerenciar recursos de computação'],
-    ['implement and manage virtual networking', 'implementar e gerenciar redes virtuais'],
-    ['monitor and maintain azure resources', 'monitorar e manter recursos do azure']
-  ];
 
-  // Theme & Language
-  const [theme, setTheme] = useState(() => localStorage.getItem('az104_theme') || 'dark');
-  const [lang, setLang] = useState(() => localStorage.getItem('az104_lang') || 'pt');
-
-  // Modes: 'treino' | 'simulado' | 'erros' | 'favoritas'
+  const [theme, setTheme] = useState(() => readRaw('az104_theme', 'dark'));
+  const [lang, setLang] = useState(() => readRaw('az104_lang', 'pt'));
   const [mode, setMode] = useState('treino');
-
-  // Filters
-  const [selectedDomain, setSelectedDomain] = useState('all');
-  const [selectedSource, setSelectedSource] = useState('all');
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState(() => readStorage('az104_user_answers', {}));
+  const [favorites, setFavorites] = useState(() => new Set(readStorage('az104_favorites', []).map(String)));
+  const [drafts, setDrafts] = useState({});
+  const [explanationOpen, setExplanationOpen] = useState(false);
+  // Questions answered in this view stay visible even if they no longer match (e.g. a fixed error).
+  const [stickyIds, setStickyIds] = useState(() => new Set());
+  const [railOpen, setRailOpen] = useState(false);
 
-  // User Answers & Favorites
-  const [userAnswers, setUserAnswers] = useState(() => {
-    try {
-      const s = localStorage.getItem('az104_user_answers');
-      return s ? JSON.parse(s) : {};
-    } catch {
-      return {};
-    }
-  });
-
-  const [favorites, setFavorites] = useState(() => {
-    try {
-      const s = localStorage.getItem('az104_favorites');
-      return s ? new Set(JSON.parse(s)) : new Set();
-    } catch {
-      return new Set();
-    }
-  });
-
-  // Simulado State
-  const [simState, setSimState] = useState('idle'); // 'idle' | 'running' | 'finished' | 'reviewing'
+  const [simState, setSimState] = useState('idle'); // idle | running | finished | reviewing
   const [simQuestions, setSimQuestions] = useState([]);
   const [simAnswers, setSimAnswers] = useState({});
-  const [simSecondsLeft, setSimSecondsLeft] = useState(100 * 60);
-  const [simCountChoice, setSimCountChoice] = useState('65');
-  const [simScore, setSimScore] = useState(0);
-  const [simPassed, setSimPassed] = useState(false);
-  const [simAnsweredCount, setSimAnsweredCount] = useState(0);
-  const [simCorrectCount, setSimCorrectCount] = useState(0);
+  const [simFlags, setSimFlags] = useState(() => new Set());
+  const [simSecondsLeft, setSimSecondsLeft] = useState(SIM_SECONDS);
+  const [simCountChoice, setSimCountChoice] = useState('50');
+  const [simResult, setSimResult] = useState(null);
 
-  // Modals
-  const [showStatsModal, setShowStatsModal] = useState(false);
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
-  const [pendingModeSwitch, setPendingModeSwitch] = useState(null);
+  const [modal, setModal] = useState(null); // stats | report | settings | exit | finish
+  const [pendingMode, setPendingMode] = useState(null);
   const [zoomedImage, setZoomedImage] = useState(null);
-  const [toastMessage, setToastMessage] = useState(null);
+  const [toast, setToast] = useState(null);
+  const toastTimer = useRef(null);
 
-  useEffect(() => {
-    if (!showStatsModal && !showReportModal && !showSettingsModal && !showExitConfirmModal && !zoomedImage) return;
-    const previousFocus = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    const dialogs = document.querySelectorAll('[role="dialog"]');
-    const dialog = dialogs[dialogs.length - 1];
-    const controls = () => dialog ? Array.from(dialog.querySelectorAll('button:not([disabled]), input, select, textarea, [tabindex="0"]')).filter(element => element.getClientRects().length) : [];
-    controls()[0]?.focus();
-    const handleDialogKey = event => {
-      if (event.key === 'Escape') {
-        setShowStatsModal(false);
-        setShowReportModal(false);
-        setShowSettingsModal(false);
-        setShowExitConfirmModal(false);
-        setZoomedImage(null);
-      }
-      if (event.key === 'Tab') {
-        const elements = controls();
-        const first = elements[0];
-        const last = elements[elements.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last?.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first?.focus();
-        }
-      }
-    };
-    document.addEventListener('keydown', handleDialogKey);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener('keydown', handleDialogKey);
-      previousFocus?.focus();
-    };
-  }, [showStatsModal, showReportModal, showSettingsModal, showExitConfirmModal, zoomedImage]);
-
-  // Explanation toggle for current question
-  const [isExplanationOpen, setIsExplanationOpen] = useState(false);
-
-  // Timer Ref
-  const timerRef = useRef(null);
-
-  // Save Theme & Lang
-  useEffect(() => {
-    localStorage.setItem('az104_theme', theme);
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  useEffect(() => {
-    localStorage.setItem('az104_lang', lang);
-  }, [lang]);
-
-  // Save Answers
-  useEffect(() => {
-    try {
-      localStorage.setItem('az104_user_answers', JSON.stringify(userAnswers));
-    } catch (e) {
-      console.warn(e);
-    }
-  }, [userAnswers]);
-
-  // Save Favorites
-  useEffect(() => {
-    try {
-      localStorage.setItem('az104_favorites', JSON.stringify(Array.from(favorites)));
-    } catch (e) {
-      console.warn(e);
-    }
-  }, [favorites]);
-
-  // Show Toast
-  const triggerToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3000);
-  };
-
-  // Beforeunload warning if simulado is running
-  useEffect(() => {
-    const handleBeforeUnload = (e) => {
-      if (mode === 'simulado' && simState === 'running') {
-        e.preventDefault();
-        e.returnValue = 'Você tem um simulado em andamento! Se sair agora, seu progresso do exame será perdido.';
-        return e.returnValue;
-      }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [mode, simState]);
-
-  // Simulado Timer
-  useEffect(() => {
-    if (mode === 'simulado' && simState === 'running') {
-      timerRef.current = setInterval(() => {
-        setSimSecondsLeft((prev) => {
-          if (prev <= 1) {
-            clearInterval(timerRef.current);
-            finishSimulado(simAnswers, simQuestions);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      if (timerRef.current) clearInterval(timerRef.current);
-    }
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-    };
-  }, [mode, simState, simAnswers, simQuestions]);
-
-  // Filter Questions
-  const filteredQuestions = useMemo(() => {
-    let list = allQuestions;
-
-    if (mode === 'erros') {
-      list = list.filter((q) => {
-        const a = userAnswers[q.id];
-        return a && a.isCorrect === false;
-      });
-    } else if (mode === 'favoritas') {
-      list = list.filter((q) => favorites.has(q.id));
-    } else if (mode === 'simulado') {
-      if (simState === 'running' || simState === 'reviewing') {
-        return simQuestions;
-      }
-    }
-
-    if (mode !== 'simulado' || simState === 'reviewing') {
-      if (selectedDomain !== 'all') {
-        const domainIndex = domainOptions.findIndex(([value]) => value === selectedDomain);
-        const aliases = domainAliases[domainIndex] || [selectedDomain.toLowerCase()];
-        list = list.filter((q) => aliases.some((alias) => (q.dominio || '').toLowerCase().includes(alias)));
-      }
-      if (selectedSource !== 'all') {
-        list = list.filter((q) => q.origem === selectedSource);
-      }
-      if (searchTerm.trim()) {
-        const term = searchTerm.toLowerCase();
-        list = list.filter((q) => {
-          const pt = (q.pergunta || '').toLowerCase();
-          const en = (q.pergunta_en || '').toLowerCase();
-          const exp = (q.explicacao || '').toLowerCase();
-          const qid = String(q.id ?? '').toLowerCase();
-          return pt.includes(term) || en.includes(term) || exp.includes(term) || qid.includes(term);
-        });
-      }
-    }
-
-    return list;
-  }, [allQuestions, mode, userAnswers, favorites, simState, simQuestions, selectedDomain, selectedSource, searchTerm]);
-
-  // Clamp current index
-  useEffect(() => {
-    if (currentIndex >= filteredQuestions.length) {
-      setCurrentIndex(Math.max(0, filteredQuestions.length - 1));
-    }
-  }, [filteredQuestions.length, currentIndex]);
-
-  // Overall Stats
-  const stats = useMemo(() => {
-    let answered = 0;
-    let correct = 0;
-    let incorrect = 0;
-    for (const q of allQuestions) {
-      const a = userAnswers[q.id];
-      if (a) {
-        answered++;
-        if (a.isCorrect) correct++;
-        else incorrect++;
-      }
-    }
-    const percent = answered > 0 ? Math.round((correct / answered) * 100) : 0;
-    return { total: allQuestions.length, answered, correct, incorrect, percent };
-  }, [allQuestions, userAnswers]);
-
-  // Mode Switch with Exit Protection
-  const requestModeSwitch = (targetMode) => {
-    if (mode === 'simulado' && simState === 'running' && targetMode !== 'simulado') {
-      setPendingModeSwitch(targetMode);
-      setShowExitConfirmModal(true);
-      return;
-    }
-    setMode(targetMode);
-    setCurrentIndex(0);
-    setIsExplanationOpen(false);
-  };
-
-  const confirmExitSimulado = () => {
-    setShowExitConfirmModal(false);
-    if (timerRef.current) clearInterval(timerRef.current);
-    setSimState('idle');
-    setSimAnswers({});
-    if (pendingModeSwitch) {
-      setMode(pendingModeSwitch);
-      setCurrentIndex(0);
-      setPendingModeSwitch(null);
-    }
-  };
-
-  // Simulado Start
-  const startSimulado = () => {
-    let pool = [...allQuestions];
-    for (let i = pool.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pool[i], pool[j]] = [pool[j], pool[i]];
-    }
-
-    let count = pool.length;
-    if (simCountChoice === '65') count = Math.min(65, pool.length);
-    else if (simCountChoice === '50') count = Math.min(50, pool.length);
-    else if (simCountChoice === '30') count = Math.min(30, pool.length);
-
-    const chosen = pool.slice(0, count);
-    setSimQuestions(chosen);
-    setSimAnswers({});
-    setSimSecondsLeft(100 * 60);
-    setSimState('running');
-    setCurrentIndex(0);
-    setIsExplanationOpen(false);
-  };
-
-  // Simulado Finish
-  const finishSimulado = (answersToScore = simAnswers, questionsToScore = simQuestions) => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setSimState('finished');
-
-    const total = questionsToScore.length;
-    let answered = 0;
-    let correct = 0;
-
-    const newUA = { ...userAnswers };
-
-    questionsToScore.forEach((q) => {
-      const userSel = answersToScore[q.id];
-      if (userSel && userSel.length > 0) {
-        answered++;
-        const isRight = isAnswerCorrect(userSel, q.opcao_correta);
-        if (isRight) correct++;
-        newUA[q.id] = { selected: userSel, isCorrect: isRight };
-      } else {
-        newUA[q.id] = { selected: [], isCorrect: false };
-      }
-    });
-
-    setUserAnswers(newUA);
-    const scoreVal = total > 0 ? Math.round((correct / total) * 1000) : 0;
-    setSimScore(scoreVal);
-    setSimPassed(scoreVal >= 700);
-    setSimAnsweredCount(answered);
-    setSimCorrectCount(correct);
-  };
-
-  // Answer Compare
-  const isAnswerCorrect = (userArr, correctArr) => {
-    if (!userArr || !correctArr) return false;
-    if (userArr.length !== correctArr.length) return false;
-    const s1 = [...userArr].sort();
-    const s2 = [...correctArr].sort();
-    return s1.every((v, i) => v.toUpperCase() === s2[i].toUpperCase());
-  };
-
-  // Option Click
-  const handleSelectOption = (q, letter) => {
-    const isMulti = q.opcao_correta.length > 1;
-
-    if (mode === 'simulado' && simState === 'running') {
-      let cur = simAnswers[q.id] ? [...simAnswers[q.id]] : [];
-      if (isMulti) {
-        if (cur.includes(letter)) cur = cur.filter((l) => l !== letter);
-        else cur.push(letter);
-      } else {
-        cur = [letter];
-      }
-      setSimAnswers({ ...simAnswers, [q.id]: cur });
-      return;
-    }
-
-    if (mode === 'simulado' && simState === 'reviewing') return;
-
-    // Treino / Erros / Favoritas
-    let cur = userAnswers[q.id] ? [...userAnswers[q.id].selected] : [];
-    if (isMulti) {
-      if (cur.includes(letter)) cur = cur.filter((l) => l !== letter);
-      else cur.push(letter);
-      setUserAnswers({
-        ...userAnswers,
-        [q.id]: { selected: cur, isCorrect: isAnswerCorrect(cur, q.opcao_correta) }
-      });
-    } else {
-      cur = [letter];
-      const correct = isAnswerCorrect(cur, q.opcao_correta);
-      setUserAnswers({
-        ...userAnswers,
-        [q.id]: { selected: cur, isCorrect: correct }
-      });
-      setIsExplanationOpen(true);
-    }
-  };
-
-  // Toggle Favorite
-  const toggleFavorite = (qid) => {
-    const next = new Set(favorites);
-    if (next.has(qid)) {
-      next.delete(qid);
-      triggerToast('Questão removida das favoritas.');
-    } else {
-      next.add(qid);
-      triggerToast('⭐ Questão adicionada às favoritas!');
-    }
-    setFavorites(next);
-  };
-
-  const currentQ = filteredQuestions[currentIndex];
   const isSimRunning = mode === 'simulado' && simState === 'running';
   const isSimReviewing = mode === 'simulado' && simState === 'reviewing';
 
-  // Answer record for current question
-  const currentAnswerRecord = isSimRunning ? simAnswers[currentQ?.id] : userAnswers[currentQ?.id];
-  const currentSelectedLetters = isSimRunning
-    ? currentAnswerRecord || []
-    : currentAnswerRecord
-    ? currentAnswerRecord.selected
-    : [];
+  useEffect(() => {
+    try { localStorage.setItem('az104_theme', theme); } catch { /* ignore */ }
+    document.documentElement.setAttribute('data-theme', theme);
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#060d1a' : '#f3f7fc');
+  }, [theme]);
+  useEffect(() => { try { localStorage.setItem('az104_lang', lang); } catch { /* ignore */ } }, [lang]);
+  useEffect(() => writeStorage('az104_user_answers', userAnswers), [userAnswers]);
+  useEffect(() => writeStorage('az104_favorites', Array.from(favorites)), [favorites]);
 
-  const shouldRevealGabarito =
-    (!isSimRunning && currentSelectedLetters.length > 0) || isSimReviewing || isExplanationOpen;
+  const showToast = useCallback(message => {
+    clearTimeout(toastTimer.current);
+    setToast(message);
+    toastTimer.current = setTimeout(() => setToast(null), 2600);
+  }, []);
 
-  // Format Code and Markdown
-  const renderFormattedText = (txt) => {
-    if (!txt) return null;
-    const parts = txt.split(/(<a\s+[^>]+>.*?<\/a>|`[^`]+`|\n)/g);
-    return parts.map((part, i) => {
-      if (part === '\n') return <br key={i} />;
-      if (part.startsWith('`') && part.endsWith('`')) {
-        return (
-          <code key={i} className="px-1.5 py-0.5 mx-0.5 rounded bg-slate-800 text-fuchsia-400 font-mono text-xs border border-slate-700">
-            {part.slice(1, -1)}
-          </code>
-        );
-      }
-      return part;
-    });
+  useEffect(() => {
+    if (!isSimRunning) return undefined;
+    const warn = event => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [isSimRunning]);
+
+  useEffect(() => {
+    if (!isSimRunning) return undefined;
+    const timer = setInterval(() => setSimSecondsLeft(s => Math.max(0, s - 1)), 1000);
+    return () => clearInterval(timer);
+  }, [isSimRunning]);
+
+  const filteredQuestions = useMemo(() => {
+    if (mode === 'simulado') return simState === 'running' || simState === 'reviewing' ? simQuestions : [];
+    let list = allQuestions;
+    if (mode === 'erros') list = list.filter(q => stickyIds.has(q.id) || userAnswers[q.id]?.isCorrect === false);
+    if (mode === 'favoritas') list = list.filter(q => stickyIds.has(q.id) || favorites.has(q.id));
+    if (filters.domain !== 'all') list = list.filter(q => q.domainIndex === Number(filters.domain));
+    if (filters.source !== 'all') list = list.filter(q => q.origem === filters.source);
+    if (filters.type !== 'all') list = list.filter(q => (q.opcao_correta.length > 1) === (filters.type === 'multi'));
+    if (filters.status !== 'all') {
+      list = list.filter(q => {
+        if (stickyIds.has(q.id)) return true;
+        const answer = userAnswers[q.id];
+        if (filters.status === 'new') return !answer;
+        return answer && answer.isCorrect === (filters.status === 'correct');
+      });
+    }
+    const term = searchTerm.trim().toLowerCase();
+    if (term) {
+      list = list.filter(q => [q.pergunta, q.pergunta_en, q.explicacao, q.id, q.tema].some(text => String(text || '').toLowerCase().includes(term)));
+    }
+    return list;
+  }, [allQuestions, mode, simState, simQuestions, stickyIds, userAnswers, favorites, filters, searchTerm]);
+
+  useEffect(() => {
+    if (currentIndex > 0 && currentIndex >= filteredQuestions.length) setCurrentIndex(Math.max(0, filteredQuestions.length - 1));
+  }, [filteredQuestions.length, currentIndex]);
+
+  const stats = useMemo(() => {
+    let answered = 0;
+    let correct = 0;
+    for (const q of allQuestions) {
+      const answer = userAnswers[q.id];
+      if (answer) { answered++; if (answer.isCorrect) correct++; }
+    }
+    return { total: allQuestions.length, answered, correct, incorrect: answered - correct, percent: answered ? Math.round(correct / answered * 100) : 0 };
+  }, [allQuestions, userAnswers]);
+
+  const domainStats = useMemo(() => DOMAINS.map((_, i) => {
+    const questions = allQuestions.filter(q => q.domainIndex === i);
+    const answers = questions.map(q => userAnswers[q.id]).filter(Boolean);
+    const correct = answers.filter(a => a.isCorrect).length;
+    return {
+      total: questions.length,
+      answered: answers.length,
+      progress: questions.length ? Math.round(answers.length / questions.length * 100) : 0,
+      accuracy: answers.length ? Math.round(correct / answers.length * 100) : 0,
+    };
+  }), [allQuestions, userAnswers]);
+
+  const resetView = () => {
+    setCurrentIndex(0);
+    setExplanationOpen(false);
+    setStickyIds(new Set());
   };
 
-  if (dataLoading) return <div className="min-h-screen bg-[#0b0f19] text-slate-200 flex items-center justify-center">A carregar o banco de questões…</div>;
-  if (dataError) return <div className="min-h-screen bg-[#0b0f19] text-slate-200 flex flex-col gap-3 items-center justify-center p-6 text-center"><strong>Não foi possível carregar as questões.</strong><span className="text-sm text-slate-400">Verifique a ligação à Internet e tente novamente.</span><button className="rounded-lg bg-indigo-600 px-4 py-2" onClick={() => window.location.reload()}>Tentar de novo</button></div>;
+  const switchMode = target => {
+    setMode(target);
+    resetView();
+    setRailOpen(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const requestModeSwitch = target => {
+    if (isSimRunning && target !== 'simulado') {
+      setPendingMode(target);
+      setModal('exit');
+      return;
+    }
+    switchMode(target);
+  };
+
+  const confirmExitSimulado = () => {
+    setModal(null);
+    setSimState('idle');
+    setSimAnswers({});
+    setSimFlags(new Set());
+    if (pendingMode) switchMode(pendingMode);
+    setPendingMode(null);
+  };
+
+  const setFilter = (key, value) => {
+    setFilters(f => ({ ...f, [key]: value }));
+    resetView();
+  };
+  const clearFilters = () => {
+    setFilters(DEFAULT_FILTERS);
+    setSearchTerm('');
+    resetView();
+  };
+  const updateSearch = value => {
+    setSearchTerm(value);
+    setCurrentIndex(0);
+    setExplanationOpen(false);
+  };
+
+  const startSimulado = () => {
+    const pool = shuffle(allQuestions);
+    const count = simCountChoice === 'all' ? pool.length : Math.min(Number(simCountChoice), pool.length);
+    setSimQuestions(pool.slice(0, count));
+    setSimAnswers({});
+    setSimFlags(new Set());
+    setSimSecondsLeft(SIM_SECONDS);
+    setSimResult(null);
+    setSimState('running');
+    resetView();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const finishSimulado = () => {
+    setModal(null);
+    const byDomain = DOMAINS.map(() => ({ total: 0, correct: 0 }));
+    let answered = 0;
+    let correct = 0;
+    const nextAnswers = { ...userAnswers };
+    simQuestions.forEach(q => {
+      const selected = simAnswers[q.id] || [];
+      const right = selected.length > 0 && isAnswerCorrect(selected, q.opcao_correta);
+      if (selected.length) answered++;
+      if (right) correct++;
+      if (byDomain[q.domainIndex]) {
+        byDomain[q.domainIndex].total++;
+        if (right) byDomain[q.domainIndex].correct++;
+      }
+      nextAnswers[q.id] = { selected, isCorrect: right };
+    });
+    setUserAnswers(nextAnswers);
+    const total = simQuestions.length;
+    const score = total ? Math.round(correct / total * 1000) : 0;
+    setSimResult({ score, passed: score >= 700, total, answered, correct, byDomain });
+    setSimState('finished');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    if (isSimRunning && simSecondsLeft === 0) {
+      finishSimulado();
+      showToast('O tempo terminou. O simulado foi submetido.');
+    }
+  }, [isSimRunning, simSecondsLeft]);
+
+  const currentQ = filteredQuestions[currentIndex];
+  const record = currentQ ? userAnswers[currentQ.id] : undefined;
+  const isMulti = currentQ ? currentQ.opcao_correta.length > 1 : false;
+  const selected = !currentQ ? [] : isSimRunning ? simAnswers[currentQ.id] || [] : record ? record.selected : drafts[currentQ.id] || [];
+  const revealed = !!currentQ && (isSimReviewing || (!isSimRunning && (!!record || explanationOpen)));
+
+  const recordAnswer = (q, letters) => {
+    const correct = isAnswerCorrect(letters, q.opcao_correta);
+    setUserAnswers(prev => ({ ...prev, [q.id]: { selected: letters, isCorrect: correct } }));
+    setStickyIds(prev => new Set(prev).add(q.id));
+    setExplanationOpen(true);
+  };
+
+  const handleSelect = letter => {
+    const q = currentQ;
+    if (!q || revealed) return;
+    const toggle = list => list.includes(letter) ? list.filter(l => l !== letter) : [...list, letter].sort();
+    if (isSimRunning) {
+      setSimAnswers(prev => ({ ...prev, [q.id]: isMulti ? toggle(prev[q.id] || []) : [letter] }));
+      return;
+    }
+    if (isMulti) setDrafts(prev => ({ ...prev, [q.id]: toggle(prev[q.id] || []) }));
+    else recordAnswer(q, [letter]);
+  };
+
+  const handleVerify = () => currentQ && selected.length && recordAnswer(currentQ, selected);
+
+  const handleRetry = () => {
+    if (!currentQ) return;
+    setUserAnswers(prev => {
+      const next = { ...prev };
+      delete next[currentQ.id];
+      return next;
+    });
+    setDrafts(prev => ({ ...prev, [currentQ.id]: [] }));
+    setExplanationOpen(false);
+  };
+
+  const goTo = index => {
+    if (index < 0 || index >= filteredQuestions.length) return;
+    setCurrentIndex(index);
+    setExplanationOpen(isSimReviewing);
+    setRailOpen(false);
+    document.querySelector('.question-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const toggleFavorite = id => {
+    setFavorites(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      showToast(next.has(id) ? 'Adicionada às favoritas.' : 'Removida das favoritas.');
+      return next;
+    });
+    if (mode === 'favoritas') setStickyIds(prev => new Set(prev).add(id));
+  };
+
+  const toggleFlag = id => setSimFlags(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id); else next.add(id);
+    return next;
+  });
+
+  const keyState = useRef({});
+  keyState.current = { currentQ, currentIndex, handleSelect, goTo, revealed, isSimRunning, modal, zoomedImage, railOpen };
+  useEffect(() => {
+    const onKey = event => {
+      const s = keyState.current;
+      if (s.modal || s.zoomedImage || event.ctrlKey || event.metaKey || event.altKey) return;
+      if (event.target.closest('input, textarea, select, [contenteditable]')) return;
+      if (event.key === 'Escape' && s.railOpen) { setRailOpen(false); return; }
+      if (!s.currentQ) return;
+      const key = event.key.toUpperCase();
+      if (event.key === 'ArrowRight') { event.preventDefault(); s.goTo(s.currentIndex + 1); }
+      else if (event.key === 'ArrowLeft') { event.preventDefault(); s.goTo(s.currentIndex - 1); }
+      else if (key === 'E' && !s.isSimRunning) setExplanationOpen(open => !open);
+      else if (/^[A-F]$/.test(key) && s.currentQ.opcoes.some(o => o.letra === key)) s.handleSelect(key);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  const pickDomain = value => {
+    if (isSimRunning) return;
+    if (mode === 'simulado') setMode('treino');
+    setFilter('domain', value);
+    setRailOpen(false);
+  };
+
+  if (dataState === 'loading') {
+    return <div className="boot"><span className="spinner"/>A carregar o banco de questões…</div>;
+  }
+  if (dataState === 'error') {
+    return (
+      <div className="boot">
+        <strong>Não foi possível carregar as questões.</strong>
+        <span>Verifica a ligação à Internet e tenta novamente.</span>
+        <button className="btn btn-primary" onClick={() => window.location.reload()}>Tentar de novo</button>
+      </div>
+    );
+  }
+
+  const modeTitle = {
+    treino: `Modo treino · ${filteredQuestions.length.toLocaleString('pt-PT')} questões`,
+    simulado: isSimRunning ? `Simulado em curso · ${Object.keys(simAnswers).filter(k => simAnswers[k].length).length}/${simQuestions.length} respondidas` : 'Modo simulado',
+    erros: `Caderno de erros · ${filteredQuestions.length} para rever`,
+    favoritas: `Favoritas · ${filteredQuestions.length} questões`,
+  }[mode];
+
+  const showQuestion = mode !== 'simulado' || isSimRunning || isSimReviewing;
+  const unanswered = simQuestions.filter(q => !(simAnswers[q.id]?.length)).length;
 
   return (
-    <div className={`app-root min-h-screen ${theme === 'dark' ? 'bg-[#0b0f19] text-slate-100' : 'bg-slate-50 text-slate-800'} flex flex-col font-sans transition-colors duration-200 relative`}>
-      {/* Ambient background glow */}
-      <div className="ambient-glow fixed top-0 right-0 w-[45vw] h-[45vw] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="ambient-glow fixed bottom-0 left-[10vw] w-[40vw] h-[40vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
-
-      <StudyHeader {...{ theme, setTheme, lang, setLang, searchTerm, setSearchTerm, isSimRunning, simSecondsLeft, requestModeSwitch }} />
-      <div className="app-shell">
-        <StudySidebar {...{ mode, requestModeSwitch, setShowStatsModal, setShowSettingsModal, stats }} />
-        <main className="app-main">
-          <div className="workspace-heading"><div><span className="eyebrow">MICROSOFT AZURE · AZ-104</span><h2>{mode === 'treino' ? 'Vamos praticar.' : mode === 'simulado' ? 'Prepara o teu simulado.' : mode === 'erros' ? 'Aprende com os teus erros.' : 'As tuas favoritas.'}</h2></div><span className="workspace-save"><span/>Progresso guardado automaticamente</span></div>
-          <StudyStats stats={stats} />
-          {/* STUDY WORKSPACE */}
-          <section className="study-layout">
-            {/* STUDY TOOLS */}
-            <div className="filters-column">
-              {/* Card 1: Filtros de Estudo */}
-              <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4">
-                <div className="flex items-center gap-2 font-bold text-sm text-white mb-3">
-                  <Icon name="filter" size={17}/>
-                  <span>Filtros de estudo</span><button className="clear-filters" onClick={() => {setSelectedDomain('all');setSelectedSource('all');setSearchTerm('');setCurrentIndex(0);}}>Limpar</button>
+    <div className="app">
+      <div className="backdrop" aria-hidden="true"/>
+      <Sidebar mode={mode} requestModeSwitch={requestModeSwitch} openStats={() => setModal('stats')} openSettings={() => setModal('settings')} stats={stats} favoritesCount={favorites.size}/>
+      <div className="main-col">
+        <Topbar theme={theme} setTheme={setTheme} lang={lang} setLang={setLang} searchTerm={searchTerm} setSearchTerm={updateSearch} isSimRunning={isSimRunning} simSecondsLeft={simSecondsLeft} openSettings={() => setModal('settings')} requestModeSwitch={requestModeSwitch} title={modeTitle}/>
+        <main className="content">
+          <StatsRow stats={stats}/>
+          <div className="workspace">
+            <div className="primary">
+              {mode === 'simulado' && simState === 'idle' && <SimuladoLobby countChoice={simCountChoice} setCountChoice={setSimCountChoice} onStart={startSimulado} total={allQuestions.length}/>}
+              {mode === 'simulado' && simState === 'finished' && simResult && (
+                <SimuladoResults
+                  result={simResult}
+                  onReview={() => { setSimState('reviewing'); setCurrentIndex(0); setExplanationOpen(true); }}
+                  onReviewWrong={() => requestModeSwitch('erros')}
+                  onRestart={() => { setSimState('idle'); setSimAnswers({}); }}
+                />
+              )}
+              {isSimReviewing && (
+                <div className="review-bar">
+                  <span><Icon name="search" size={16}/>A rever o simulado · {simResult?.score ?? 0}/1000</span>
+                  <button className="link-btn" onClick={() => setSimState('finished')}>Voltar ao resultado</button>
                 </div>
-
-                {/* Domain Select */}
-                <div className="mb-3">
-                  <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 mb-1.5">
-                    <Icon name="grid" size={13}/>
-                    <span>Domínio Oficial</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedDomain}
-                      onChange={(e) => setSelectedDomain(e.target.value)}
-                      className="w-full bg-[#0d121f] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 appearance-none focus:outline-none focus:border-indigo-500 cursor-pointer pr-8"
-                    >
-                      <option value="all">Todos os domínios</option>
-                      {domainOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-                    </select>
-                    <span className="absolute right-3 top-2.5 text-[10px] text-slate-500 pointer-events-none">⌵</span>
-                  </div>
-                </div>
-
-                {/* Source Select */}
-                <div>
-                  <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 mb-1.5">
-                    <Icon name="file" size={13}/>
-                    <span>Fonte das Questões</span>
-                  </label>
-                  <div className="relative">
-                    <select
-                      value={selectedSource}
-                      onChange={(e) => setSelectedSource(e.target.value)}
-                      className="w-full bg-[#0d121f] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 appearance-none focus:outline-none focus:border-indigo-500 cursor-pointer pr-8"
-                    >
-                      <option value="all">Todas as fontes ({allQuestions.length})</option>
-                      {Object.entries(sourceCounts).sort(([a], [b]) => a.localeCompare(b)).map(([source, count]) => (
-                        <option key={source} value={source}>{source} ({count})</option>
-                      ))}
-                    </select>
-                    <span className="absolute right-3 top-2.5 text-[10px] text-slate-500 pointer-events-none">⌵</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Card 2: Navegador de Questões */}
-              <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4 flex flex-col">
-                <div className="navigator-heading flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-1.5 font-bold text-sm text-white">
-                    <Icon name="grid" size={17}/>
-                    <span>Navegação de questões</span>
-                  </div>
-                  <span className="text-[11px] text-slate-400 font-medium">
-                    {filteredQuestions.length} questões
-                  </span>
-                </div>
-
-                <div className="navigator-legend"><span><i className="legend-current"/>Atual</span><span><i className="legend-correct"/>Certa</span><span><i className="legend-incorrect"/>Errada</span><span><i/>Por responder</span></div>
-                {/* Question navigator */}
-                <div className="question-grid grid grid-cols-7 gap-1.5 max-h-[360px] overflow-y-auto pr-1">
-                  {filteredQuestions.map((q, idx) => {
-                    const isActive = idx === currentIndex;
-                    const isFav = favorites.has(q.id);
-
-                    let itemStyle = 'bg-[#0d121f] border-slate-800 text-slate-400 hover:border-slate-700 hover:text-white';
-
-                    if (isSimRunning) {
-                      if (simAnswers[q.id]) {
-                        itemStyle = 'bg-indigo-950/40 border-indigo-500/60 text-indigo-300';
-                      }
-                    } else {
-                      const ans = userAnswers[q.id];
-                      if (ans) {
-                        if (ans.isCorrect) itemStyle = 'bg-emerald-950/20 border-emerald-500 text-emerald-400';
-                        else itemStyle = 'bg-rose-950/20 border-rose-500 text-rose-400';
-                      }
-                    }
-
-                    if (isActive) {
-                      itemStyle = 'bg-indigo-600 border-indigo-500 text-white font-bold shadow-md shadow-indigo-600/30';
-                    }
-
-                    return (
-                      <button
-                        key={q.id || idx}
-                        onClick={() => {
-                          if (mode === 'simulado' && simState === 'idle') return;
-                          setCurrentIndex(idx);
-                          setIsExplanationOpen(false);
-                        }}
-                        className={`question-number aspect-square rounded-lg border text-xs font-semibold flex items-center justify-center transition-all relative ${itemStyle}`}
-                        aria-current={isActive ? 'step' : undefined}
-                        title={`Questão ${idx + 1} (${q.id})`}
-                      >
-                        {idx + 1}
-                        {isFav && (
-                          <span className="absolute top-0.5 right-1 text-[8px] text-amber-400 leading-none">★</span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            {/* Progresso por domínio — calculado a partir de respostas reais */}
-            <div className="domain-progress-panel">
-              <div className="domain-progress-heading"><Icon name="chart" size={17}/> Progresso por tema</div>
-              {domainOptions.map(([domain, label], domainIndex) => {
-                const aliases = domainAliases[domainIndex] || [];
-                const questions = allQuestions.filter(q => aliases.some(alias => (q.dominio || '').toLowerCase().includes(alias)));
-                const completed = questions.filter(q => userAnswers[q.id]).length;
-                const percentage = questions.length ? Math.round(completed / questions.length * 100) : 0;
-                return (
-                  <div className="domain-progress-item" key={domain}>
-                    <div><span>{label.split(' · ')[0]}</span><strong>{percentage}%</strong></div>
-                    <div className="domain-progress-track"><div style={{ width: `${percentage}%` }} /></div>
-                  </div>
-                );
-              })}
+              )}
+              {showQuestion && (currentQ ? (
+                <QuestionCard
+                  question={currentQ}
+                  index={currentIndex}
+                  total={filteredQuestions.length}
+                  lang={lang}
+                  selected={selected}
+                  revealed={revealed}
+                  isCorrect={record ? record.isCorrect : null}
+                  locked={revealed}
+                  isMulti={isMulti}
+                  isSimRunning={isSimRunning}
+                  isSimReviewing={isSimReviewing}
+                  isFavorite={favorites.has(currentQ.id)}
+                  isFlagged={simFlags.has(currentQ.id)}
+                  explanationOpen={explanationOpen && !isSimRunning}
+                  onSelect={handleSelect}
+                  onVerify={handleVerify}
+                  onRetry={handleRetry}
+                  onToggleExplanation={() => setExplanationOpen(open => !open)}
+                  onPrev={() => goTo(currentIndex - 1)}
+                  onNext={() => goTo(currentIndex + 1)}
+                  onToggleFavorite={() => toggleFavorite(currentQ.id)}
+                  onToggleFlag={() => toggleFlag(currentQ.id)}
+                  onReport={() => setModal('report')}
+                  onZoom={setZoomedImage}
+                  onFinish={() => setModal('finish')}
+                  onOpenNavigator={() => setRailOpen(true)}
+                />
+              ) : <EmptyState mode={mode} onClear={() => mode === 'treino' ? clearFilters() : requestModeSwitch('treino')}/>)}
             </div>
+
+            <aside className={`rail ${railOpen ? 'is-open' : ''}`} aria-label="Navegação, filtros e progresso">
+              <div className="rail-head">
+                <strong>Questões e filtros</strong>
+                <button className="icon-btn" onClick={() => setRailOpen(false)} aria-label="Fechar painel"><Icon name="close"/></button>
+              </div>
+              <QuickActions requestModeSwitch={requestModeSwitch} mode={mode}/>
+              {filteredQuestions.length > 0 && (
+                <QuestionNavigator
+                  questions={filteredQuestions}
+                  currentIndex={currentIndex}
+                  onJump={goTo}
+                  userAnswers={userAnswers}
+                  isSimRunning={isSimRunning}
+                  simAnswers={simAnswers}
+                  simFlags={simFlags}
+                  favorites={favorites}
+                />
+              )}
+              {mode !== 'simulado' && <FiltersPanel filters={filters} setFilter={setFilter} clearFilters={clearFilters} sourceCounts={sourceCounts} total={allQuestions.length}/>}
+              <DomainProgress domainStats={domainStats} onPick={pickDomain}/>
+            </aside>
+            <div className={`rail-scrim ${railOpen ? 'is-open' : ''}`} onClick={() => setRailOpen(false)} aria-hidden="true"/>
           </div>
-
-          <div className="study-quick-actions">
-            <button onClick={() => requestModeSwitch('treino')} className="quick-primary"><Icon name="play"/><span>Continuar treino<small>Uma questão de cada vez</small></span></button>
-            <button onClick={() => requestModeSwitch('simulado')} className="quick-secondary"><Icon name="file"/><span>Iniciar simulado<small>Treina com cronómetro</small></span></button>
-          </div>
-
-          {/* QUESTION OR EXAM */}
-            <div className="question-workspace">
-              {/* 1. SIMULADO LOBBY (when simState === 'idle') */}
-              {mode === 'simulado' && simState === 'idle' && (
-                <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-8 flex flex-col gap-6 animate-fadeIn">
-                  <div className="flex items-center gap-4 pb-5 border-b border-slate-800/80">
-                    <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-2xl text-white shadow-lg shadow-indigo-600/40">
-                      📋
-                    </div>
-                    <div className="flex flex-col">
-                      <h2 className="text-xl font-extrabold text-white">Simulado Oficial do Exame AZ-104</h2>
-                      <p className="text-xs text-slate-400 mt-1">Microsoft Azure Administrator • Ambiente Real de Certificação</p>
-                    </div>
-                  </div>
-
-                  {/* 4 Info Spec Cards */}
-                  <div className="grid grid-cols-4 gap-3.5">
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Duração</span>
-                      <span className="text-base font-extrabold text-white">100 min</span>
-                      <span className="text-[10px] text-slate-400">Com alerta de tempo</span>
-                    </div>
-
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Nota de Corte</span>
-                      <span className="text-base font-extrabold text-white">700 / 1000</span>
-                      <span className="text-[10px] text-slate-400">70% para aprovação</span>
-                    </div>
-
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Formato</span>
-                      <span className="text-base font-extrabold text-white">Oficial</span>
-                      <span className="text-[10px] text-slate-400">Múltipla escolha e seleção</span>
-                    </div>
-
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3.5 flex flex-col gap-1">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Revisão</span>
-                      <span className="text-base font-extrabold text-white">No Final</span>
-                      <span className="text-[10px] text-slate-400">Gabarito e erros liberados</span>
-                    </div>
-                  </div>
-
-                  {/* Rules Box */}
-                  <div className="bg-indigo-950/20 border border-indigo-500/20 rounded-xl p-4">
-                    <div className="flex items-center gap-2 font-bold text-xs text-indigo-300 mb-2.5">
-                      <span>📌</span>
-                      <span>Regras e Orientações para a Prova:</span>
-                    </div>
-                    <ul className="text-xs text-slate-300 space-y-1.5 list-disc list-inside leading-relaxed">
-                      <li>As respostas corretas e as justificativas <strong>NÃO</strong> serão exibidas durante o teste.</li>
-                      <li>Você pode navegar livremente entre as questões pelo Navegador e alterar qualquer resposta antes de finalizar.</li>
-                      <li>Questões marcadas com estrela (⭐) ficam sinalizadas para você revisitar facilmente.</li>
-                      <li>Não há penalidade para respostas erradas (chute livre). Responda todas as questões!</li>
-                      <li>Ao clicar em <strong>"Começar Simulado"</strong>, o cronômetro regressivo de 100 minutos será iniciado.</li>
-                      <li>Se você tentar sair da página ou trocar de modo durante o exame, um modal de segurança será exibido para proteger suas respostas.</li>
-                    </ul>
-                  </div>
-
-                  {/* Config & Start Button */}
-                  <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-4 flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-3">
-                      <label className="text-xs font-semibold text-white">Quantidade de Questões:</label>
-                      <select
-                        value={simCountChoice}
-                        onChange={(e) => setSimCountChoice(e.target.value)}
-                        className="bg-[#131b2e] border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-semibold outline-none cursor-pointer"
-                      >
-                        <option value="65">65 Questões (Padrão Oficial do Exame)</option>
-                        <option value="50">50 Questões (Simulado Médio)</option>
-                        <option value="30">30 Questões (Simulado Rápido)</option>
-                        <option value="all">Todas as Questões do Banco (Maratona)</option>
-                      </select>
-                    </div>
-
-                    <button
-                      onClick={startSimulado}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm px-7 py-3 rounded-full shadow-lg shadow-indigo-600/40 flex items-center gap-2 transition-all transform hover:-translate-y-0.5 cursor-pointer"
-                    >
-                      <span>🚀</span>
-                      <span>Começar Simulado Agora</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* 2. SIMULADO RESULTS (when simState === 'finished') */}
-              {mode === 'simulado' && simState === 'finished' && (
-                <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-8 flex flex-col items-center text-center gap-6 animate-fadeIn">
-                  <div
-                    className={`px-5 py-2 rounded-full text-xs font-extrabold uppercase tracking-wider flex items-center gap-2 ${
-                      simPassed
-                        ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-500/60'
-                        : 'bg-rose-950/40 text-rose-400 border border-rose-500/60'
-                    }`}
-                  >
-                    <span>{simPassed ? '🎉' : '❌'}</span>
-                    <span>{simPassed ? 'APROVADO NO SIMULADO!' : 'NÃO APROVADO (Abaixo de 700)'}</span>
-                  </div>
-
-                  <div>
-                    <div className={`text-5xl font-black tracking-tight leading-none ${simPassed ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {simScore}
-                    </div>
-                    <div className="text-xs text-slate-400 mt-2">
-                      de 1000 pontos (Nota de Corte da Microsoft: 700)
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-4 gap-3.5 w-full max-w-xl">
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                      <span className="text-lg font-bold text-white">{simQuestions.length}</span>
-                      <span className="text-[10px] text-slate-400">Total</span>
-                    </div>
-
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                      <span className="text-lg font-bold text-blue-400">{simAnsweredCount}</span>
-                      <span className="text-[10px] text-slate-400">Respondidas</span>
-                    </div>
-
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                      <span className="text-lg font-bold text-emerald-400">{simCorrectCount}</span>
-                      <span className="text-[10px] text-slate-400">Acertos</span>
-                    </div>
-
-                    <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                      <span className="text-lg font-bold text-rose-400">{simQuestions.length - simCorrectCount}</span>
-                      <span className="text-[10px] text-slate-400">Erros</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 flex-wrap mt-2">
-                    <button
-                      onClick={() => requestModeSwitch('erros')}
-                      className="border border-rose-500/60 bg-rose-950/20 text-rose-400 hover:bg-rose-950/40 px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <span>❌</span>
-                      <span>Revisar Questões Erradas</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setSimState('reviewing');
-                        setCurrentIndex(0);
-                        setIsExplanationOpen(true);
-                      }}
-                      className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors shadow-md shadow-indigo-600/30 cursor-pointer"
-                    >
-                      <span>🔍</span>
-                      <span>Revisar Todas as Questões</span>
-                    </button>
-
-                    <button
-                      onClick={() => {
-                        setSimState('idle');
-                        setSimAnswers({});
-                      }}
-                      className="border border-slate-800 bg-[#0d121f] text-slate-300 hover:text-white px-5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-2 transition-colors cursor-pointer"
-                    >
-                      <span>🔄</span>
-                      <span>Fazer Novo Simulado</span>
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* 3. MAIN QUESTION CARD (when in treino/erros/favoritas or active/reviewing simulado) */}
-              {(mode !== 'simulado' || simState === 'running' || simState === 'reviewing') && (
-                <div className="question-card bg-[#131b2e] border border-slate-800/80 rounded-2xl p-7 flex flex-col min-h-[560px] animate-fadeIn">
-                  {currentQ ? (
-                    <>
-                      {/* Question Top Header Bar */}
-                      <div className="question-header flex items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800/80 flex-wrap">
-                        <div className="flex items-center gap-3 flex-wrap">
-                          <div className="w-7 h-7 rounded-full bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0 shadow-sm shadow-indigo-600/40">
-                            {currentIndex + 1}
-                          </div>
-                          <span className="font-extrabold text-white text-base">
-                            Questão {currentIndex + 1} de {filteredQuestions.length}
-                          </span>
-
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="bg-blue-950/80 text-blue-400 border border-blue-800/60 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-                              {currentQ.id}
-                            </span>
-                            <span className="bg-slate-800/80 text-slate-300 border border-slate-700 text-[11px] font-medium px-2.5 py-0.5 rounded-full">
-                              {currentQ.origem}
-                            </span>
-                            <span className="bg-amber-950/60 text-amber-400 border border-amber-800/60 text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-                              {currentQ.tipo}
-                            </span>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => toggleFavorite(currentQ.id)}
-                            className={`w-8 h-8 rounded-lg border text-sm flex items-center justify-center transition-colors cursor-pointer ${
-                              favorites.has(currentQ.id)
-                                ? 'bg-amber-950/40 border-amber-500/60 text-amber-400'
-                                : 'bg-[#0d121f] border-slate-800 text-slate-400 hover:text-amber-400'
-                            }`}
-                            title="Marcar como favorita"
-                          >
-                            ★
-                          </button>
-
-                          <button
-                            onClick={() => setShowReportModal(true)}
-                            className="bg-indigo-950/40 border border-indigo-800/60 text-indigo-300 hover:bg-indigo-900/40 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
-                          >
-                            <Icon name="alert" size={15}/>
-                            <span>Reportar</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Question Statement */}
-                      <div className="question-statement text-[14.5px] leading-relaxed text-slate-200 mb-6">
-                        {renderFormattedText(lang === 'en' && currentQ.pergunta_en ? currentQ.pergunta_en : currentQ.pergunta)}
-                      </div>
-
-                      {/* Architecture Diagrams Box */}
-                      {currentQ.assets && currentQ.assets.length > 0 && (
-                        <div className="answer-options flex flex-col gap-3 mb-6">
-                          {currentQ.assets.map((assetPath, aIdx) => (
-                            <div
-                              key={aIdx}
-                              onClick={() => setZoomedImage(assetPath)}
-                              className="bg-[#0d121f] border border-slate-800/80 hover:border-indigo-500/50 rounded-xl p-3 text-center cursor-zoom-in transition-all group"
-                            >
-                              <img
-                                src={assetPath}
-                                alt={`Diagrama ${aIdx + 1}`}
-                                className="max-w-full max-h-[460px] mx-auto rounded-lg group-hover:scale-[1.01] transition-transform"
-                                loading="lazy"
-                              />
-                              <div className="text-[10px] text-slate-400 mt-2 flex items-center justify-center gap-1">
-                                <span>🔍</span>
-                                <span>Clique no diagrama para ampliar em tela cheia</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      {/* Options Stack */}
-                      <div className="answer-options flex flex-col gap-3 mb-6">
-                        {currentQ.opcoes.map((opt) => {
-                          const isSelected = currentSelectedLetters.includes(opt.letra);
-                          const isCorrectOpt = currentQ.opcao_correta.includes(opt.letra);
-
-                          let rowClasses = 'bg-[#0d121f] border-slate-800/80 hover:border-slate-700 hover:bg-slate-900/60 text-slate-200';
-                          let letterCircleClasses = 'bg-slate-800 text-slate-300';
-
-                          if (isSelected && isSimRunning) {
-                            rowClasses = 'bg-indigo-950/20 border-indigo-500/60 text-white';
-                            letterCircleClasses = 'bg-indigo-600 text-white';
-                          }
-
-                          if (shouldRevealGabarito) {
-                            if (isCorrectOpt) {
-                              rowClasses = 'bg-emerald-950/20 border-emerald-500 text-white shadow-sm shadow-emerald-500/20';
-                              letterCircleClasses = 'bg-emerald-500 text-emerald-950 font-black';
-                            } else if (isSelected && !isCorrectOpt) {
-                              rowClasses = 'bg-rose-950/20 border-rose-500 text-white shadow-sm shadow-rose-500/20';
-                              letterCircleClasses = 'bg-rose-500 text-white font-black';
-                            }
-                          }
-
-                          return (
-                            <button
-                              key={opt.letra}
-                              type="button"
-                              data-option-row="true"
-                              onClick={() => handleSelectOption(currentQ, opt.letra)}
-                              disabled={isSimReviewing}
-                              aria-pressed={isSelected}
-                              className={`w-full text-left border rounded-xl p-3.5 flex items-center gap-3.5 cursor-pointer transition-all disabled:cursor-default ${rowClasses}`}
-                            >
-                              <div className={`w-7 h-7 rounded-full text-xs font-bold flex items-center justify-center flex-shrink-0 transition-colors ${letterCircleClasses}`}>
-                                {opt.letra}
-                              </div>
-                              <div className="text-sm font-medium leading-relaxed flex-1">
-                                {renderFormattedText(lang === 'en' && opt.texto_en ? opt.texto_en : opt.texto)}
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-
-                      {/* Explanation Card */}
-                      {isExplanationOpen && (
-                        <div className="explanation-card border rounded-xl p-5 mb-6 animate-fadeIn">
-                          <div className="flex items-center gap-2 font-bold text-sm text-indigo-400 mb-2">
-                            <Icon name="bulb" size={17}/>
-                            <span>Compreende a resposta</span>
-                          </div>
-                          <div className="text-xs md:text-[13px] leading-relaxed text-slate-300">
-                            {renderFormattedText(currentQ.explicacao || 'Ainda não existe uma explicação para esta questão. Consulte a documentação indicada na fonte e reporte-a para revisão.')}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Question Card Bottom Footer */}
-                      <div className="question-footer mt-auto pt-4 border-t border-slate-800/80 flex items-center justify-between gap-3">
-                        <button
-                          onClick={() => {
-                            if (currentIndex > 0) {
-                              setCurrentIndex(currentIndex - 1);
-                              setIsExplanationOpen(false);
-                            }
-                          }}
-                          disabled={currentIndex === 0}
-                          className="border border-slate-800 bg-[#0d121f] text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-colors disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
-                        >
-                          <span>←</span>
-                          <span>Questão Anterior</span>
-                        </button>
-
-                        <button
-                          onClick={() => setIsExplanationOpen(!isExplanationOpen)}
-                          className="text-slate-300 hover:text-white px-4 py-2 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
-                        >
-                          <Icon name="bulb" size={17}/>
-                          <span>{isExplanationOpen ? 'Ocultar explicação' : currentQ.opcao_correta.length > 1 ? 'Corrigir e ver explicação' : 'Ver explicação'}</span>
-                        </button>
-
-                        <div className="flex items-center gap-2.5">
-                          {isSimRunning && (
-                            <button
-                              onClick={() => {
-                                const remaining = simQuestions.length - Object.keys(simAnswers).length;
-                                if (remaining > 0) {
-                                  if (!window.confirm(`Você ainda possui ${remaining} questões sem responder.\nDeseja realmente finalizar o simulado?`)) return;
-                                }
-                                finishSimulado();
-                              }}
-                              className="bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition-colors cursor-pointer"
-                            >
-                              Finalizar Simulado
-                            </button>
-                          )}
-
-                          <button
-                            onClick={() => {
-                              if (currentIndex < filteredQuestions.length - 1) {
-                                setCurrentIndex(currentIndex + 1);
-                                setIsExplanationOpen(false);
-                              }
-                            }}
-                            disabled={currentIndex === filteredQuestions.length - 1}
-                            className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 shadow-lg shadow-indigo-600/30 transition-all disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
-                          >
-                            <span>Próxima Questão</span>
-                            <span>→</span>
-                          </button>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <div className="flex flex-col items-center justify-center py-20 text-center gap-3">
-                      <span className="text-3xl">🔍</span>
-                      <h3 className="text-base font-bold text-white">Nenhuma questão encontrada</h3>
-                      <p className="text-xs text-slate-400 max-w-sm">
-                        Nenhuma questão corresponde aos filtros ou termo de busca aplicados. Tente selecionar "Todos os domínios" ou limpar o campo de busca.
-                      </p>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </section>
+          <footer className="site-foot">
+            <span>Plataforma de estudo independente, não afiliada à Microsoft. Conteúdo alinhado com o <a href="https://learn.microsoft.com/credentials/certifications/resources/study-guides/az-104" target="_blank" rel="noreferrer noopener">guia de estudo AZ-104</a>.</span>
+          </footer>
         </main>
       </div>
+      <BottomNav mode={mode} requestModeSwitch={requestModeSwitch} openStats={() => setModal('stats')} stats={stats}/>
 
-      {/* ========================================================
-          MODALS (NO JAVASCRIPT ALERTS!)
-      ======================================================== */}
-
-      {/* 1. STATS MODAL */}
-      {showStatsModal && (
-        <div role="dialog" aria-modal="true" aria-label="Estatísticas do estudo" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#131b2e] border border-slate-800 rounded-2xl p-6 max-w-lg w-full flex flex-col gap-5 shadow-2xl animate-fadeIn">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2 font-bold text-base text-white">
-                <Icon name="chart" size={19}/>
-                <span>Estatísticas Detalhadas de Estudo</span>
-              </div>
-              <button onClick={() => setShowStatsModal(false)} aria-label="Fechar janela" className="text-slate-400 hover:text-white text-lg">✕</button>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                <span className="text-xs text-slate-400">Total no Banco</span>
-                <span className="text-xl font-bold text-white">{stats.total} questões</span>
-              </div>
-              <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                <span className="text-xs text-slate-400">Respondidas</span>
-                <span className="text-xl font-bold text-blue-400">{stats.answered}</span>
-              </div>
-              <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                <span className="text-xs text-slate-400">Acertos</span>
-                <span className="text-xl font-bold text-emerald-400">{stats.correct}</span>
-              </div>
-              <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3 flex flex-col">
-                <span className="text-xs text-slate-400">Erros</span>
-                <span className="text-xl font-bold text-rose-400">{stats.incorrect}</span>
-              </div>
-            </div>
-
-            <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-4 flex flex-col gap-2">
-              <div className="flex justify-between text-xs font-semibold text-slate-300">
-                <span>Taxa Geral de Aproveitamento:</span>
-                <span className="text-indigo-400 font-bold">{stats.percent}%</span>
-              </div>
-              <div className="w-full h-2.5 rounded-full bg-slate-800 overflow-hidden">
-                <div className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style={{ width: `${stats.percent}%` }} />
-              </div>
-              <span className="text-[10px] text-slate-400 mt-1">
-                Usa os resultados para identificar os temas que precisas de rever.
-              </span>
-            </div>
-
-            <button
-              onClick={() => setShowStatsModal(false)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl transition-colors"
-            >
-              Fechar Estatísticas
-            </button>
-          </div>
-        </div>
+      {modal === 'stats' && <StatsModal stats={stats} domainStats={domainStats} onClose={() => setModal(null)}/>}
+      {modal === 'report' && currentQ && <ReportModal question={currentQ} onClose={() => setModal(null)}/>}
+      {modal === 'settings' && (
+        <SettingsModal lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} onClose={() => setModal(null)}
+          onResetAnswers={() => { setUserAnswers({}); setDrafts({}); setModal(null); showToast('Histórico de respostas apagado.'); }}/>
       )}
-
-      {/* 2. REPORT MODAL */}
-      {showReportModal && (
-        <div role="dialog" aria-modal="true" aria-label="Reportar questão" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#131b2e] border border-slate-800 rounded-2xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl animate-fadeIn">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2 font-bold text-base text-white">
-                <Icon name="alert" size={15}/>
-                <span>Reportar Questão {currentQ?.id}</span>
-              </div>
-              <button onClick={() => setShowReportModal(false)} aria-label="Fechar janela" className="text-slate-400 hover:text-white text-lg">✕</button>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-slate-300">Motivo do apontamento:</label>
-              <select className="w-full bg-[#0d121f] border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 outline-none">
-                <option>Gabarito oficial discordante</option>
-                <option>Erro na tradução em Português</option>
-                <option>Diagrama ou imagem faltando</option>
-                <option>Texto truncado ou formatado incorretamente</option>
-                <option>Outro motivo</option>
-              </select>
-            </div>
-
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-slate-300">Observações adicionais (opcional):</label>
-              <textarea
-                rows={3}
-                placeholder="Descreva o que identificou nesta questão..."
-                className="w-full bg-[#0d121f] border border-slate-800 rounded-xl p-3 text-xs text-slate-200 placeholder-slate-500 outline-none resize-none"
-              />
-            </div>
-
-            <div className="flex justify-end gap-2.5 pt-2">
-              <button
-                onClick={() => setShowReportModal(false)}
-                className="border border-slate-800 bg-[#0d121f] text-slate-300 hover:text-white px-4 py-2 rounded-xl text-xs font-semibold"
-              >
-                Cancelar
-              </button>
-              <button
-                onClick={() => {
-                  setShowReportModal(false);
-                  triggerToast(`Feedback para a questão ${currentQ?.id} enviado com sucesso!`);
-                }}
-                className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-2 rounded-xl shadow-md shadow-indigo-600/30"
-              >
-                Enviar Feedback
-              </button>
-            </div>
-          </div>
-        </div>
+      {modal === 'exit' && (
+        <ConfirmModal title="Sair do simulado?" message="O simulado ainda está a decorrer. Se saíres agora, as respostas deste simulado são descartadas."
+          cancelLabel="Continuar simulado" confirmLabel="Sair e descartar" onConfirm={confirmExitSimulado} onClose={() => { setModal(null); setPendingMode(null); }}/>
       )}
-
-      {/* 3. SETTINGS & RESET MODAL */}
-      {showSettingsModal && (
-        <div role="dialog" aria-modal="true" aria-label="Definições da plataforma" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#131b2e] border border-slate-800 rounded-2xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl animate-fadeIn">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <div className="flex items-center gap-2 font-bold text-base text-white">
-                <Icon name="settings" size={19}/>
-                <span>Configurações da Plataforma</span>
-              </div>
-              <button onClick={() => setShowSettingsModal(false)} aria-label="Fechar janela" className="text-slate-400 hover:text-white text-lg">✕</button>
-            </div>
-
-            <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
-              <div className="flex flex-col">
-                <span className="text-xs font-semibold text-white">Idioma do Exame</span>
-                <span className="text-[10px] text-slate-400">Alterne entre Português e Inglês</span>
-              </div>
-              <button
-                onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}
-                className="bg-indigo-600/20 border border-indigo-500/40 text-indigo-300 px-3 py-1.5 rounded-lg text-xs font-bold"
-              >
-                {lang === 'pt' ? '🇵🇹 PT' : '🇺🇸 EN'}
-              </button>
-            </div>
-
-            <div className="bg-[#0d121f] border border-rose-900/40 rounded-xl p-3.5 flex flex-col gap-2">
-              <span className="text-xs font-bold text-rose-400">Zerar Histórico de Respostas</span>
-              <p className="text-[10px] text-slate-400 leading-relaxed">
-                Limpa todas as respostas registradas de acertos e erros, permitindo recomeçar do zero. Suas questões favoritas (⭐) serão preservadas.
-              </p>
-              <button
-                onClick={() => {
-                  setUserAnswers({});
-                  setShowSettingsModal(false);
-                  triggerToast('Histórico de respostas zerado com sucesso!');
-                }}
-                className="bg-rose-600/20 border border-rose-500/50 hover:bg-rose-600/30 text-rose-300 font-bold text-xs py-2 rounded-lg transition-colors mt-1"
-              >
-                Confirmar e Zerar Respostas
-              </button>
-            </div>
-
-            <button
-              onClick={() => setShowSettingsModal(false)}
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl transition-colors mt-2"
-            >
-              Fechar
-            </button>
-          </div>
-        </div>
+      {modal === 'finish' && (
+        <ConfirmModal title="Terminar o simulado?" tone={unanswered ? 'danger' : 'primary'}
+          message={unanswered ? `Ainda tens ${unanswered} ${unanswered === 1 ? 'questão' : 'questões'} sem resposta. Questões sem resposta contam como erradas.` : 'Respondeste a todas as questões. Queres submeter e ver o resultado?'}
+          cancelLabel="Voltar" confirmLabel="Terminar e ver resultado" onConfirm={finishSimulado} onClose={() => setModal(null)}/>
       )}
-
-      {/* 4. EXIT CONFIRMATION MODAL */}
-      {showExitConfirmModal && (
-        <div role="dialog" aria-modal="true" aria-label="Sair do simulado" className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#131b2e] border border-rose-500/60 rounded-2xl p-6 max-w-md w-full flex flex-col items-center text-center gap-4 shadow-2xl animate-fadeIn">
-            <div className="w-14 h-14 rounded-full bg-rose-950/40 border border-rose-500 text-rose-400 flex items-center justify-center text-2xl font-bold">
-              ⚠️
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <h3 className="text-lg font-extrabold text-white">Simulado em Andamento!</h3>
-              <p className="text-xs text-slate-300 leading-relaxed max-w-sm mt-1">
-                Você está com uma prova em andamento e o tempo está correndo. Se sair agora, o simulado será cancelado e suas respostas serão perdidas.
-              </p>
-            </div>
-
-            <div className="flex items-center gap-3 w-full mt-2">
-              <button
-                onClick={() => setShowExitConfirmModal(false)}
-                className="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl shadow-lg shadow-indigo-600/30 transition-all cursor-pointer"
-              >
-                Continuar Simulado
-              </button>
-
-              <button
-                onClick={confirmExitSimulado}
-                className="flex-1 bg-transparent hover:bg-rose-950/20 text-rose-400 border border-rose-500/60 font-bold text-xs py-2.5 rounded-xl transition-colors cursor-pointer"
-              >
-                Sair e Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 5. IMAGE ZOOM MODAL */}
-      {zoomedImage && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Imagem ampliada"
-          onClick={() => setZoomedImage(null)}
-          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out"
-        >
-          <button
-            aria-label="Fechar imagem"
-            onClick={() => setZoomedImage(null)}
-            className="absolute top-5 right-6 text-white text-3xl font-light hover:text-slate-300 transition-colors"
-          >
-            &times;
-          </button>
-          <img
-            src={zoomedImage}
-            alt="Imagem Ampliada"
-            className="max-w-[94vw] max-h-[90vh] object-contain rounded-xl bg-white p-2 shadow-2xl"
-          />
-        </div>
-      )}
-
-      {/* TOAST NOTIFICATION */}
-      {toastMessage && (
-        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 border border-indigo-500/40 text-slate-100 text-xs font-semibold px-4 py-3 rounded-xl shadow-2xl shadow-indigo-600/30 flex items-center gap-2 animate-fadeIn">
-          <span>✨</span>
-          <span>{toastMessage}</span>
-        </div>
-      )}
+      {zoomedImage && <ImageModal src={zoomedImage} onClose={() => setZoomedImage(null)}/>}
+      {toast && <div className="toast" role="status"><Icon name="check" size={16}/>{toast}</div>}
     </div>
   );
 }

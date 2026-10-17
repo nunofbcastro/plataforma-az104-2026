@@ -1,0 +1,692 @@
+[
+  {
+    "id": "AUT26-ID-01",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Grupos do Microsoft Entra",
+    "pergunta": "A sua empresa tem um inquilino do Microsoft Entra ID com licenças Microsoft Entra ID P1. O departamento de Vendas contrata e transfere colaboradores com frequência.\n\nPrecisa de garantir que os utilizadores cujo atributo `department` tem o valor `Sales` são adicionados e removidos automaticamente de um grupo usado para atribuir acesso a aplicações. A solução deve minimizar o esforço administrativo.\n\nO que deve criar?",
+    "pergunta_en": "Your company has a Microsoft Entra ID tenant with Microsoft Entra ID P1 licenses. The Sales department hires and transfers employees frequently.\n\nYou need to ensure that users whose `department` attribute is `Sales` are automatically added to and removed from a group used to grant access to applications. The solution must minimize administrative effort.\n\nWhat should you create?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Um grupo de segurança com o tipo de associação Atribuído e uma revisão de acesso mensal.",
+        "texto_en": "A security group with the Assigned membership type and a monthly access review."
+      },
+      {
+        "letra": "B",
+        "texto": "Um grupo do Microsoft 365 com o tipo de associação Atribuído.",
+        "texto_en": "A Microsoft 365 group with the Assigned membership type."
+      },
+      {
+        "letra": "C",
+        "texto": "Um grupo de segurança com o tipo de associação Utilizador Dinâmico e a regra `(user.department -eq \"Sales\")`.",
+        "texto_en": "A security group with the Dynamic User membership type and the rule `(user.department -eq \"Sales\")`."
+      },
+      {
+        "letra": "D",
+        "texto": "Um grupo de segurança com o tipo de associação Dispositivo Dinâmico e a regra `(device.department -eq \"Sales\")`.",
+        "texto_en": "A security group with the Dynamic Device membership type and the rule `(device.department -eq \"Sales\")`."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "Um grupo com associação Utilizador Dinâmico avalia continuamente a regra sobre os atributos dos utilizadores e adiciona ou remove membros automaticamente quando o atributo `department` muda. Esta funcionalidade requer Microsoft Entra ID P1, que a empresa já tem.\n\nA está errada: a associação Atribuída é manual e uma revisão de acesso apenas ajuda a remover acessos, não adiciona novos membros automaticamente. B está errada porque a associação Atribuída continua a exigir gestão manual. D está errada: uma regra de dispositivo avalia objetos de dispositivo e não pode conter utilizadores; além disso, `department` não é uma propriedade de dispositivo.\n\nDocumentação: https://learn.microsoft.com/entra/identity/users/groups-dynamic-membership",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-02",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Licenciamento baseado em grupos",
+    "pergunta": "A sua empresa usa licenciamento baseado em grupos no Microsoft Entra ID. Atribuiu uma licença do Microsoft 365 E5 ao grupo de segurança `Grupo1`.\n\nO `Grupo1` tem como membros 20 utilizadores e o grupo de segurança `Grupo2`. O `Grupo2` contém 15 utilizadores.\n\nOs 20 utilizadores que são membros diretos do `Grupo1` receberam a licença, mas os utilizadores do `Grupo2` não receberam nenhuma licença.\n\nPrecisa de garantir que os utilizadores do `Grupo2` recebem a licença do Microsoft 365 E5 através de licenciamento baseado em grupos.\n\nO que deve fazer?",
+    "pergunta_en": "Your company uses group-based licensing in Microsoft Entra ID. You assigned a Microsoft 365 E5 license to the security group `Group1`.\n\n`Group1` has 20 users and the security group `Group2` as members. `Group2` contains 15 users.\n\nThe 20 users who are direct members of `Group1` received the license, but the users in `Group2` did not receive any license.\n\nYou need to ensure that the users in `Group2` receive the Microsoft 365 E5 license through group-based licensing.\n\nWhat should you do?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Converter o `Grupo2` num grupo do Microsoft 365.",
+        "texto_en": "Convert `Group2` to a Microsoft 365 group."
+      },
+      {
+        "letra": "B",
+        "texto": "Definir a propriedade Localização de utilização em cada utilizador do `Grupo2`.",
+        "texto_en": "Set the Usage location property on each user in `Group2`."
+      },
+      {
+        "letra": "C",
+        "texto": "Atribuir a função Administrador de Licenças aos utilizadores do `Grupo2`.",
+        "texto_en": "Assign the License Administrator role to the users in `Group2`."
+      },
+      {
+        "letra": "D",
+        "texto": "Atribuir a licença do Microsoft 365 E5 diretamente ao `Grupo2`.",
+        "texto_en": "Assign the Microsoft 365 E5 license directly to `Group2`."
+      }
+    ],
+    "opcao_correta": [
+      "D"
+    ],
+    "explicacao": "O licenciamento baseado em grupos não suporta grupos aninhados: quando uma licença é atribuída a um grupo que contém outros grupos, apenas os utilizadores membros diretos (primeiro nível) recebem a licença. Para que os membros do `Grupo2` sejam licenciados, a licença tem de ser atribuída ao próprio `Grupo2` (ou os utilizadores têm de ser membros diretos do `Grupo1`).\n\nA está errada: mudar o tipo de grupo não altera a limitação de aninhamento. B está errada: a localização de utilização não explica a falha apenas nos membros aninhados e, no licenciamento baseado em grupos, os utilizadores sem localização herdam a localização do diretório. C está errada: a função Administrador de Licenças permite gerir licenças, não faz com que os próprios utilizadores sejam licenciados.\n\nDocumentação: https://learn.microsoft.com/entra/identity/users/licensing-group-advanced",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-03",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Utilizadores externos (B2B)",
+    "pergunta": "A sua empresa tem um inquilino do Microsoft Entra ID. Os utilizadores colaboram com parceiros externos através da colaboração B2B.\n\nUma nova política de segurança determina que só podem ser enviados convites de convidado a utilizadores do domínio `fabrikam.com`. Os convites para qualquer outro domínio têm de ser bloqueados.\n\nO que deve configurar?",
+    "pergunta_en": "Your company has a Microsoft Entra ID tenant. Users collaborate with external partners by using B2B collaboration.\n\nA new security policy states that guest invitations can be sent only to users in the `fabrikam.com` domain. Invitations to any other domain must be blocked.\n\nWhat should you configure?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Nas definições de colaboração externa, definir as restrições de acesso de utilizadores convidados para o nível mais restritivo.",
+        "texto_en": "In the external collaboration settings, set the guest user access restrictions to the most restrictive level."
+      },
+      {
+        "letra": "B",
+        "texto": "Nas definições de colaboração externa, definir as restrições de colaboração para permitir convites apenas para os domínios especificados e adicionar `fabrikam.com`.",
+        "texto_en": "In the external collaboration settings, set the collaboration restrictions to allow invitations only to the specified domains and add `fabrikam.com`."
+      },
+      {
+        "letra": "C",
+        "texto": "Nas definições de convite de convidados, permitir que apenas utilizadores com funções de administrador específicas enviem convites.",
+        "texto_en": "In the guest invite settings, allow only users assigned to specific admin roles to send invitations."
+      },
+      {
+        "letra": "D",
+        "texto": "Uma política de Acesso Condicional que exija autenticação multifator para todos os utilizadores convidados.",
+        "texto_en": "A Conditional Access policy that requires multifactor authentication for all guest users."
+      }
+    ],
+    "opcao_correta": [
+      "B"
+    ],
+    "explicacao": "As restrições de colaboração nas definições de colaboração externa permitem criar uma lista de domínios permitidos ou bloqueados para convites B2B. Ao escolher permitir convites apenas para os domínios especificados e adicionar `fabrikam.com`, qualquer convite para outro domínio é bloqueado.\n\nA está errada: as restrições de acesso de convidados controlam o que os convidados podem ver no diretório, não a quem podem ser enviados convites. C está errada: controla quem pode convidar, mas não restringe o domínio dos convidados. D está errada: o Acesso Condicional protege o início de sessão dos convidados, mas não impede convites para outros domínios.\n\nDocumentação: https://learn.microsoft.com/entra/external-id/allow-deny-list",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-04",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Reposição de palavra-passe self-service (SSPR)",
+    "pergunta": "A sua empresa tem um inquilino do Microsoft Entra ID com utilizadores apenas na cloud. Antes de uma implementação global, pretende testar a reposição de palavra-passe self-service (SSPR) com os membros do grupo `SSPR-Piloto`.\n\nPrecisa de ativar a SSPR apenas para os membros do grupo `SSPR-Piloto`.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has a Microsoft Entra ID tenant with cloud-only users. Before a global rollout, you want to test self-service password reset (SSPR) with the members of the `SSPR-Pilot` group.\n\nYou need to enable SSPR only for the members of the `SSPR-Pilot` group.\n\nWhat should you do?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Nas propriedades de Reposição de palavra-passe, definir a SSPR como Selecionado e escolher o grupo `SSPR-Piloto`.",
+        "texto_en": "In the Password reset properties, set SSPR to Selected and choose the `SSPR-Pilot` group."
+      },
+      {
+        "letra": "B",
+        "texto": "Criar uma política de Acesso Condicional destinada ao grupo `SSPR-Piloto` que exija a alteração da palavra-passe.",
+        "texto_en": "Create a Conditional Access policy that targets the `SSPR-Pilot` group and requires a password change."
+      },
+      {
+        "letra": "C",
+        "texto": "Ativar a repetição de escrita de palavras-passe no Microsoft Entra Connect.",
+        "texto_en": "Enable password writeback in Microsoft Entra Connect."
+      },
+      {
+        "letra": "D",
+        "texto": "Configurar uma política de risco de utilizador no Microsoft Entra ID Protection para o grupo `SSPR-Piloto`.",
+        "texto_en": "Configure a user risk policy in Microsoft Entra ID Protection for the `SSPR-Pilot` group."
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "A SSPR é ativada em Microsoft Entra ID > Reposição de palavra-passe > Propriedades. A opção Selecionado permite limitar a funcionalidade a um grupo, o que é a abordagem recomendada para um piloto.\n\nB está errada: o Acesso Condicional não ativa a SSPR para um grupo. C está errada: a repetição de escrita só é necessária para utilizadores sincronizados a partir do AD DS local; os utilizadores do cenário existem apenas na cloud e a repetição de escrita não ativa a SSPR. D está errada: uma política de risco de utilizador reage a riscos detetados e não ativa a SSPR para um grupo.\n\nDocumentação: https://learn.microsoft.com/entra/identity/authentication/tutorial-enable-sspr",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-05",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "RBAC",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém um grupo de recursos chamado `RG1`. O `RG1` contém várias máquinas virtuais, redes virtuais e contas de armazenamento.\n\nUm operador chamado `Utilizador1` precisa de gerir as máquinas virtuais existentes no `RG1`, incluindo iniciar, parar e redimensionar. O `Utilizador1` não deve poder gerir as contas de armazenamento nem atribuir acesso a outros utilizadores.\n\nPrecisa de atribuir uma função ao `Utilizador1` no âmbito do `RG1`, seguindo o princípio do privilégio mínimo.\n\nQue função deve atribuir?",
+    "pergunta_en": "Your company has an Azure subscription that contains a resource group named `RG1`. `RG1` contains several virtual machines, virtual networks, and storage accounts.\n\nAn operator named `User1` needs to manage the existing virtual machines in `RG1`, including starting, stopping, and resizing them. `User1` must not be able to manage the storage accounts or grant access to other users.\n\nYou need to assign a role to `User1` at the `RG1` scope by following the principle of least privilege.\n\nWhich role should you assign?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Proprietário (Owner)",
+        "texto_en": "Owner"
+      },
+      {
+        "letra": "B",
+        "texto": "Contribuidor (Contributor)",
+        "texto_en": "Contributor"
+      },
+      {
+        "letra": "C",
+        "texto": "Administrador de Acesso de Utilizador (User Access Administrator)",
+        "texto_en": "User Access Administrator"
+      },
+      {
+        "letra": "D",
+        "texto": "Contribuidor de Máquinas Virtuais (Virtual Machine Contributor)",
+        "texto_en": "Virtual Machine Contributor"
+      }
+    ],
+    "opcao_correta": [
+      "D"
+    ],
+    "explicacao": "A função Contribuidor de Máquinas Virtuais permite gerir máquinas virtuais (iniciar, parar, redimensionar, etc.), mas não concede acesso de gestão às contas de armazenamento nem permite atribuir funções. É a opção de privilégio mínimo.\n\nA está errada: Proprietário concede acesso total, incluindo a atribuição de funções. B está errada: Contribuidor permite gerir todos os recursos do `RG1`, incluindo as contas de armazenamento. C está errada: Administrador de Acesso de Utilizador permite gerir atribuições de funções, mas não gerir máquinas virtuais.\n\nDocumentação: https://learn.microsoft.com/azure/role-based-access-control/built-in-roles",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-06",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "RBAC – herança de âmbito",
+    "pergunta": "A sua empresa tem a seguinte hierarquia no Azure:\n\n- Grupo de gestão `MG1`\n- Subscrição `Sub1`, que é filha de `MG1`\n- Grupos de recursos `RG1` e `RG2` em `Sub1`\n- Máquina virtual `VM1` em `RG1` e máquina virtual `VM2` em `RG2`\n\nO `Utilizador1` tem as seguintes atribuições de funções do Azure:\n\n- Leitor (Reader) no âmbito de `MG1`\n- Contribuidor (Contributor) no âmbito de `RG1`\n\nQuais são as DUAS afirmações verdadeiras? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has the following hierarchy in Azure:\n\n- Management group `MG1`\n- Subscription `Sub1`, which is a child of `MG1`\n- Resource groups `RG1` and `RG2` in `Sub1`\n- Virtual machine `VM1` in `RG1` and virtual machine `VM2` in `RG2`\n\n`User1` has the following Azure role assignments:\n\n- Reader at the `MG1` scope\n- Contributor at the `RG1` scope\n\nWhich TWO statements are true? Each correct answer presents part of the solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "O `Utilizador1` pode parar a `VM1`.",
+        "texto_en": "`User1` can stop `VM1`."
+      },
+      {
+        "letra": "B",
+        "texto": "O `Utilizador1` pode atribuir a função Leitor ao `Utilizador2` no âmbito de `RG1`.",
+        "texto_en": "`User1` can assign the Reader role to `User2` at the `RG1` scope."
+      },
+      {
+        "letra": "C",
+        "texto": "O `Utilizador1` pode ver as propriedades da `VM2`.",
+        "texto_en": "`User1` can view the properties of `VM2`."
+      },
+      {
+        "letra": "D",
+        "texto": "O `Utilizador1` pode criar uma conta de armazenamento em `RG2`.",
+        "texto_en": "`User1` can create a storage account in `RG2`."
+      },
+      {
+        "letra": "E",
+        "texto": "O `Utilizador1` pode criar um novo grupo de recursos em `Sub1`.",
+        "texto_en": "`User1` can create a new resource group in `Sub1`."
+      }
+    ],
+    "opcao_correta": [
+      "A",
+      "C"
+    ],
+    "explicacao": "As atribuições de funções do Azure são herdadas pelos âmbitos filhos e as permissões efetivas são a união de todas as atribuições. O Leitor em `MG1` é herdado por `Sub1`, `RG1`, `RG2` e todos os recursos, pelo que o `Utilizador1` pode ver a `VM2` (C). O Contribuidor em `RG1` aplica-se à `VM1`, permitindo pará-la (A).\n\nB está errada: Contribuidor não inclui permissões `Microsoft.Authorization/roleAssignments/write`, por isso não permite atribuir funções. D está errada: em `RG2` o `Utilizador1` tem apenas Leitor. E está errada: criar grupos de recursos exige permissões de escrita no âmbito da subscrição, onde o `Utilizador1` só tem Leitor.\n\nDocumentação: https://learn.microsoft.com/azure/role-based-access-control/scope-overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-07",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Funções personalizadas",
+    "pergunta": "A sua empresa tem duas subscrições do Azure chamadas `Sub1` e `Sub2`, associadas ao mesmo inquilino do Microsoft Entra ID.\n\nCriou uma função personalizada chamada `Operador-VM` com a seguinte propriedade:\n\n`\"AssignableScopes\": [\"/subscriptions/<ID-Sub1>\"]`\n\nPrecisa de atribuir a função `Operador-VM` a um utilizador num grupo de recursos de `Sub2`.\n\nO que deve fazer primeiro?",
+    "pergunta_en": "Your company has two Azure subscriptions named `Sub1` and `Sub2` that are associated with the same Microsoft Entra ID tenant.\n\nYou created a custom role named `VM-Operator` with the following property:\n\n`\"AssignableScopes\": [\"/subscriptions/<Sub1-ID>\"]`\n\nYou need to assign the `VM-Operator` role to a user in a resource group in `Sub2`.\n\nWhat should you do first?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Mover `Sub2` para o mesmo grupo de gestão que `Sub1`.",
+        "texto_en": "Move `Sub2` to the same management group as `Sub1`."
+      },
+      {
+        "letra": "B",
+        "texto": "Criar a atribuição de função com `New-AzRoleAssignment` especificando o âmbito do grupo de recursos em `Sub2`.",
+        "texto_en": "Create the role assignment with `New-AzRoleAssignment` specifying the resource group scope in `Sub2`."
+      },
+      {
+        "letra": "C",
+        "texto": "Atualizar a definição da função para adicionar `/subscriptions/<ID-Sub2>` a `AssignableScopes`.",
+        "texto_en": "Update the role definition to add `/subscriptions/<Sub2-ID>` to `AssignableScopes`."
+      },
+      {
+        "letra": "D",
+        "texto": "Exportar a função personalizada e importá-la no inquilino de `Sub2`.",
+        "texto_en": "Export the custom role and import it into the tenant of `Sub2`."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "A propriedade `AssignableScopes` define em que âmbitos uma função personalizada fica disponível para atribuição. Como só contém `Sub1`, a função não pode ser atribuída em `Sub2`. É necessário atualizar a definição (por exemplo, com `Set-AzRoleDefinition` ou `az role definition update`) para incluir `Sub2`.\n\nA está errada: a posição na hierarquia de grupos de gestão não altera os âmbitos atribuíveis definidos na função. B está errada: a atribuição falha enquanto `Sub2` não estiver em `AssignableScopes`. D está errada: ambas as subscrições estão no mesmo inquilino e as definições de funções personalizadas já são partilhadas no inquilino; o limite está nos âmbitos atribuíveis.\n\nDocumentação: https://learn.microsoft.com/azure/role-based-access-control/custom-roles",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-08",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "RBAC – ações de dados",
+    "pergunta": "A sua empresa tem uma subscrição do Azure que contém uma conta de armazenamento chamada `storage1` e uma aplicação web chamada `App1`. A `App1` tem uma identidade gerida atribuída pelo sistema.\n\nA `App1` tem de ler blobs num contentor de `storage1` através da autenticação Microsoft Entra ID. A `App1` não deve poder modificar dados nem obter as chaves de acesso da conta.\n\nPrecisa de atribuir uma função à identidade gerida, seguindo o princípio do privilégio mínimo.\n\nQue função deve atribuir?",
+    "pergunta_en": "Your company has an Azure subscription that contains a storage account named `storage1` and a web app named `App1`. `App1` has a system-assigned managed identity.\n\n`App1` must read blobs in a container in `storage1` by using Microsoft Entra ID authentication. `App1` must not be able to modify data or retrieve the account access keys.\n\nYou need to assign a role to the managed identity by following the principle of least privilege.\n\nWhich role should you assign?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Leitor (Reader)",
+        "texto_en": "Reader"
+      },
+      {
+        "letra": "B",
+        "texto": "Leitor de Dados de Blobs de Armazenamento (Storage Blob Data Reader)",
+        "texto_en": "Storage Blob Data Reader"
+      },
+      {
+        "letra": "C",
+        "texto": "Contribuidor de Contas de Armazenamento (Storage Account Contributor)",
+        "texto_en": "Storage Account Contributor"
+      },
+      {
+        "letra": "D",
+        "texto": "Contribuidor de Dados de Blobs de Armazenamento (Storage Blob Data Contributor)",
+        "texto_en": "Storage Blob Data Contributor"
+      }
+    ],
+    "opcao_correta": [
+      "B"
+    ],
+    "explicacao": "O acesso aos dados de blobs com Microsoft Entra ID é controlado por funções com ações de dados (`DataActions`). A função Leitor de Dados de Blobs de Armazenamento concede apenas leitura de contentores e blobs, sem acesso às chaves de acesso.\n\nA está errada: Leitor só concede ações do plano de controlo e não permite ler dados de blobs com Microsoft Entra ID. C está errada: gere a conta no plano de controlo e inclui a listagem das chaves de acesso, o que viola o requisito. D está errada: permite também escrever e eliminar blobs, excedendo o privilégio mínimo.\n\nDocumentação: https://learn.microsoft.com/azure/storage/blobs/assign-azure-role-data-access",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-09",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Fácil",
+    "tema": "Azure Policy",
+    "pergunta": "A sua empresa tem uma subscrição do Azure. Por motivos de residência de dados, todos os novos recursos têm de ser criados apenas nas regiões West Europe e North Europe.\n\nPrecisa de impedir que os utilizadores criem recursos noutras regiões.\n\nQue efeito deve ter a definição do Azure Policy que vai atribuir?",
+    "pergunta_en": "Your company has an Azure subscription. For data residency reasons, all new resources must be created only in the West Europe and North Europe regions.\n\nYou need to prevent users from creating resources in other regions.\n\nWhich effect should the Azure Policy definition that you assign have?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "`Deny`",
+        "texto_en": "`Deny`"
+      },
+      {
+        "letra": "B",
+        "texto": "`Audit`",
+        "texto_en": "`Audit`"
+      },
+      {
+        "letra": "C",
+        "texto": "`Append`",
+        "texto_en": "`Append`"
+      },
+      {
+        "letra": "D",
+        "texto": "`AuditIfNotExists`",
+        "texto_en": "`AuditIfNotExists`"
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "O efeito `Deny` avalia o pedido de criação ou atualização antes de ser processado e bloqueia-o se não estiver em conformidade. É o efeito usado pela definição incorporada Localizações permitidas (Allowed locations).\n\nB está errada: `Audit` apenas regista um aviso no registo de atividades e marca o recurso como não conforme, sem bloquear a criação. C está errada: `Append` adiciona campos ao pedido, não bloqueia regiões. D está errada: `AuditIfNotExists` audita a ausência de recursos relacionados, sem impedir a criação.\n\nDocumentação: https://learn.microsoft.com/azure/governance/policy/concepts/effect-deny",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-10",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Médio",
+    "tema": "Etiquetas e Azure Policy",
+    "pergunta": "A sua empresa tem uma subscrição do Azure com 40 grupos de recursos. Cada grupo de recursos tem a etiqueta `CentroCusto`. Muitos recursos existentes não têm esta etiqueta.\n\nPrecisa de garantir que todos os recursos, novos e existentes, recebem a etiqueta `CentroCusto` com o valor do respetivo grupo de recursos, caso a etiqueta esteja em falta. A solução deve minimizar o esforço administrativo.\n\nQuais são as DUAS ações que deve realizar? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has an Azure subscription with 40 resource groups. Each resource group has the `CostCenter` tag. Many existing resources do not have this tag.\n\nYou need to ensure that all resources, new and existing, receive the `CostCenter` tag with the value from their resource group if the tag is missing. The solution must minimize administrative effort.\n\nWhich TWO actions should you perform? Each correct answer presents part of the solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Atribuir a definição de política incorporada Exigir uma etiqueta nos recursos (Require a tag on resources).",
+        "texto_en": "Assign the built-in policy definition Require a tag on resources."
+      },
+      {
+        "letra": "B",
+        "texto": "Atribuir a definição de política incorporada Herdar uma etiqueta do grupo de recursos se estiver em falta (Inherit a tag from the resource group if missing).",
+        "texto_en": "Assign the built-in policy definition Inherit a tag from the resource group if missing."
+      },
+      {
+        "letra": "C",
+        "texto": "Aplicar um bloqueio `ReadOnly` a cada grupo de recursos.",
+        "texto_en": "Apply a `ReadOnly` lock to each resource group."
+      },
+      {
+        "letra": "D",
+        "texto": "Criar uma tarefa de remediação para a atribuição de política.",
+        "texto_en": "Create a remediation task for the policy assignment."
+      },
+      {
+        "letra": "E",
+        "texto": "Atribuir uma definição de política com o efeito `Audit` que verifique a etiqueta `CentroCusto`.",
+        "texto_en": "Assign a policy definition with the `Audit` effect that checks for the `CostCenter` tag."
+      }
+    ],
+    "opcao_correta": [
+      "B",
+      "D"
+    ],
+    "explicacao": "As etiquetas dos grupos de recursos não são herdadas automaticamente pelos recursos. A política incorporada Herdar uma etiqueta do grupo de recursos se estiver em falta usa o efeito `Modify` para adicionar a etiqueta a recursos novos ou atualizados (B). Os recursos já existentes só são corrigidos através de uma tarefa de remediação, que usa a identidade gerida da atribuição (D).\n\nA está errada: usa `Deny` e bloquearia recursos sem a etiqueta, em vez de a adicionar. C está errada: um bloqueio `ReadOnly` impediria alterações, incluindo a adição de etiquetas. E está errada: `Audit` apenas reporta a não conformidade, sem corrigir.\n\nDocumentação: https://learn.microsoft.com/azure/azure-resource-manager/management/tag-policies",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-11",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Azure Policy – DeployIfNotExists",
+    "pergunta": "A sua empresa tem uma subscrição do Azure com centenas de cofres de chaves. Pretende atribuir uma definição de política personalizada com o efeito `DeployIfNotExists` que cria definições de diagnóstico para enviar registos para uma área de trabalho do Log Analytics sempre que estas não existam.\n\nA definição de política inclui a propriedade `roleDefinitionIds` com a função Contribuidor do Log Analytics e a função Contribuidor de Monitorização.\n\nPrecisa de garantir que a atribuição de política consegue implementar as definições de diagnóstico nos recursos não conformes.\n\nO que deve configurar como parte da atribuição?",
+    "pergunta_en": "Your company has an Azure subscription with hundreds of key vaults. You plan to assign a custom policy definition with the `DeployIfNotExists` effect that creates diagnostic settings to send logs to a Log Analytics workspace whenever they do not exist.\n\nThe policy definition includes the `roleDefinitionIds` property with the Log Analytics Contributor role and the Monitoring Contributor role.\n\nYou need to ensure that the policy assignment can deploy the diagnostic settings to noncompliant resources.\n\nWhat should you configure as part of the assignment?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Uma identidade gerida para a atribuição, com as funções indicadas em `roleDefinitionIds` atribuídas no âmbito necessário.",
+        "texto_en": "A managed identity for the assignment, with the roles listed in `roleDefinitionIds` assigned at the required scope."
+      },
+      {
+        "letra": "B",
+        "texto": "A função Proprietário para a sua conta de utilizador no âmbito da subscrição.",
+        "texto_en": "The Owner role for your user account at the subscription scope."
+      },
+      {
+        "letra": "C",
+        "texto": "O modo de imposição definido como `DoNotEnforce`.",
+        "texto_en": "The enforcement mode set to `DoNotEnforce`."
+      },
+      {
+        "letra": "D",
+        "texto": "Uma exclusão para o grupo de recursos que contém a área de trabalho do Log Analytics.",
+        "texto_en": "An exclusion for the resource group that contains the Log Analytics workspace."
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "As atribuições com efeitos `DeployIfNotExists` ou `Modify` executam as implementações em nome de uma identidade gerida associada à atribuição (atribuída pelo sistema ou pelo utilizador). Essa identidade tem de ter as funções definidas em `roleDefinitionIds`; ao atribuir pelo portal, as atribuições de funções podem ser criadas automaticamente.\n\nB está errada: as implementações da política não usam as permissões da conta de quem criou a atribuição. C está errada: `DoNotEnforce` desativa a imposição do efeito, pelo que as implementações automáticas deixam de ocorrer. D está errada: uma exclusão retira recursos da avaliação, mas não dá à política permissões para implementar.\n\nDocumentação: https://learn.microsoft.com/azure/governance/policy/how-to/remediate-resources",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-12",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Azure Policy – iniciativas",
+    "pergunta": "A equipa de conformidade da sua empresa identificou 12 definições do Azure Policy que têm de ser aplicadas a várias subscrições para cumprir uma norma interna de segurança.\n\nPrecisa de atribuir as 12 definições como uma única unidade e consultar um estado de conformidade agregado para a norma. A solução deve minimizar o esforço administrativo.\n\nO que deve criar?",
+    "pergunta_en": "Your company's compliance team identified 12 Azure Policy definitions that must be applied to several subscriptions to meet an internal security standard.\n\nYou need to assign the 12 definitions as a single unit and view an aggregated compliance state for the standard. The solution must minimize administrative effort.\n\nWhat should you create?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Doze atribuições de política separadas em cada subscrição.",
+        "texto_en": "Twelve separate policy assignments in each subscription."
+      },
+      {
+        "letra": "B",
+        "texto": "Uma única definição de política personalizada com 12 regras `if/then`.",
+        "texto_en": "A single custom policy definition with 12 `if/then` rules."
+      },
+      {
+        "letra": "C",
+        "texto": "Um modelo ARM que implemente as 12 definições.",
+        "texto_en": "An ARM template that deploys the 12 definitions."
+      },
+      {
+        "letra": "D",
+        "texto": "Uma iniciativa (definição de conjunto de políticas) que contenha as 12 definições.",
+        "texto_en": "An initiative (policy set definition) that contains the 12 definitions."
+      }
+    ],
+    "opcao_correta": [
+      "D"
+    ],
+    "explicacao": "Uma iniciativa agrupa várias definições de política para que sejam atribuídas e geridas como um único item, com um estado de conformidade agregado. Pode ainda expor parâmetros comuns às definições incluídas.\n\nA está errada: funciona, mas multiplica o esforço de gestão e não fornece uma visão agregada da norma. B está errada: cada definição de política tem uma única regra de política. C está errada: um modelo ARM pode implementar definições, mas não as agrupa para atribuição e acompanhamento de conformidade.\n\nDocumentação: https://learn.microsoft.com/azure/governance/policy/concepts/initiative-definition-structure",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-13",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Difícil",
+    "tema": "Azure Policy – isenções",
+    "pergunta": "A sua empresa tem uma atribuição do Azure Policy no âmbito da subscrição `Sub1` que exige encriptação com chaves geridas pelo cliente nas contas de armazenamento.\n\nO grupo de recursos `RG-Legado` contém contas de armazenamento que só serão migradas daqui a três meses. A equipa de segurança aprovou uma exceção temporária e exige que:\n\n- A exceção expire automaticamente na data acordada.\n- A exceção fique registada com a categoria de renúncia (waiver) aprovada.\n- A política continue a aplicar-se a todos os outros grupos de recursos.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has an Azure Policy assignment at the `Sub1` subscription scope that requires customer-managed key encryption on storage accounts.\n\nThe `RG-Legacy` resource group contains storage accounts that will be migrated only in three months. The security team approved a temporary exception and requires that:\n\n- The exception expires automatically on the agreed date.\n- The exception is recorded with the approved waiver category.\n- The policy continues to apply to all other resource groups.\n\nWhat should you do?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Adicionar `RG-Legado` às exclusões (`notScopes`) da atribuição de política.",
+        "texto_en": "Add `RG-Legacy` to the exclusions (`notScopes`) of the policy assignment."
+      },
+      {
+        "letra": "B",
+        "texto": "Alterar o efeito da definição de política para `Disabled`.",
+        "texto_en": "Change the effect of the policy definition to `Disabled`."
+      },
+      {
+        "letra": "C",
+        "texto": "Criar uma isenção de política no âmbito de `RG-Legado` com a categoria `Waiver` e uma data de expiração.",
+        "texto_en": "Create a policy exemption at the `RG-Legacy` scope with the `Waiver` category and an expiration date."
+      },
+      {
+        "letra": "D",
+        "texto": "Definir o modo de imposição da atribuição como `DoNotEnforce`.",
+        "texto_en": "Set the enforcement mode of the assignment to `DoNotEnforce`."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "As isenções de política permitem excluir um âmbito ou recurso da avaliação de uma atribuição, com uma categoria (`Waiver` ou `Mitigated`), uma descrição e uma data de expiração opcional (`expiresOn`). Após essa data, a isenção deixa de ser respeitada.\n\nA está errada: uma exclusão retira o âmbito da avaliação, mas não tem data de expiração nem categoria, e o recurso deixa de aparecer na conformidade. B está errada: desativaria a política para todos os âmbitos. D está errada: `DoNotEnforce` deixa de impor o efeito em toda a atribuição, não apenas em `RG-Legado`.\n\nDocumentação: https://learn.microsoft.com/azure/governance/policy/concepts/exemption-structure",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-14",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Bloqueios de recursos",
+    "pergunta": "A sua empresa tem uma conta de armazenamento chamada `storage1`. Um administrador aplicou um bloqueio `ReadOnly` a `storage1`.\n\nVários utilizadores com a função Contribuidor na subscrição comunicam que uma operação deixou de funcionar.\n\nQue operação é bloqueada pelo bloqueio `ReadOnly`?",
+    "pergunta_en": "Your company has a storage account named `storage1`. An administrator applied a `ReadOnly` lock to `storage1`.\n\nSeveral users with the Contributor role on the subscription report that an operation stopped working.\n\nWhich operation is blocked by the `ReadOnly` lock?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Listar as chaves de acesso de `storage1`.",
+        "texto_en": "Listing the access keys of `storage1`."
+      },
+      {
+        "letra": "B",
+        "texto": "Ler blobs com autenticação Microsoft Entra ID.",
+        "texto_en": "Reading blobs by using Microsoft Entra ID authentication."
+      },
+      {
+        "letra": "C",
+        "texto": "Carregar um blob com um token SAS existente.",
+        "texto_en": "Uploading a blob by using an existing SAS token."
+      },
+      {
+        "letra": "D",
+        "texto": "Ver as propriedades de `storage1` no portal do Azure.",
+        "texto_en": "Viewing the properties of `storage1` in the Azure portal."
+      }
+    ],
+    "opcao_correta": [
+      "A"
+    ],
+    "explicacao": "Os bloqueios aplicam-se apenas a operações do plano de controlo. A operação List Keys é um pedido `POST` ao Azure Resource Manager, pelo que um bloqueio `ReadOnly` impede a listagem das chaves de acesso. Os utilizadores sem as chaves têm de usar credenciais do Microsoft Entra ID para aceder aos dados.\n\nB e C estão erradas: são operações do plano de dados, enviadas diretamente para o ponto final do serviço de armazenamento, e não são afetadas pelos bloqueios. D está errada: o bloqueio `ReadOnly` permite operações de leitura no plano de controlo.\n\nDocumentação: https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-15",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Médio",
+    "tema": "Bloqueios de recursos",
+    "pergunta": "A sua empresa tem uma subscrição do Azure. É Proprietário da subscrição.\n\nO grupo de recursos `RG1` tem um bloqueio `CanNotDelete`. O `RG1` contém uma máquina virtual chamada `VM1` e o respetivo disco gerido.\n\nSem remover o bloqueio, quais são as DUAS ações que consegue realizar? Cada resposta correta apresenta uma solução completa.",
+    "pergunta_en": "Your company has an Azure subscription. You are an Owner of the subscription.\n\nThe resource group `RG1` has a `CanNotDelete` lock. `RG1` contains a virtual machine named `VM1` and its managed disk.\n\nWithout removing the lock, which TWO actions can you perform? Each correct answer presents a complete solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Eliminar a `VM1`.",
+        "texto_en": "Delete `VM1`."
+      },
+      {
+        "letra": "B",
+        "texto": "Alterar o tamanho da `VM1`.",
+        "texto_en": "Resize `VM1`."
+      },
+      {
+        "letra": "C",
+        "texto": "Eliminar o grupo de recursos `RG1`.",
+        "texto_en": "Delete the `RG1` resource group."
+      },
+      {
+        "letra": "D",
+        "texto": "Adicionar uma etiqueta à `VM1`.",
+        "texto_en": "Add a tag to `VM1`."
+      },
+      {
+        "letra": "E",
+        "texto": "Eliminar o disco gerido da `VM1` depois de o desanexar.",
+        "texto_en": "Delete the managed disk of `VM1` after detaching it."
+      }
+    ],
+    "opcao_correta": [
+      "B",
+      "D"
+    ],
+    "explicacao": "Um bloqueio `CanNotDelete` aplicado a um grupo de recursos é herdado por todos os recursos nele contidos. Os utilizadores autorizados podem ler e modificar os recursos, como alterar o tamanho da VM (B) ou adicionar etiquetas (D), mas não os podem eliminar. O bloqueio aplica-se mesmo a Proprietários.\n\nA, C e E estão erradas: são operações de eliminação, bloqueadas até que o bloqueio seja removido por alguém com permissões `Microsoft.Authorization/locks/*`.\n\nDocumentação: https://learn.microsoft.com/azure/azure-resource-manager/management/lock-resources",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-16",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Seleção Múltipla",
+    "dificuldade": "Difícil",
+    "tema": "Mover recursos",
+    "pergunta": "A sua empresa tem uma subscrição do Azure com dois grupos de recursos:\n\n- `RG1`, criado na região West Europe\n- `RG2`, criado na região North Europe\n\nA máquina virtual `VM1` está em `RG1`, na região West Europe. O `Utilizador1` tem a função Contribuidor no âmbito de `RG1` e não tem nenhuma outra atribuição de função.\n\nMove a `VM1` e os recursos dependentes de `RG1` para `RG2`.\n\nQuais são as DUAS afirmações verdadeiras após a movimentação? Cada resposta correta apresenta parte da solução.",
+    "pergunta_en": "Your company has an Azure subscription with two resource groups:\n\n- `RG1`, created in the West Europe region\n- `RG2`, created in the North Europe region\n\nThe virtual machine `VM1` is in `RG1`, in the West Europe region. `User1` has the Contributor role at the `RG1` scope and has no other role assignments.\n\nYou move `VM1` and its dependent resources from `RG1` to `RG2`.\n\nWhich TWO statements are true after the move? Each correct answer presents part of the solution.",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "O ID de recurso da `VM1` muda.",
+        "texto_en": "The resource ID of `VM1` changes."
+      },
+      {
+        "letra": "B",
+        "texto": "A `VM1` passa a estar alojada na região North Europe.",
+        "texto_en": "`VM1` is now hosted in the North Europe region."
+      },
+      {
+        "letra": "C",
+        "texto": "O `Utilizador1` deixa de poder gerir a `VM1`.",
+        "texto_en": "`User1` can no longer manage `VM1`."
+      },
+      {
+        "letra": "D",
+        "texto": "A `VM1` tem de ser eliminada e recriada para concluir a movimentação.",
+        "texto_en": "`VM1` must be deleted and re-created to complete the move."
+      },
+      {
+        "letra": "E",
+        "texto": "As etiquetas da `VM1` são substituídas pelas etiquetas de `RG2`.",
+        "texto_en": "The tags of `VM1` are replaced by the tags of `RG2`."
+      }
+    ],
+    "opcao_correta": [
+      "A",
+      "C"
+    ],
+    "explicacao": "Mover um recurso para outro grupo de recursos altera o seu ID de recurso, porque o ID inclui o nome do grupo de recursos (A). As atribuições de funções herdadas do grupo de recursos de origem deixam de se aplicar, pelo que o `Utilizador1`, que só tinha Contribuidor em `RG1`, perde o acesso de gestão à `VM1` (C).\n\nB está errada: a movimentação altera apenas o contentor lógico; a região do recurso não muda, mesmo que o grupo de recursos de destino tenha outra localização. D está errada: a movimentação não recria o recurso. E está errada: as etiquetas do recurso são mantidas e as etiquetas do grupo de recursos não são herdadas automaticamente.\n\nDocumentação: https://learn.microsoft.com/azure/azure-resource-manager/management/move-resource-group-and-subscription",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-17",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Grupos de gestão",
+    "pergunta": "A sua empresa tem 10 subscrições do Azure no mesmo inquilino do Microsoft Entra ID. Seis subscrições são de produção e quatro são de desenvolvimento. Estão previstas novas subscrições de produção.\n\nPrecisa de aplicar o mesmo conjunto de atribuições do Azure Policy e de funções RBAC a todas as subscrições de produção, atuais e futuras, sem afetar as subscrições de desenvolvimento. A solução deve minimizar o esforço administrativo.\n\nO que deve fazer?",
+    "pergunta_en": "Your company has 10 Azure subscriptions in the same Microsoft Entra ID tenant. Six subscriptions are for production and four are for development. New production subscriptions are planned.\n\nYou need to apply the same set of Azure Policy and RBAC role assignments to all production subscriptions, current and future, without affecting the development subscriptions. The solution must minimize administrative effort.\n\nWhat should you do?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Criar as atribuições no grupo de gestão raiz do inquilino.",
+        "texto_en": "Create the assignments at the tenant root management group."
+      },
+      {
+        "letra": "B",
+        "texto": "Criar um grupo de gestão para produção, mover as subscrições de produção para esse grupo e criar as atribuições no âmbito do grupo de gestão.",
+        "texto_en": "Create a management group for production, move the production subscriptions into it, and create the assignments at the management group scope."
+      },
+      {
+        "letra": "C",
+        "texto": "Criar as atribuições em cada subscrição de produção e repeti-las para cada nova subscrição.",
+        "texto_en": "Create the assignments in each production subscription and repeat them for each new subscription."
+      },
+      {
+        "letra": "D",
+        "texto": "Configurar o Azure Lighthouse para delegar a gestão das subscrições de produção.",
+        "texto_en": "Configure Azure Lighthouse to delegate management of the production subscriptions."
+      }
+    ],
+    "opcao_correta": [
+      "B"
+    ],
+    "explicacao": "Os grupos de gestão permitem organizar subscrições numa hierarquia; as atribuições de políticas e funções feitas num grupo de gestão são herdadas por todas as subscrições filhas, incluindo as que forem adicionadas mais tarde.\n\nA está errada: o grupo de gestão raiz contém todas as subscrições, incluindo as de desenvolvimento. C está errada: funciona, mas exige esforço repetido e é propensa a erros. D está errada: o Azure Lighthouse serve para gestão delegada entre inquilinos, não para aplicar governação hierárquica dentro do mesmo inquilino.\n\nDocumentação: https://learn.microsoft.com/azure/governance/management-groups/overview",
+    "assets": []
+  },
+  {
+    "id": "AUT26-ID-18",
+    "origem": "Questões autorais 2026",
+    "dominio": "Gerenciar identidades e governança do Azure",
+    "tipo": "Múltipla Escolha",
+    "dificuldade": "Médio",
+    "tema": "Gestão de custos",
+    "pergunta": "A sua empresa tem um grupo de recursos chamado `RG-Dev` usado para ambientes de desenvolvimento. O gasto mensal previsto para `RG-Dev` é de 5000 EUR.\n\nPrecisa de garantir que, quando o custo real de `RG-Dev` atingir 90% do valor mensal, a equipa financeira recebe um email e é executado automaticamente um runbook do Azure Automation que desaloca as máquinas virtuais de desenvolvimento.\n\nO que deve configurar?",
+    "pergunta_en": "Your company has a resource group named `RG-Dev` used for development environments. The planned monthly spend for `RG-Dev` is EUR 5,000.\n\nYou need to ensure that when the actual cost of `RG-Dev` reaches 90% of the monthly amount, the finance team receives an email and an Azure Automation runbook that deallocates the development virtual machines runs automatically.\n\nWhat should you configure?",
+    "opcoes": [
+      {
+        "letra": "A",
+        "texto": "Recomendações de custo do Azure Advisor para `RG-Dev`.",
+        "texto_en": "Azure Advisor cost recommendations for `RG-Dev`."
+      },
+      {
+        "letra": "B",
+        "texto": "Uma regra de alerta de métricas do Azure Monitor sobre a percentagem de CPU das máquinas virtuais.",
+        "texto_en": "An Azure Monitor metric alert rule on the CPU percentage of the virtual machines."
+      },
+      {
+        "letra": "C",
+        "texto": "Um orçamento no Microsoft Cost Management no âmbito de `RG-Dev`, com uma condição de alerta de 90% do custo real associada a um grupo de ações.",
+        "texto_en": "A budget in Microsoft Cost Management at the `RG-Dev` scope, with a 90% actual cost alert condition linked to an action group."
+      },
+      {
+        "letra": "D",
+        "texto": "Uma atribuição do Azure Policy com o efeito `Deny` que bloqueie novos recursos quando o custo exceder o limite.",
+        "texto_en": "An Azure Policy assignment with the `Deny` effect that blocks new resources when the cost exceeds the limit."
+      }
+    ],
+    "opcao_correta": [
+      "C"
+    ],
+    "explicacao": "Os orçamentos do Cost Management permitem definir um valor para um âmbito (como uma subscrição ou um grupo de recursos) e condições de alerta baseadas em percentagens do custo real ou previsto. Os alertas podem enviar emails e acionar um grupo de ações, que por sua vez pode executar um runbook do Azure Automation.\n\nA está errada: o Azure Advisor fornece recomendações de otimização (por exemplo, VMs subutilizadas), mas não reage a limiares de custo. B está errada: a utilização de CPU não reflete o custo acumulado. D está errada: o Azure Policy avalia propriedades dos recursos e não tem condições baseadas no custo.\n\nDocumentação: https://learn.microsoft.com/azure/cost-management-billing/costs/tutorial-acm-create-budgets",
+    "assets": []
+  }
+]
