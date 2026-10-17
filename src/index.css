@@ -17,6 +17,15 @@ html{scroll-behavior:smooth}
 .app-header>div:first-child>div span:last-child{font-size:11px}
 .app-header>div:nth-child(2){display:none!important}
 .app-header>div:last-child{margin-left:auto}
+.header-search-panel{display:flex;align-items:center;justify-content:space-between;gap:22px;flex:1;min-width:0}
+.header-heading{min-width:max-content}
+.header-heading h1{margin:0;color:#eef6ff;font-size:21px;font-weight:800;letter-spacing:-.035em}
+.header-heading h1 span{color:#2994ff}
+.header-heading p{margin:3px 0 0;color:#a9bfdc;font-size:13px}
+.header-search-box{display:flex;align-items:center;gap:12px;flex:0 1 430px;min-width:180px;padding:10px 14px;border:1px solid #2c527c;border-radius:12px;background:#0a1d36;color:#8cb4e3}
+.header-search-box>span{font-size:22px;line-height:1}
+.header-search-box input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#eef6ff;font-size:13px}
+.header-search-box input::placeholder{color:#90a9c7}
 .app-shell{display:flex;align-items:stretch;min-height:calc(100vh - 84px)}
 .app-sidebar{width:220px!important;flex-shrink:0;padding:24px 12px!important;gap:9px!important;background:#0a192e!important;border-right:1px solid #223853!important}
 .app-sidebar button{min-height:49px;padding:12px 15px!important;font-size:13px!important;gap:12px;border-radius:12px!important}
@@ -39,21 +48,20 @@ html{scroll-behavior:smooth}
  min-width:0;
  grid-template-columns:minmax(0,1fr) 315px!important;
  grid-template-rows:auto auto!important;
- grid-template-areas:"question actions" "question filters";
  gap:15px 19px!important;
  align-items:start!important;
 }
 .study-layout>.filters-column{
- grid-area:filters!important;
- grid-column:auto!important;
- grid-row:auto!important;
+ grid-area:auto!important;
+ grid-column:2!important;
+ grid-row:2!important;
  min-width:0;
  gap:14px!important;
 }
 .study-layout>.study-quick-actions{
- grid-area:actions!important;
- grid-column:auto!important;
- grid-row:auto!important;
+ grid-area:auto!important;
+ grid-column:2!important;
+ grid-row:1!important;
  min-width:0;
  display:grid;grid-template-columns:1fr 1fr;gap:9px;
 }
@@ -65,9 +73,9 @@ html{scroll-behavior:smooth}
 .quick-primary{background:#086ce7}
 .quick-secondary{background:#17375f}
 .study-layout>div:last-child{
- grid-area:question!important;
- grid-column:auto!important;
- grid-row:auto!important;
+ grid-area:auto!important;
+ grid-column:1!important;
+ grid-row:1 / span 2!important;
  min-width:0!important;
  width:100%;
 }
@@ -118,7 +126,7 @@ html{scroll-behavior:smooth}
 @media(max-width:1250px){
  .app-sidebar{width:176px!important}
  .app-main{padding:18px!important}
- .study-layout{grid-template-columns:minmax(0,1fr) 285px!important;gap:13px!important}
+ .study-layout{grid-template-columns:minmax(0,1fr) 285px!important;grid-template-rows:auto auto!important;gap:13px!important}
  .stats-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
 }
 @media(max-width:960px){
@@ -129,8 +137,11 @@ html{scroll-behavior:smooth}
  .study-layout{
   grid-template-columns:minmax(0,1fr)!important;
   grid-template-rows:auto auto auto!important;
-  grid-template-areas:"actions" "question" "filters";
  }
+ .study-layout>.study-quick-actions{grid-column:1!important;grid-row:1!important}
+ .study-layout>div:last-child{grid-column:1!important;grid-row:2!important}
+ .study-layout>.filters-column{grid-column:1!important;grid-row:3!important}
+ .header-search-panel{order:4;flex:1 0 100%;padding-top:4px}
  .study-layout>.study-quick-actions{grid-template-columns:1fr 1fr}
  .filters-column{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))}
  .filters-column>.domain-progress-panel{grid-column:1/-1}
@@ -138,6 +149,10 @@ html{scroll-behavior:smooth}
 }
 @media(max-width:640px){
  .app-header{min-height:65px;padding:12px!important;gap:8px}
+ .header-search-panel{flex-direction:column;align-items:stretch;gap:9px}
+ .header-heading h1{font-size:17px}
+ .header-heading p{font-size:11px}
+ .header-search-box{flex:auto;width:100%;min-height:42px}
  .app-header>div:first-child{min-width:0}
  .app-header>div:first-child svg{width:29px;height:29px}
  .app-header>div:first-child>div span:first-child{font-size:17px}

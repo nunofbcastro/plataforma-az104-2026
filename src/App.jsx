@@ -488,6 +488,23 @@ function App() {
           </button>
         </div>
 
+        <div className="header-search-panel">
+          <div className="header-heading">
+            <h1>Plataforma <span>AZ-104 2026</span></h1>
+            <p>Microsoft Azure Administrator</p>
+          </div>
+          <label className="header-search-box">
+            <span aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Pesquisar questões, temas ou conceitos..."
+              aria-label="Pesquisar questões, temas ou conceitos"
+            />
+          </label>
+        </div>
+
         {/* Right Actions */}
         <div className="flex items-center gap-3">
           {/* Simulado Timer Tag */}
