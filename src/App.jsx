@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import authoredQuestions from './data/authored-questions.json';
 import './index.css';
+import { Icon, StudyHeader, StudySidebar, StudyStats } from './components/StudyChrome';
 
 function App() {
   const [questionBank, setQuestionBank] = useState([]);
@@ -93,6 +94,44 @@ function App() {
   const [pendingModeSwitch, setPendingModeSwitch] = useState(null);
   const [zoomedImage, setZoomedImage] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
+
+  useEffect(() => {
+    if (!showStatsModal && !showReportModal && !showSettingsModal && !showExitConfirmModal && !zoomedImage) return;
+    const previousFocus = document.activeElement;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const dialogs = document.querySelectorAll('[role="dialog"]');
+    const dialog = dialogs[dialogs.length - 1];
+    const controls = () => dialog ? Array.from(dialog.querySelectorAll('button:not([disabled]), input, select, textarea, [tabindex="0"]')).filter(element => element.getClientRects().length) : [];
+    controls()[0]?.focus();
+    const handleDialogKey = event => {
+      if (event.key === 'Escape') {
+        setShowStatsModal(false);
+        setShowReportModal(false);
+        setShowSettingsModal(false);
+        setShowExitConfirmModal(false);
+        setZoomedImage(null);
+      }
+      if (event.key === 'Tab') {
+        const elements = controls();
+        const first = elements[0];
+        const last = elements[elements.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last?.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first?.focus();
+        }
+      }
+    };
+    document.addEventListener('keydown', handleDialogKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleDialogKey);
+      previousFocus?.focus();
+    };
+  }, [showStatsModal, showReportModal, showSettingsModal, showExitConfirmModal, zoomedImage]);
 
   // Explanation toggle for current question
   const [isExplanationOpen, setIsExplanationOpen] = useState(false);
@@ -200,7 +239,7 @@ function App() {
           const pt = (q.pergunta || '').toLowerCase();
           const en = (q.pergunta_en || '').toLowerCase();
           const exp = (q.explicacao || '').toLowerCase();
-          const qid = (q.id || '').toLowerCase();
+          const qid = String(q.id ?? '').toLowerCase();
           return pt.includes(term) || en.includes(term) || exp.includes(term) || qid.includes(term);
         });
       }
@@ -406,295 +445,32 @@ function App() {
   if (dataError) return <div className="min-h-screen bg-[#0b0f19] text-slate-200 flex flex-col gap-3 items-center justify-center p-6 text-center"><strong>Não foi possível carregar as questões.</strong><span className="text-sm text-slate-400">Verifique a ligação à Internet e tente novamente.</span><button className="rounded-lg bg-indigo-600 px-4 py-2" onClick={() => window.location.reload()}>Tentar de novo</button></div>;
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-[#0b0f19] text-slate-100' : 'bg-slate-50 text-slate-800'} flex flex-col font-sans transition-colors duration-200 relative`}>
+    <div className={`app-root min-h-screen ${theme === 'dark' ? 'bg-[#0b0f19] text-slate-100' : 'bg-slate-50 text-slate-800'} flex flex-col font-sans transition-colors duration-200 relative`}>
       {/* Ambient background glow */}
-      <div className="fixed top-0 right-0 w-[45vw] h-[45vw] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="fixed bottom-0 left-[10vw] w-[40vw] h-[40vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
+      <div className="ambient-glow fixed top-0 right-0 w-[45vw] h-[45vw] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="ambient-glow fixed bottom-0 left-[10vw] w-[40vw] h-[40vw] bg-indigo-600/10 rounded-full blur-[140px] pointer-events-none z-0" />
 
-      {/* TOP HEADER */}
-      <header className="app-header sticky top-0 z-40 bg-[#0b0f19]/80 backdrop-blur-md border-b border-slate-800/80 px-6 py-3 flex items-center justify-between">
-        {/* Brand */}
-        <div className="flex items-center gap-3 cursor-pointer" onClick={() => requestModeSwitch('treino')}>
-          <svg className="w-8 h-8 flex-shrink-0" viewBox="0 0 96 96" fill="none">
-            <path d="M57.6 12L31.2 57.6H12L38.4 12H57.6Z" fill="#0078D4" />
-            <path d="M57.6 12H38.4L64.8 57.6H84L57.6 12Z" fill="#50E6FF" />
-            <path d="M84 57.6L60 84H40.8L64.8 57.6H84Z" fill="#0078D4" />
-            <path d="M31.2 57.6L12 84H52.8L40.8 57.6H31.2Z" fill="#002050" />
-          </svg>
-          <div className="flex flex-col">
-            <span className="font-extrabold text-white text-base tracking-tight leading-none">AZ-104</span>
-            <span className="text-xs text-slate-400 font-medium mt-1">Microsoft Azure Administrator</span>
-          </div>
-        </div>
-
-        {/* Center Mode Pills */}
-        <div className="flex items-center bg-[#131b2e] border border-slate-800/80 rounded-full p-1 gap-1">
-          <button
-            onClick={() => requestModeSwitch('treino')}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              mode === 'treino'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>🎓</span>
-            <span>Modo Treino</span>
-          </button>
-
-          <button
-            onClick={() => requestModeSwitch('simulado')}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              mode === 'simulado'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>📋</span>
-            <span>Simulado</span>
-          </button>
-
-          <button
-            onClick={() => requestModeSwitch('erros')}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              mode === 'erros'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>❌</span>
-            <span>Caderno de Erros</span>
-            {stats.incorrect > 0 && (
-              <span className="bg-rose-500/20 text-rose-400 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
-                {stats.incorrect}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => requestModeSwitch('favoritas')}
-            className={`flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-              mode === 'favoritas'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            <span>⭐</span>
-            <span>Favoritas</span>
-            {favorites.size > 0 && (
-              <span className="bg-amber-500/20 text-amber-400 text-[10px] px-1.5 py-0.2 rounded-full font-bold">
-                {favorites.size}
-              </span>
-            )}
-          </button>
-        </div>
-
-        <div className="header-search-panel">
-          <div className="header-heading">
-            <h1>Plataforma <span>AZ-104 2026</span></h1>
-            <p>Microsoft Azure Administrator</p>
-          </div>
-          <label className="header-search-box">
-            <span aria-hidden="true">⌕</span>
-            <input
-              type="search"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Pesquisar questões, temas ou conceitos..."
-              aria-label="Pesquisar questões, temas ou conceitos"
-            />
-          </label>
-        </div>
-
-        {/* Right Actions */}
-        <div className="flex items-center gap-3">
-          {/* Simulado Timer Tag */}
-          {isSimRunning && (
-            <div className="font-mono font-bold text-xs bg-rose-950/60 text-rose-400 border border-rose-600/60 px-3 py-1.5 rounded-full flex items-center gap-1.5 animate-pulse">
-              <span>⏱️</span>
-              <span>
-                {Math.floor(simSecondsLeft / 60).toString().padStart(2, '0')}:
-                {(simSecondsLeft % 60).toString().padStart(2, '0')}
-              </span>
-            </div>
-          )}
-
-          {/* Theme Slider */}
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="w-14 h-7 rounded-full bg-[#131b2e] border border-slate-800 p-0.5 flex items-center relative cursor-pointer"
-            title="Alternar tema"
-          >
-            <div className="w-full flex justify-between px-1.5 text-[10px] text-slate-400 pointer-events-none">
-              <span>☀️</span>
-              <span>🌙</span>
-            </div>
-            <div
-              className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-sm flex items-center justify-center text-[10px] text-slate-900 font-bold transition-transform duration-200 ${
-                theme === 'light' ? 'translate-x-7' : 'translate-x-0'
-              }`}
-            >
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </div>
-          </button>
-
-          {/* Language Switcher */}
-          <button
-            onClick={() => setLang(lang === 'pt' ? 'en' : 'pt')}
-            className="bg-[#131b2e] border border-slate-800/80 hover:border-slate-700 text-slate-300 rounded-full px-3 py-1.5 text-xs font-semibold flex items-center gap-2 transition-colors"
-          >
-            <span>{lang === 'pt' ? '🇵🇹' : '🇺🇸'}</span>
-            <span>{lang === 'pt' ? 'Português (PT)' : 'English (EN)'}</span>
-            <span className="text-[10px] text-slate-400">⌵</span>
-          </button>
-
-          <div className="w-8 h-8 rounded-full bg-indigo-600 text-white font-extrabold flex items-center justify-center text-xs shadow-md shadow-indigo-600/40 border border-indigo-400/30" aria-label="Perfil">U</div>
-        </div>
-      </header>
-
-      {/* BODY LAYOUT */}
-      <div className="app-shell flex flex-1 z-10">
-        {/* Navegação redundante mantida no DOM para acessibilidade; a navegação principal está no cabeçalho. */}
-        <aside className="app-sidebar w-44 bg-[#0d121f] border-r border-slate-800/80 p-3 flex flex-col gap-1.5 flex-shrink-0">
-          <button
-            onClick={() => requestModeSwitch('treino')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-              mode === 'treino'
-                ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
-            }`}
-          >
-            <span>🗂️</span>
-            <span>Questões</span>
-          </button>
-
-          <button
-            onClick={() => setShowStatsModal(true)}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/40 transition-colors"
-          >
-            <span>📊</span>
-            <span>Estatísticas</span>
-          </button>
-
-          <button
-            onClick={() => requestModeSwitch('erros')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-              mode === 'erros'
-                ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
-            }`}
-          >
-            <span>📑</span>
-            <span>Meus cadernos</span>
-          </button>
-
-          <button
-            onClick={() => requestModeSwitch('favoritas')}
-            className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
-              mode === 'favoritas'
-                ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
-                : 'text-slate-400 hover:text-white hover:bg-slate-800/40'
-            }`}
-          >
-            <span>⭐</span>
-            <span>Favoritas</span>
-          </button>
-
-          <button
-            onClick={() => setShowSettingsModal(true)}
-            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/40 transition-colors mt-auto"
-          >
-            <span>⚙️</span>
-            <span>Configurações</span>
-          </button>
-        </aside>
-
-        {/* MAIN WORKSPACE */}
-        <main className="app-main flex-1 p-6 flex flex-col gap-5 max-w-[1550px] mx-auto w-full">
-          {/* TOP 5 METRIC CARDS ROW */}
-          <section className="stats-grid grid grid-cols-5 gap-3.5">
-            {/* Card 1: Total */}
-            <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-700 transition-colors">
-              <div className="w-11 h-11 rounded-xl bg-blue-950/40 border border-blue-500/30 text-blue-400 flex items-center justify-center text-lg flex-shrink-0">
-                📖
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-white leading-tight">{stats.total}</span>
-                <span className="text-[11px] text-slate-400 font-medium">Questões no banco</span>
-              </div>
-            </div>
-
-            {/* Card 2: Respondidas */}
-            <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-700 transition-colors">
-              <div className="w-11 h-11 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-lg flex-shrink-0">
-                ✓
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-white leading-tight">{stats.answered}</span>
-                <span className="text-[11px] text-slate-400 font-medium">Respondidas</span>
-              </div>
-            </div>
-
-            {/* Card 3: Acertos */}
-            <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-700 transition-colors">
-              <div className="w-11 h-11 rounded-xl bg-purple-950/40 border border-purple-500/30 text-purple-400 flex items-center justify-center text-lg flex-shrink-0">
-                📊
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-white leading-tight">{stats.correct}</span>
-                <span className="text-[11px] text-slate-400 font-medium">Acertos</span>
-              </div>
-            </div>
-
-            {/* Card 4: Erros */}
-            <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-700 transition-colors">
-              <div className="w-11 h-11 rounded-xl bg-rose-950/40 border border-rose-500/30 text-rose-400 flex items-center justify-center text-lg flex-shrink-0">
-                ✕
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-white leading-tight">{stats.incorrect}</span>
-                <span className="text-[11px] text-slate-400 font-medium">Erros</span>
-              </div>
-            </div>
-
-            {/* Card 5: Aproveitamento */}
-            <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4 flex items-center gap-4 hover:border-slate-700 transition-colors">
-              <div className="w-11 h-11 rounded-xl bg-amber-950/40 border border-amber-500/30 text-amber-400 flex items-center justify-center text-lg flex-shrink-0">
-                🎯
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xl font-extrabold text-white leading-tight">{stats.percent}%</span>
-                <span className="text-[11px] text-slate-400 font-medium">Aproveitamento</span>
-              </div>
-            </div>
-          </section>
-
-          {/* LOWER WORKSPACE GRID (Left: Filters & Grid, Right: Question Area) */}
-          <section className="study-layout grid grid-cols-[290px_1fr] gap-5 items-start">
-            {/* LEFT COLUMN: FILTERS & QUESTION NAVIGATOR */}
-            <div className="filters-column flex flex-col gap-4">
+      <StudyHeader {...{ theme, setTheme, lang, setLang, searchTerm, setSearchTerm, isSimRunning, simSecondsLeft, requestModeSwitch }} />
+      <div className="app-shell">
+        <StudySidebar {...{ mode, requestModeSwitch, setShowStatsModal, setShowSettingsModal, stats }} />
+        <main className="app-main">
+          <div className="workspace-heading"><div><span className="eyebrow">MICROSOFT AZURE · AZ-104</span><h2>{mode === 'treino' ? 'Vamos praticar.' : mode === 'simulado' ? 'Prepara o teu simulado.' : mode === 'erros' ? 'Aprende com os teus erros.' : 'As tuas favoritas.'}</h2></div><span className="workspace-save"><span/>Progresso guardado automaticamente</span></div>
+          <StudyStats stats={stats} />
+          {/* STUDY WORKSPACE */}
+          <section className="study-layout">
+            {/* STUDY TOOLS */}
+            <div className="filters-column">
               {/* Card 1: Filtros de Estudo */}
               <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4">
                 <div className="flex items-center gap-2 font-bold text-sm text-white mb-3">
-                  <span className="text-purple-400">⚡</span>
-                  <span>Filtros de Estudo</span>
-                </div>
-
-                {/* Search */}
-                <div className="relative mb-3">
-                  <span className="absolute left-3 top-2.5 text-xs text-slate-500 pointer-events-none">🔍</span>
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Buscar por termo (ex: VM, NSG, Azure AD...)"
-                    className="w-full bg-[#0d121f] border border-slate-800 rounded-xl pl-8 pr-3 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                  />
+                  <Icon name="filter" size={17}/>
+                  <span>Filtros de estudo</span><button className="clear-filters" onClick={() => {setSelectedDomain('all');setSelectedSource('all');setSearchTerm('');setCurrentIndex(0);}}>Limpar</button>
                 </div>
 
                 {/* Domain Select */}
                 <div className="mb-3">
                   <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 mb-1.5">
-                    <span>🌐</span>
+                    <Icon name="grid" size={13}/>
                     <span>Domínio Oficial</span>
                   </label>
                   <div className="relative">
@@ -713,7 +489,7 @@ function App() {
                 {/* Source Select */}
                 <div>
                   <label className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-400 mb-1.5">
-                    <span>📄</span>
+                    <Icon name="file" size={13}/>
                     <span>Fonte das Questões</span>
                   </label>
                   <div className="relative">
@@ -734,17 +510,18 @@ function App() {
 
               {/* Card 2: Navegador de Questões */}
               <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-4 flex flex-col">
-                <div className="flex items-center justify-between mb-3">
+                <div className="navigator-heading flex items-center justify-between mb-3">
                   <div className="flex items-center gap-1.5 font-bold text-sm text-white">
-                    <span>:::</span>
-                    <span>Navegador de Questões</span>
+                    <Icon name="grid" size={17}/>
+                    <span>Navegação de questões</span>
                   </div>
                   <span className="text-[11px] text-slate-400 font-medium">
                     {filteredQuestions.length} questões
                   </span>
                 </div>
 
-                {/* 7-Column Grid */}
+                <div className="navigator-legend"><span><i className="legend-current"/>Atual</span><span><i className="legend-correct"/>Certa</span><span><i className="legend-incorrect"/>Errada</span><span><i/>Por responder</span></div>
+                {/* Question navigator */}
                 <div className="question-grid grid grid-cols-7 gap-1.5 max-h-[360px] overflow-y-auto pr-1">
                   {filteredQuestions.map((q, idx) => {
                     const isActive = idx === currentIndex;
@@ -776,7 +553,8 @@ function App() {
                           setCurrentIndex(idx);
                           setIsExplanationOpen(false);
                         }}
-                        className={`aspect-square rounded-lg border text-xs font-semibold flex items-center justify-center transition-all relative ${itemStyle}`}
+                        className={`question-number aspect-square rounded-lg border text-xs font-semibold flex items-center justify-center transition-all relative ${itemStyle}`}
+                        aria-current={isActive ? 'step' : undefined}
                         title={`Questão ${idx + 1} (${q.id})`}
                       >
                         {idx + 1}
@@ -790,7 +568,7 @@ function App() {
               </div>
             {/* Progresso por domínio — calculado a partir de respostas reais */}
             <div className="domain-progress-panel">
-              <div className="domain-progress-heading"><span>▥</span> Progresso por tema</div>
+              <div className="domain-progress-heading"><Icon name="chart" size={17}/> Progresso por tema</div>
               {domainOptions.map(([domain, label], domainIndex) => {
                 const aliases = domainAliases[domainIndex] || [];
                 const questions = allQuestions.filter(q => aliases.some(alias => (q.dominio || '').toLowerCase().includes(alias)));
@@ -807,12 +585,12 @@ function App() {
           </div>
 
           <div className="study-quick-actions">
-            <button onClick={() => requestModeSwitch('treino')} className="quick-primary">▶ <span>Continuar treino</span></button>
-            <button onClick={() => requestModeSwitch('simulado')} className="quick-secondary">▤ <span>Iniciar simulado</span></button>
+            <button onClick={() => requestModeSwitch('treino')} className="quick-primary"><Icon name="play"/><span>Continuar treino<small>Uma questão de cada vez</small></span></button>
+            <button onClick={() => requestModeSwitch('simulado')} className="quick-secondary"><Icon name="file"/><span>Iniciar simulado<small>Treina com cronómetro</small></span></button>
           </div>
 
-          {/* RIGHT COLUMN: SIMULADO LOBBY OR QUESTION CARD */}
-            <div className="flex flex-col">
+          {/* QUESTION OR EXAM */}
+            <div className="question-workspace">
               {/* 1. SIMULADO LOBBY (when simState === 'idle') */}
               {mode === 'simulado' && simState === 'idle' && (
                 <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-8 flex flex-col gap-6 animate-fadeIn">
@@ -978,11 +756,11 @@ function App() {
 
               {/* 3. MAIN QUESTION CARD (when in treino/erros/favoritas or active/reviewing simulado) */}
               {(mode !== 'simulado' || simState === 'running' || simState === 'reviewing') && (
-                <div className="bg-[#131b2e] border border-slate-800/80 rounded-2xl p-7 flex flex-col min-h-[560px] animate-fadeIn">
+                <div className="question-card bg-[#131b2e] border border-slate-800/80 rounded-2xl p-7 flex flex-col min-h-[560px] animate-fadeIn">
                   {currentQ ? (
                     <>
                       {/* Question Top Header Bar */}
-                      <div className="flex items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800/80 flex-wrap">
+                      <div className="question-header flex items-center justify-between gap-3 pb-4 mb-4 border-b border-slate-800/80 flex-wrap">
                         <div className="flex items-center gap-3 flex-wrap">
                           <div className="w-7 h-7 rounded-full bg-indigo-600 text-white font-extrabold text-xs flex items-center justify-center flex-shrink-0 shadow-sm shadow-indigo-600/40">
                             {currentIndex + 1}
@@ -1021,7 +799,7 @@ function App() {
                             onClick={() => setShowReportModal(true)}
                             className="bg-indigo-950/40 border border-indigo-800/60 text-indigo-300 hover:bg-indigo-900/40 text-xs font-semibold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors cursor-pointer"
                           >
-                            <span>🚩</span>
+                            <Icon name="alert" size={15}/>
                             <span>Reportar</span>
                           </button>
                         </div>
@@ -1057,7 +835,7 @@ function App() {
                       )}
 
                       {/* Options Stack */}
-                      <div className="flex flex-col gap-3 mb-6">
+                      <div className="answer-options flex flex-col gap-3 mb-6">
                         {currentQ.opcoes.map((opt) => {
                           const isSelected = currentSelectedLetters.includes(opt.letra);
                           const isCorrectOpt = currentQ.opcao_correta.includes(opt.letra);
@@ -1103,10 +881,10 @@ function App() {
 
                       {/* Explanation Card */}
                       {isExplanationOpen && (
-                        <div className="bg-gradient-to-b from-[#131b2e] to-[#0d121f] border-l-4 border-indigo-500 border border-slate-800 rounded-xl p-5 mb-6 animate-fadeIn">
+                        <div className="explanation-card border rounded-xl p-5 mb-6 animate-fadeIn">
                           <div className="flex items-center gap-2 font-bold text-sm text-indigo-400 mb-2">
-                            <span>💡</span>
-                            <span>Resolução & Justificativa Detalhada</span>
+                            <Icon name="bulb" size={17}/>
+                            <span>Compreende a resposta</span>
                           </div>
                           <div className="text-xs md:text-[13px] leading-relaxed text-slate-300">
                             {renderFormattedText(currentQ.explicacao || 'Ainda não existe uma explicação para esta questão. Consulte a documentação indicada na fonte e reporte-a para revisão.')}
@@ -1115,7 +893,7 @@ function App() {
                       )}
 
                       {/* Question Card Bottom Footer */}
-                      <div className="mt-auto pt-4 border-t border-slate-800/80 flex items-center justify-between gap-3">
+                      <div className="question-footer mt-auto pt-4 border-t border-slate-800/80 flex items-center justify-between gap-3">
                         <button
                           onClick={() => {
                             if (currentIndex > 0) {
@@ -1134,7 +912,7 @@ function App() {
                           onClick={() => setIsExplanationOpen(!isExplanationOpen)}
                           className="text-slate-300 hover:text-white px-4 py-2 text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer"
                         >
-                          <span>💡</span>
+                          <Icon name="bulb" size={17}/>
                           <span>{isExplanationOpen ? 'Ocultar explicação' : currentQ.opcao_correta.length > 1 ? 'Corrigir e ver explicação' : 'Ver explicação'}</span>
                         </button>
 
@@ -1192,14 +970,14 @@ function App() {
 
       {/* 1. STATS MODAL */}
       {showStatsModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Estatísticas do estudo" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#131b2e] border border-slate-800 rounded-2xl p-6 max-w-lg w-full flex flex-col gap-5 shadow-2xl animate-fadeIn">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2 font-bold text-base text-white">
-                <span>📊</span>
+                <Icon name="chart" size={19}/>
                 <span>Estatísticas Detalhadas de Estudo</span>
               </div>
-              <button onClick={() => setShowStatsModal(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
+              <button onClick={() => setShowStatsModal(false)} aria-label="Fechar janela" className="text-slate-400 hover:text-white text-lg">✕</button>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -1230,7 +1008,7 @@ function App() {
                 <div className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 rounded-full transition-all duration-500" style={{ width: `${stats.percent}%` }} />
               </div>
               <span className="text-[10px] text-slate-400 mt-1">
-                Meta recomendada para o exame AZ-104: 85% ou mais para aprovação garantida.
+                Usa os resultados para identificar os temas que precisas de rever.
               </span>
             </div>
 
@@ -1246,14 +1024,14 @@ function App() {
 
       {/* 2. REPORT MODAL */}
       {showReportModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Reportar questão" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#131b2e] border border-slate-800 rounded-2xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl animate-fadeIn">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2 font-bold text-base text-white">
-                <span>🚩</span>
+                <Icon name="alert" size={15}/>
                 <span>Reportar Questão {currentQ?.id}</span>
               </div>
-              <button onClick={() => setShowReportModal(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
+              <button onClick={() => setShowReportModal(false)} aria-label="Fechar janela" className="text-slate-400 hover:text-white text-lg">✕</button>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -1299,14 +1077,14 @@ function App() {
 
       {/* 3. SETTINGS & RESET MODAL */}
       {showSettingsModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Definições da plataforma" className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#131b2e] border border-slate-800 rounded-2xl p-6 max-w-md w-full flex flex-col gap-4 shadow-2xl animate-fadeIn">
             <div className="flex items-center justify-between pb-3 border-b border-slate-800">
               <div className="flex items-center gap-2 font-bold text-base text-white">
-                <span>⚙️</span>
+                <Icon name="settings" size={19}/>
                 <span>Configurações da Plataforma</span>
               </div>
-              <button onClick={() => setShowSettingsModal(false)} className="text-slate-400 hover:text-white text-lg">✕</button>
+              <button onClick={() => setShowSettingsModal(false)} aria-label="Fechar janela" className="text-slate-400 hover:text-white text-lg">✕</button>
             </div>
 
             <div className="bg-[#0d121f] border border-slate-800 rounded-xl p-3.5 flex items-center justify-between">
@@ -1351,7 +1129,7 @@ function App() {
 
       {/* 4. EXIT CONFIRMATION MODAL */}
       {showExitConfirmModal && (
-        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div role="dialog" aria-modal="true" aria-label="Sair do simulado" className="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#131b2e] border border-rose-500/60 rounded-2xl p-6 max-w-md w-full flex flex-col items-center text-center gap-4 shadow-2xl animate-fadeIn">
             <div className="w-14 h-14 rounded-full bg-rose-950/40 border border-rose-500 text-rose-400 flex items-center justify-center text-2xl font-bold">
               ⚠️
@@ -1386,10 +1164,14 @@ function App() {
       {/* 5. IMAGE ZOOM MODAL */}
       {zoomedImage && (
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Imagem ampliada"
           onClick={() => setZoomedImage(null)}
           className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out"
         >
           <button
+            aria-label="Fechar imagem"
             onClick={() => setZoomedImage(null)}
             className="absolute top-5 right-6 text-white text-3xl font-light hover:text-slate-300 transition-colors"
           >
